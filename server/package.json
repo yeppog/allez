@@ -1,0 +1,26 @@
+{
+  "name": "allez",
+  "version": "1.0.0",
+  "description": "Backend server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yeppog/allez.git"
+  },
+  "keywords": [
+    "allez"
+  ],
+  "author": "Jonathan Lee, Ng Zi Xuan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yeppog/allez/issues"
+  },
+  "homepage": "https://github.com/yeppog/allez#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.12.7"
+  }
+}
