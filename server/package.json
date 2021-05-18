@@ -4,6 +4,7 @@
   "description": "Backend server",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,7 +21,12 @@
   },
   "homepage": "https://github.com/yeppog/allez#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mongoose": "^5.12.7"
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.7",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0"
   }
 }
