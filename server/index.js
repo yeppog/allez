@@ -8,9 +8,16 @@ const mongoose = require('mongoose');
 /** Imports for CORS policy */
 const cors = require('cors');
 
+require('dotenv').config();
+
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    allowedHeaders: ['sessionId', 'Content-Type'],
+    exposedHeaders: ['sessionId'],
+    origin: '*',
+    methods: 'GET, PUT, PATCH, POST, DELETE',
+}));
 
 /** Import User API */
 const users = require('./routes/api/Users');
@@ -44,11 +51,4 @@ mongoose.connect("mongodb+srv://allez:allez@allez.1bbnv.mongodb.net/myFirstDatab
 
 app.get("/", async(req, res) => {
     res.json("test");
-    UserModel.find({}, (err, result) => {
-        if (err) {
-            res.send(err);
-        } else {
-            res.json(result);
-        }
-    })
 })
