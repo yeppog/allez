@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const ObjectId = require("mongodb").ObjectID;
 // const config = require('./../../../config')
 
 // Validate inputs
@@ -18,6 +19,7 @@ const User = require("../../models/User");
  * Firstly checks if a user account of given email already exists. Then hashes the password and finally sends a POST request through save()
  * 
  * TODO: implement JWT token
+ * TODO: implement account validation
  * 
  * @param {object} req Takes in a request with a body that should contain a Username, Email and Password
  * @param {object} res Server response
@@ -89,11 +91,54 @@ async function handleLogin(req, res) {
     };
 }
 
+/**
+ * Checks the JWT token given in the header to see if it is a valid JWT token and if it has expired.
+ * If the JWT token is valid, return essential user credentials to the client.
+ * 
+ * @param {object} req Contains "auth-token" in the header with the JWT token 
+ * @param {object} res Returns a JSON with the user credentials if valid, else server response
+ * @returns Returns HTTP code with a server response
+ * HTTP 400: No token specified
+ * HTTP 401: Token is not valid
+ * HTTP 403: Error finding user
+ */
+
+async function handleVerify(req, res) {
+    const token = req.header("auth-token");
+    if (!token) {
+        return res.status(400).json({message: "No token"});
+    } else {
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        if (!verified) {
+            return res.status(401).json({message: "Failed"});
+        } else {
+            // decoding the token returns us our objectId that we encoded
+            const userId =  jwt.decode(token, process.env.JWT_SECRET).id;
+            let user;
+            try {
+                user = await User.findOne(new ObjectId(userId));
+            } catch (err) {
+                // return error if we somehow encounter an error finding the user
+                return res.status(403).json(err);
+            }
+            // Return specific fields (to not return password hash)
+            return res.json({
+                username: user.username,
+                email: user.email
+            });
+        }
+    }   
+}
+
+
 /** Provides the route for the API at ./register using the handleRegister function. */
 router.post("/register", handleRegister);
 
 /** Provides the route for the API at ./login using the handleLogin function */
 router.post("/login", handleLogin);
+
+/** Provides the route for the API at ./check, verifies the JWT token for relogins */
+router.post("/verify", handleVerify);
 
 
 module.exports = router;
