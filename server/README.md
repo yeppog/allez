@@ -5,7 +5,7 @@ This backend server is serviced by Node.js, Express and MongoDB.
 ## Getting Started
 
 1. Clone this repository
-    `git clone https://github.com/yeppog/allez.git`bash
+    `git clone https://github.com/yeppog/allez.git`
 
 2. Ensure Node.js is installed. You can get Node.js here <https://nodejs.org/en/>
 
