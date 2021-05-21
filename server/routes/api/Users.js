@@ -39,7 +39,9 @@ function handleRegister(req, res) {
 
             bcrypt.genSalt().then(salt => {
                 bcrypt.hash(newUser.password, salt, (err, hash) => {
-                    if (err) throw err;
+                    if (err) {
+                        return res.status(400).json(err)
+                    };
                     newUser.password = hash;
                     newUser
                         .save()
