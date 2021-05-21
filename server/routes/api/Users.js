@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
+/** Used to query by ObjectId */
 const ObjectId = require("mongodb").ObjectID;
 // const config = require('./../../../config')
 
@@ -72,17 +74,21 @@ async function handleLogin(req, res) {
             if (!user) {
                 return res.status(401).json({message:" Invalid user"})
             } 
+            // use bcrypt to compare crypto hash from db and given password
             const checkPassword = await bcrypt.compare(password, user.password);
             if (!checkPassword) {
                 return res.status(401).json({message: "Invalid credentials"});
             }
+            // use jwt to sign our user ID to be decoded later, using the key from the .env file
             const token = jwt.sign({id: user._id}, process.env.JWT_SECRET);
-
+            
+            // returns status 200 with the token and the user information
             return res.status(200).json({
                 token,
                 user: {
                     id: user._id,
-                    username: user.username
+                    username: user.username,
+                    email: user.email
                 }
             });
         }
@@ -100,7 +106,7 @@ async function handleLogin(req, res) {
  * @returns Returns HTTP code with a server response
  * HTTP 400: No token specified
  * HTTP 401: Token is not valid
- * HTTP 403: Error finding user
+ * HTTP 500: Any other error
  */
 
 async function handleVerify(req, res) {
@@ -117,15 +123,15 @@ async function handleVerify(req, res) {
             let user;
             try {
                 user = await User.findOne(new ObjectId(userId));
+                return res.json({
+                    username: user.username,
+                    email: user.email
+                });
             } catch (err) {
                 // return error if we somehow encounter an error finding the user
-                return res.status(403).json(err);
+                return res.status(500).json(err);
             }
             // Return specific fields (to not return password hash)
-            return res.json({
-                username: user.username,
-                email: user.email
-            });
         }
     }   
 }
