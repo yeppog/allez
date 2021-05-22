@@ -31,6 +31,7 @@ function handleRegister(req, res) {
         if (user) {
             return res.status(400).json({ email: "Email already exists" });
         } else {
+            // TODO: Insert validator? maybe
             const newUser = new User({
                 username: req.body.username,
                 email: req.body.email,
@@ -46,7 +47,7 @@ function handleRegister(req, res) {
                     newUser
                         .save()
                         .then(user => res.json(user))
-                        .catch(err => console.log(err));
+                        .catch(err => res.status(500).json(err));
                 });
             });
         }
@@ -122,6 +123,7 @@ async function handleVerify(req, res) {
         } else {
             // decoding the token returns us our objectId that we encoded
             const userId =  jwt.decode(token, process.env.JWT_SECRET).id;
+            console.log(userId);
             let user;
             try {
                 user = await User.findOne(new ObjectId(userId));
@@ -133,10 +135,96 @@ async function handleVerify(req, res) {
                 // return error if we somehow encounter an error finding the user
                 return res.status(500).json(err);
             }
-            // Return specific fields (to not return password hash)
         }
     }   
 }
+
+/**
+ * Generates a new password reset token using JWT that holds the user ID in the payload.
+ * TODO: Add STMP to send the password reset link to a user's email account.
+ * 
+ * @param {object} req The HTTP request, containing the user's email account
+ * @param {object} res The HTTP response with the token
+ * @returns A HTTP response with the token generated from the user's email address.
+ */
+
+async function handleResetRequest(req, res) {
+    const email = req.body.email;
+    // Ensure the email is specified
+    if (!email) {
+        return res.status(400).json({message: "Email not specified"});
+    } else {
+        try {
+            // ensure we can find the user
+            const user = await User.findOne({email: email})
+            if (!user) {
+                return res.status(401).json({message: "Invalid user"});
+            } else {
+                const secret = user._id + '-' + process.env.JWT_TOKEN;
+                const token = jwt.sign({id: user._id}, secret, {expiresIn: 600 });
+                return res.status(200).send(token);
+            }
+        } catch(err) {
+            console.log(err);
+        }
+    }
+}
+
+/**
+ * End point for the reset password request. Expects a token, an id and a password to be passed in the request.
+ * Token will be verified to check if the token matches the user Id passed back, and its expiry. If all are valid, hash the new password
+ * and update the database for the password of that user.
+ * 
+ * @param {*} req The HTTP request, containing the token, id and a new password.
+ * @param {*} res THE HTTP response with the result of the request.
+ * @returns A HTTP response with the response message.
+ */
+
+async function handleReset(req, res) {
+    const token = req.body.token;
+    if (!token) {
+        return res.status(400).json({message: "No token"});
+    } else {
+        try {
+            const id = req.body.id;
+            const user = await User.findOne(new ObjectId(id));
+            if (!user) {
+                return res.status(400).json({message: "Invalid user ID"});
+            } else {
+                // verify to ensure token has not expired
+                jwt.verify(req.body.token, user.id + '-' + process.env.JWT_TOKEN);
+                // decode to ensure the token matches the userId 
+                decoded = jwt.decode(req.body.token, user.id + '-' + process.env.JWT_TOKEN).id;
+                if (decoded == user.id) {
+                    let password;
+                    // generate password hash for the new password
+                    bcrypt.genSalt().then(salt => bcrypt.hash(req.body.password, salt, (err, hash) => {
+                        if (err) {
+                            return res.status(500).json({message: "Password error"});
+                        } else {
+                            password = hash;
+                        }
+                    }))
+                    // update the password field for this user
+                    User.findByIdAndUpdate(new ObjectId(req.body.id),{
+                        password: password
+                    });
+                    return res.status(200).json({message: "Password successfully updated"})
+                } else {
+                    return res.status(401).json({message: "Unauthorized"})
+                }
+            }
+        } catch(err) {
+            // catch the error thrown if the token has expired.
+            if (err instanceof jwt.TokenExpiredError) {
+                return res.status(401).json({message: "Token has expired"})
+            }
+            // console log for now. TODO: implement error handling
+            console.log(err)
+        }
+    }
+}
+
 
 
 /** Provides the route for the API at ./register using the handleRegister function. */
@@ -147,6 +235,12 @@ router.post("/login", handleLogin);
 
 /** Provides the route for the API at ./check, verifies the JWT token for relogins */
 router.post("/verify", handleVerify);
+
+/** Provides the route for the API at ./reset, creates a JWT token for a unique reset link */
+router.post("/reset", handleResetRequest);
+
+/** Provides the route for the API at ./reset/end, validates a JWT and authorises a password reset */
+router.post("/reset/end", handleReset)
 
 
 module.exports = router;
