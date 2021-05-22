@@ -1,0 +1,36 @@
+.RegisterComponent {
+    display: grid;
+    margin-left: 50px;
+    
+}
+
+.registerForm {
+    border: 1px solid black;
+    border-radius: 5px;
+    max-width: 40vw;
+    display: grid; 
+    place-self: center;
+    background: lightsteelblue;
+    padding: 25px;
+    margin-left: auto;
+    margin-right: auto;
+    // margin-top: auto;
+    
+    input {
+        margin: 10px 0px;
+        padding: 10px 5px;
+        border-style: none;
+        border-radius: 5px;
+    }
+
+    button {
+        margin: 10px 0px;
+        padding: 10px 0px;
+        border-style: none;
+        border-radius: 5px;
+        background-color:rgb(7, 7, 143);
+        color: white;
+    }
+}
+
+
