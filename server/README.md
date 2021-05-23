@@ -85,5 +85,6 @@ This backend server is serviced by Node.js, Express and MongoDB.
 
     The required header is:
     - token: `string`
-o    A sample POST request using HTTPie can be found below:
+    A sample POST request using HTTPie can be found below:
+
     `http post :3001/api/users/confirm token: "sfojw2eiofon23io324"`
