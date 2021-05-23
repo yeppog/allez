@@ -284,6 +284,10 @@ async function handleConfirm(req, res) {
         } else {
             try {
                 const id = jwt.decode(req.headers.token, process.env.JWT_SECRET).id;
+                const user = await User.findOne(new ObjectId(id));
+                if (user) {
+                    return res.status(403).json({message: "Account already activated"})
+                }
                 console.log(id);
                 await User.findByIdAndUpdate(new ObjectId(id), {activated: true}, {useFindAndModify: false});
                 return res.status(200).json({message: "Account successfully activated"})
