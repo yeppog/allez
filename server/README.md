@@ -35,6 +35,7 @@ This backend server is serviced by Node.js, Express and MongoDB.
     - password: `string`
 
     A sample POST request using HTTPie can be found below:
+
     `http post :3001/api/users/register username="test" email="test" password="test"`
 
 2. Login
@@ -45,6 +46,7 @@ This backend server is serviced by Node.js, Express and MongoDB.
     - password: `string`
 
     A sample POST request using HTTPie can be found below:
+
     `http post :3001/api/users/login username="test" email="test" password="test"`
 
 3. Verify JWT
@@ -54,6 +56,7 @@ This backend server is serviced by Node.js, Express and MongoDB.
     - `auth-token`: `string`
 
     A sample POST request using HTTPie can be found below:
+
     `http post :3001/api/users/verify auth-token:<JWT_TOKEN>"`
 
 4. Forget Password
@@ -63,6 +66,7 @@ This backend server is serviced by Node.js, Express and MongoDB.
     - email: `string`
 
     A sample POST request using HTTPie can be found below:
+
     `http post :3001/api/users/login username="test" email="test@gmail.com"`
 
 5. Reset Password
@@ -73,6 +77,7 @@ This backend server is serviced by Node.js, Express and MongoDB.
     - password: `string`
 
     A sample POST request using HTTPie can be found below:
+
     `http post :3001/api/users/login token="fmi23j489f3hr13e12" password="test"`
 
 6. Confirm
@@ -80,5 +85,5 @@ This backend server is serviced by Node.js, Express and MongoDB.
 
     The required header is:
     - token: `string`
-    A sample POST request using HTTPie can be found below:
+o    A sample POST request using HTTPie can be found below:
     `http post :3001/api/users/confirm token: "sfojw2eiofon23io324"`
