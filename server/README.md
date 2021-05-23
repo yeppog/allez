@@ -5,14 +5,14 @@ This backend server is serviced by Node.js, Express and MongoDB.
 ## Getting Started
 
 1. Clone this repository
-    `git clone https://github.com/yeppog/allez.git`
+    `git clone https://github.com/yeppog/allez.git/`
 
 2. Ensure Node.js is installed. You can get Node.js here <https://nodejs.org/en/>
 
 3. Run the following command to get the dependencies
 
     ```bash
-    $ cd allez
+    $ cd allez/server
     $ npm install
     > Installing dependencies
     ```
@@ -55,3 +55,30 @@ This backend server is serviced by Node.js, Express and MongoDB.
 
     A sample POST request using HTTPie can be found below:
     `http post :3001/api/users/verify auth-token:<JWT_TOKEN>"`
+
+4. Forget Password
+    A password reset request can be made at the endpoint `./api/users/reset` and expects a `POST` request. Sends an email to the user resetting the password
+
+    The required field is:
+    - email: `string`
+
+    A sample POST request using HTTPie can be found below:
+    `http post :3001/api/users/login username="test" email="test@gmail.com"`
+
+5. Reset Password
+    A password reset can be made at the endpoint './api/users/reset/end` and expects a `POST` request.
+
+    The required fields are:
+    - token: `string`
+    - password: `string`
+
+    A sample POST request using HTTPie can be found below:
+    `http post :3001/api/users/login token="fmi23j489f3hr13e12" password="test"`
+
+6. Confirm
+    Confirming an account can be made at the endpoint './api/users/confirm` and expects a `GET` request
+
+    The required header is:
+    - token: `string`
+    A sample POST request using HTTPie can be found below:
+    `http post :3001/api/users/confirm token: "sfojw2eiofon23io324"`
