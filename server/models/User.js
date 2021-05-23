@@ -18,6 +18,15 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    activated: {
+        type: Boolean,
+    },
+    firstName: {
+        type: String,
+    },
+    lastName: {
+        type: String,
     }
 });
 

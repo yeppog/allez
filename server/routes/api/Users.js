@@ -5,7 +5,22 @@ const jwt = require("jsonwebtoken");
 
 /** Used to query by ObjectId */
 const ObjectId = require("mongodb").ObjectID;
-// const config = require('./../../../config')
+
+/** Automailer */
+const nodemailer = require("nodemailer");
+
+/** SMTP configuration. TODO: Store real credentials in env */
+const transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false,
+    auth: {
+        // spoof credentials from ethereal
+        user: "malinda66@ethereal.email",
+        pass: "mg36XzUWRXTvGN1GGG"
+    }
+});
+
 
 // Validate inputs
 
@@ -20,13 +35,11 @@ const User = require("../../models/User");
  * 
  * Firstly checks if a user account of given email already exists. Then hashes the password and finally sends a POST request through save()
  * 
- * TODO: implement JWT token
- * TODO: implement account validation
  * 
  * @param {object} req Takes in a request with a body that should contain a Username, Email and Password
  * @param {object} res Server response
  */
-function handleRegister(req, res) {
+async function handleRegister(req, res) {
     User.findOne({ email: req.body.email }).then(user => {
         if (user) {
             return res.status(400).json({ email: "Email already exists" });
@@ -35,7 +48,8 @@ function handleRegister(req, res) {
             const newUser = new User({
                 username: req.body.username,
                 email: req.body.email,
-                password: req.body.password
+                password: req.body.password,
+                activated: false,
             });
 
             bcrypt.genSalt().then(salt => {
@@ -44,9 +58,24 @@ function handleRegister(req, res) {
                         return res.status(400).json(err)
                     };
                     newUser.password = hash;
+                    let id;
                     newUser
                         .save()
-                        .then(user => res.json(user))
+                        .then(async user => {
+                            const token = jwt.sign({id: user.id}, process.env.JWT_SECRET);
+                            // sends token to the registered email for confirmation;
+                            await transporter.sendMail({
+                                from: '"Allez" <reset@allez.com>',
+                                to: `${newUser.email}`,
+                                subject: "Please confirm your account",
+                                text: `${token}`,
+                                html: `<b>${token}</b>`
+                            }, (err, info) => {
+                                res.status(400).json({message: err});
+                                res.status(200).json({message: info});
+                            })
+                            res.json(user)
+                        })
                         .catch(err => res.status(500).json(err));
                 });
             });
@@ -76,7 +105,9 @@ async function handleLogin(req, res) {
             const user = await User.findOne({ email: email});
             if (!user) {
                 return res.status(401).json({message:" Invalid user"})
-            } 
+            } else if (!user.activated) {
+                return res.status(403).json({message:"Account not activated"});
+            }
             // use bcrypt to compare crypto hash from db and given password
             const checkPassword = await bcrypt.compare(password, user.password);
             if (!checkPassword) {
@@ -141,7 +172,6 @@ async function handleVerify(req, res) {
 
 /**
  * Generates a new password reset token using JWT that holds the user ID in the payload.
- * TODO: Add STMP to send the password reset link to a user's email account.
  * 
  * @param {object} req The HTTP request, containing the user's email account
  * @param {object} res The HTTP response with the token
@@ -161,7 +191,19 @@ async function handleResetRequest(req, res) {
                 return res.status(401).json({message: "Invalid user"});
             } else {
                 const secret = user._id + '-' + process.env.JWT_TOKEN;
+                // currently set the token to expire in 10 minutes
                 const token = jwt.sign({id: user._id}, secret, {expiresIn: 600 });
+                // auto email sender to send recovery link to reset password.
+                await transporter.sendMail({
+                    from: '"Allez" <reset@allez.com>',
+                    to: `${req.body.email}`,
+                    subject: "You requested for a password reset",
+                    text: `${token}`,
+                    html: `<b>${token}</b>`
+                }, (err, info) => {
+                    console.log(err);
+                    console.log(info);
+                })
                 return res.status(200).send(token);
             }
         } catch(err) {
@@ -192,9 +234,9 @@ async function handleReset(req, res) {
                 return res.status(400).json({message: "Invalid user ID"});
             } else {
                 // verify to ensure token has not expired
-                jwt.verify(req.body.token, user.id + '-' + process.env.JWT_TOKEN);
+                jwt.verify(req.body.token, user.id + '-' + process.env.JWT_SECRET);
                 // decode to ensure the token matches the userId 
-                decoded = jwt.decode(req.body.token, user.id + '-' + process.env.JWT_TOKEN).id;
+                decoded = jwt.decode(req.body.token, user.id + '-' + process.env.JWT_SECRET).id;
                 if (decoded == user.id) {
                     let password;
                     // generate password hash for the new password
@@ -206,9 +248,9 @@ async function handleReset(req, res) {
                         }
                     }))
                     // update the password field for this user
-                    User.findByIdAndUpdate(new ObjectId(req.body.id),{
+                    await User.findByIdAndUpdate(new ObjectId(req.body.id),{
                         password: password
-                    });
+                    }, {useFindAndModify: false});
                     return res.status(200).json({message: "Password successfully updated"})
                 } else {
                     return res.status(401).json({message: "Unauthorized"})
@@ -221,6 +263,33 @@ async function handleReset(req, res) {
             }
             // console log for now. TODO: implement error handling
             console.log(err)
+        }
+    }
+}
+
+/**
+ * Hanldes account activation. Sets the activated param in the database to true to allow the account to be used.
+ * 
+ * @param {object} req HTTP request that holds the token in the header as 'token'
+ * @param {object} res HTTP response for the request
+ * @return Returns the HTTP status and message
+ */
+
+async function handleConfirm(req, res) {
+    if (!req.headers) {
+        return res.status(400).json({message: "Missing header"});
+    } else {
+        if (!req.headers.token) {
+            return res.status(400).json({message: "Missing token"});
+        } else {
+            try {
+                const id = jwt.decode(req.headers.token, process.env.JWT_SECRET).id;
+                console.log(id);
+                await User.findByIdAndUpdate(new ObjectId(id), {activated: true}, {useFindAndModify: false});
+                return res.status(200).json({message: "Account successfully activated"})
+            } catch (err) {
+                return res.status(400).json({message: err});
+            }
         }
     }
 }
@@ -241,6 +310,9 @@ router.post("/reset", handleResetRequest);
 
 /** Provides the route for the API at ./reset/end, validates a JWT and authorises a password reset */
 router.post("/reset/end", handleReset)
+
+/** Provides the route for the API at ./confirm, activates a user account. */
+router.get("/confirm", handleConfirm);
 
 
 module.exports = router;
