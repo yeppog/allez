@@ -1,3 +1,44 @@
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *      LoginCredentials:
+ *          type: object
+ *          required:
+ *              - email
+ *              - password
+ *          properties:
+ *              email:
+ *                  type: string
+ *                  description: The email of the account being logged on to.
+ *              password:
+ *                  type: string
+ *                  description: The password of the account being logged on to.
+ *      RegisterCredentials:
+ *          type: object
+ *          required:
+ *              - username
+ *              - email
+ *              - password
+ *          properties:
+ *              email:
+ *                  type: string
+ *                  description: The email of the account to be created with.
+ *              password:
+ *                  type: string
+ *                  description: The password of the account to be created with.
+ *              username:
+ *                  type: string
+ *                  description: The username of the account to be created with.
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+
+
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
@@ -302,6 +343,23 @@ async function handleConfirm(req, res) {
 
 
 /** Provides the route for the API at ./register using the handleRegister function. */
+
+/**
+ * @openapi
+ * /api/users/register:
+ *  post:
+ *      description: Registers a new user onto the database.
+ *      tags: [Users]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/RegisterCredentials'
+ *      responses:
+ *          200:
+ *              description: Sends an email out to the email address registered with
+ */
 router.post("/register", handleRegister);
 
 /** Provides the route for the API at ./login using the handleLogin function */
