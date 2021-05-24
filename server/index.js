@@ -39,7 +39,7 @@ mongoose.connect("mongodb+srv://allez:allez@allez.1bbnv.mongodb.net/myFirstDatab
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
-    app.listen(3001, () => {
+    app.listen(process.env.PORT || 3001, () => {
         console.log("Server started on port 3001");
     })
 })
