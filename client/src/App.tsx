@@ -1,17 +1,22 @@
 import React from 'react';
-import logo from './logo.svg';
+import { Route, Switch, Redirect } from 'react-router-dom'
 import './App.scss';
 import LoginComponent from './components/Auth/LoginComponent/LoginComponent';
 import RegisterComponent from './components/Auth/RegisterComponent/RegisterComponent';
+import ConfirmComponent from './components/Auth/ConfirmComponent/ConfirmComponent';
 
 
 function App() {
   return (
     <div className="App">
-        <LoginComponent>
+      <Switch>
+        <Route path = "/confirm/token=:token" component = {ConfirmComponent} />
+        <Route path = "/login" component = {LoginComponent} />
+        <Route path = "/register" component = {RegisterComponent} />
+        <Redirect from="*" to="/login"/>
 
-        </LoginComponent>
-        <RegisterComponent/>
+
+      </Switch>
     </div>
   );
 }

@@ -3,7 +3,8 @@ import './LoginComponent.scss';
 import { useState, useEffect } from 'react'
 import { LoginCredentials } from '../../../interface/Credentials';
 import { checkLoggedInUser, loginUser } from '../../Redux/userSlice';
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom';
 
 const LoginComponent: React.FC = () => {
 
@@ -15,8 +16,7 @@ const LoginComponent: React.FC = () => {
   const [ message, setMessage ] = useState('');
 
   const dispatch = useDispatch();
-  
-  const selector = useSelector(checkLoggedInUser);
+  const history = useHistory();
 
   useEffect(() => {
     dispatch(checkLoggedInUser());
@@ -82,6 +82,8 @@ const LoginComponent: React.FC = () => {
         />
 
         <button className="submit" type="submit">Submit</button>
+        <button className="register" type="button" onClick={() => history.push('/register')}>Register for an account</button> 
+
         <p>username: {username}</p>
         <p>email: {email}</p>
         <p>password: {password}</p>

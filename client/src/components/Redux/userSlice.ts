@@ -8,10 +8,11 @@ interface UsersState {
     error: string | null | undefined;
 }
 
-interface User {
-    username: string,
-    email: string,
-}
+// interface User {
+//     username: string,
+//     email: string,
+// }
+
 
 const initialState = {
     user: [],
@@ -20,7 +21,6 @@ const initialState = {
 } as UsersState
 
 export const loginUser = createAsyncThunk('user/loginUser', async (body: LoginCredentials) => {
-    const credentials = body;
     const res = await axios.post("http://localhost:3001/api/users/login", body, HTTPOptions); 
     return res.data
 })
@@ -36,6 +36,7 @@ export const checkLoggedInUser = createAsyncThunk('user/checkLoggedInUser', asyn
         return res.data;
     }
 })
+
 
 
 const userSlice = createSlice({

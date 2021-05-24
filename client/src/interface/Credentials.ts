@@ -8,3 +8,9 @@ export interface RegisterCredentials {
     email: string;
     password: string;
 }
+
+
+
+export interface ConfirmCredentials {
+    token: string,
+}

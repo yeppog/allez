@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -9,7 +10,15 @@ import store from './components/Redux/store'
 ReactDOM.render(
   <React.StrictMode>
     <Provider store = {store}>
-      <App />
+      <Router>
+        <Route exact path = "/auth">
+
+          </Route>
+        <App />
+        {/* <Route exact path = "/confirm">
+          <ConfirmComponent/>
+        </Route> */}
+      </Router>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')
