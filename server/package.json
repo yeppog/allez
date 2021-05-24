@@ -2,7 +2,7 @@
   "name": "allez",
   "version": "1.0.0",
   "description": "Backend server",
-  "main": "main.js",
+  "main": "index.js",
   "engines": {
     "node": "16.x",
     "npm": "7.11.2"
