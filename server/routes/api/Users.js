@@ -69,8 +69,8 @@ async function handleRegister(req, res) {
                                 from: '"Allez" <reset@allez.com>',
                                 to: `${newUser.email}`,
                                 subject: "Please confirm your account",
-                                text: `${token}`,
-                                html: `<b>${token}</b>`
+                                text: `Click here to confirm your account.`,
+                                html: `Click <a href = "http://localhost:3000/confirm/token=${token}">here</a> to confirm your account.`
                             }, (err, info) => {
                                 res.status(400).json({message: err});
                                 res.status(200).json({message: info});
@@ -286,7 +286,7 @@ async function handleConfirm(req, res) {
             try {
                 const id = jwt.decode(req.headers.token, process.env.JWT_SECRET).id;
                 const user = await User.findOne(new ObjectId(id));
-                if (user) {
+                if (user.activated) {
                     return res.status(403).json({message: "Account already activated"})
                 }
                 console.log(id);
