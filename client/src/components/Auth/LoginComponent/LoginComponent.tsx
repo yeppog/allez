@@ -1,8 +1,9 @@
 import React from 'react';
 import './LoginComponent.scss';
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { LoginCredentials } from '../../../interface/Credentials';
-import axios from 'axios'
+import { checkLoggedInUser, loginUser } from '../../Redux/userSlice';
+import { useDispatch, useSelector } from 'react-redux'
 
 const LoginComponent: React.FC = () => {
 
@@ -12,6 +13,15 @@ const LoginComponent: React.FC = () => {
 
   // Redudant code just to display in frontend instead of console.logging , can remove later
   const [ message, setMessage ] = useState('');
+
+  const dispatch = useDispatch();
+  
+  const selector = useSelector(checkLoggedInUser);
+
+  useEffect(() => {
+    dispatch(checkLoggedInUser());
+  }, [])
+
 
   /**
    * Passes the credentials the user has entered to the redux handler to log the user in.
@@ -26,7 +36,7 @@ const LoginComponent: React.FC = () => {
     // TODO: Better validation for email and password
     if (username && email && password) {
       const credential = { username, email, password } as LoginCredentials;
-      handleLogin(credential);
+      dispatch(loginUser(credential));
       console.log(credential);
       setMessage("Valid");
     } else {
@@ -34,20 +44,17 @@ const LoginComponent: React.FC = () => {
     } 
   }
 
-  const handleLogin = (credentials: LoginCredentials): void => {
-    try {
-      const url = "http://localhost:3001/api/users/login";
-      axios.post(url, credentials, HTTPOptions)
-        .then(data => console.log(data))
-        .catch(err => console.log(err));
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  // const handleLogin = (credentials: LoginCredentials): void => {
+  //   try {
+  //     const url = "http://localhost:3001/api/users/login";
+  //     axios.post(url, credentials, HTTPOptions)
+  //       .then(data => console.log(data))
+  //       .catch(err => console.log(err));
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
 
-  const HTTPOptions = {
-    headers: {'Content-Type': 'application/json'}
-  }
 
 
   return (
