@@ -16,6 +16,7 @@ const transporter = nodemailer.createTransport({
     secure: false,
     auth: {
         // spoof credentials from ethereal
+        // can login from here to access the emails https://ethereal.email/
         user: "malinda66@ethereal.email",
         pass: "mg36XzUWRXTvGN1GGG"
     }
@@ -144,7 +145,7 @@ async function handleLogin(req, res) {
  */
 
 async function handleVerify(req, res) {
-    const token = req.header("auth-token");
+    const token = req.header("token");
     if (!token) {
         return res.status(400).json({message: "No token"});
     } else {
@@ -307,7 +308,7 @@ router.post("/register", handleRegister);
 router.post("/login", handleLogin);
 
 /** Provides the route for the API at ./check, verifies the JWT token for relogins */
-router.post("/verify", handleVerify);
+router.get("/verify", handleVerify);
 
 /** Provides the route for the API at ./reset, creates a JWT token for a unique reset link */
 router.post("/reset", handleResetRequest);
