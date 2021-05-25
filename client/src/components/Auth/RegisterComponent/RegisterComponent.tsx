@@ -1,17 +1,18 @@
-import React from 'react';
 import './RegisterComponent.scss';
-import { useState } from 'react'
-import axios from 'axios'
+
+import React from 'react';
 import { RegisterCredentials } from '../../../interface/Credentials'
+import axios from 'axios'
+import { useState } from 'react'
 
 const RegisterComponent: React.FC = () => {
-  const [ username, setUsername ] = useState('');
-  const [ email, setEmail ] = useState('');
-  const [ password, setPassword ] = useState('');
-  const [ confirmPassword, setConfirmPassword ] = useState('')
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('')
 
   // Redudant code just to display in frontend instead of console.logging , can remove later
-  const [ message, setMessage ] = useState('');
+  const [message, setMessage] = useState('');
 
   /**
    * Passes the credentials the user has entered to the redux handler to log the user in.
@@ -31,7 +32,7 @@ const RegisterComponent: React.FC = () => {
       setMessage("Valid");
     } else {
       console.log("Form is invalid or passwords do not match");
-    } 
+    }
   }
 
   const registerLogin = (credentials: RegisterCredentials): void => {
@@ -47,38 +48,38 @@ const RegisterComponent: React.FC = () => {
   }
 
   const HTTPOptions = {
-    headers: {'Content-Type': 'application/json'}
+    headers: { 'Content-Type': 'application/json' }
   }
 
 
   return (
     <div className="RegisterComponent" data-testid="RegisterComponent">
       <form action="" className="registerForm" onSubmit={e => onSubmit(e)}>
-      <h2>Registration</h2>
-        <input 
-          type="text" 
-          className="username" 
-          placeholder= "username" 
+        <h2>Registration</h2>
+        <input
+          type="text"
+          className="username"
+          placeholder="username"
           onChange={e => setUsername(e.target.value)}
         />
 
-        <input 
-          type="text" 
+        <input
+          type="text"
           className="email"
-          placeholder = "email"
+          placeholder="email"
           onChange={e => setEmail(e.target.value)}
         />
-        <input 
-          type="text" 
-          className="password" 
-          placeholder = "password"
+        <input
+          type="text"
+          className="password"
+          placeholder="password"
           onChange={e => setPassword(e.target.value)}
         />
 
-        <input 
-          type="text" 
-          className="confirm_password" 
-          placeholder = "Confirm Password"
+        <input
+          type="text"
+          className="confirm_password"
+          placeholder="Confirm Password"
           onChange={e => setConfirmPassword(e.target.value)}
         />
 
@@ -87,12 +88,12 @@ const RegisterComponent: React.FC = () => {
         <p>email: {email}</p>
         <p>password: {password}</p>
         <p>confirm_password: {confirmPassword}</p>
-        
-        {message ? 
+
+        {message ?
           <p>
             {message}
           </p>
-        :<div></div>
+          : <div></div>
         }
 
 

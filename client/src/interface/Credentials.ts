@@ -9,8 +9,6 @@ export interface RegisterCredentials {
     password: string;
 }
 
-
-
 export interface ConfirmCredentials {
-    token: string,
+    token: string;
 }
