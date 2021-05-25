@@ -37,8 +37,7 @@ const RegisterComponent: React.FC = () => {
 
   const registerLogin = (credentials: RegisterCredentials): void => {
     try {
-      console.log(credentials);
-      const url = "http://localhost:3001/api/users/register";
+      const url = "/api/users/register";
       axios.post(url, credentials, HTTPOptions)
         .then(data => console.log(data))
         .catch(err => console.log(err));
