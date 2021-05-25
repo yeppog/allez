@@ -3,16 +3,15 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { LoginCredentials } from "../../interface/Credentials";
 import axios from "axios";
 
+
+// sets the default axios baseURL to the environmental variable
+axios.defaults.baseURL = process.env.REACT_APP_API_URI;
+
 interface UsersState {
   user: string[];
   status: "idle" | "pending" | "succeeded" | "failed";
   error: string | null | undefined;
 }
-
-// interface User {
-//     username: string,
-//     email: string,
-// }
 
 const initialState = {
   user: [],
@@ -23,10 +22,8 @@ const initialState = {
 export const loginUser = createAsyncThunk(
   "user/loginUser",
   async (body: LoginCredentials) => {
-    console.log("test");
-    console.log(process.env.REACT_APP_API_URI);
     const res = await axios.post(
-      process.env.REACT_APP_API_URI + "/api/users/login",
+      "/api/users/login",
       body,
       HTTPOptions
     );
@@ -42,9 +39,10 @@ export const checkLoggedInUser = createAsyncThunk(
       return { error: "User is not logged in." };
     } else {
       console.log(token);
-      const res = await axios.get("http://localhost:3001/api/users/verify", {
-        headers: { ...HTTPOptions.headers, token: token },
-      });
+      const res = await axios.get(
+        "/api/users/verify",
+        { headers: { ...HTTPOptions.headers, token: token } }
+      );
 
       return res.data;
     }
