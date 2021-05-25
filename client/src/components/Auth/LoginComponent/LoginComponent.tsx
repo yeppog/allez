@@ -1,19 +1,21 @@
-import React from 'react';
 import './LoginComponent.scss';
-import { useState, useEffect } from 'react'
-import { LoginCredentials } from '../../../interface/Credentials';
+
 import { checkLoggedInUser, loginUser } from '../../Redux/userSlice';
+import { useEffect, useState } from 'react'
+
+import { LoginCredentials } from '../../../interface/Credentials';
+import React from 'react';
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom';
 
 const LoginComponent: React.FC = () => {
 
-  const [ username, setUsername ] = useState('');
-  const [ email, setEmail ] = useState('');
-  const [ password, setPassword ] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   // Redudant code just to display in frontend instead of console.logging , can remove later
-  const [ message, setMessage ] = useState('');
+  const [message, setMessage] = useState('');
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -41,7 +43,7 @@ const LoginComponent: React.FC = () => {
       setMessage("Valid");
     } else {
       console.log("Form is invalid");
-    } 
+    }
   }
 
   // const handleLogin = (credentials: LoginCredentials): void => {
@@ -61,38 +63,38 @@ const LoginComponent: React.FC = () => {
     <div className="LoginComponent" data-testid="LoginComponent">
       <form action="" className="loginForm" onSubmit={e => onSubmit(e)}>
         <h2>Login</h2>
-        <input 
-          type="text" 
-          className="username" 
-          placeholder= "username" 
+        <input
+          type="text"
+          className="username"
+          placeholder="username"
           onChange={e => setUsername(e.target.value)}
         />
 
-        <input 
-          type="text" 
+        <input
+          type="text"
           className="email"
-          placeholder = "email"
+          placeholder="email"
           onChange={e => setEmail(e.target.value)}
         />
-        <input 
-          type="text" 
-          className="password" 
-          placeholder = "password"
+        <input
+          type="text"
+          className="password"
+          placeholder="password"
           onChange={e => setPassword(e.target.value)}
         />
 
         <button className="submit" type="submit">Submit</button>
-        <button className="register" type="button" onClick={() => history.push('/register')}>Register for an account</button> 
+        <button className="register" type="button" onClick={() => history.push('/register')}>Register for an account</button>
 
         <p>username: {username}</p>
         <p>email: {email}</p>
         <p>password: {password}</p>
-        
-        {message ? 
+
+        {message ?
           <p>
             {message}
           </p>
-        :<div></div>
+          : <div></div>
         }
 
 
