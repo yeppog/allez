@@ -6,12 +6,9 @@ import {
   Fade,
   FormControl,
   Grid,
-  IconButton,
   Input,
-  InputAdornment,
   InputLabel,
 } from '@material-ui/core';
-import { Visibility, VisibilityOff } from '@material-ui/icons';
 
 import { Alert } from '@material-ui/lab';
 import React from 'react';
@@ -32,6 +29,8 @@ interface State {
 
 const RegisterComponent: React.FC = () => {
   const history = useHistory();
+  // temporary workaround as SMTP is not set up
+  const [confirm, setConfirm] = useState<string>('');
   const [state, setState] = useState({
     name: '',
     username: '',
@@ -74,8 +73,8 @@ const RegisterComponent: React.FC = () => {
       axios
         .post(url, credentials, HTTPOptions)
         .then((data) => {
+          setConfirm(data.data.token);
           setState({ ...state, postSuccess: true });
-          console.log(state.postSuccess);
         })
         .catch((err) => {
           setState({ ...state, message: err.message });
@@ -108,19 +107,28 @@ const RegisterComponent: React.FC = () => {
         <Grid item xs={12}>
           <Card className="registerForm" variant="outlined">
             {state.postSuccess ? (
-              <div>
-                <Fade in={state.postSuccess}>
-                  <Grid item sm={12}>
-                    <h2>Thank you for registering</h2>
-                    <p>
-                      Please check your email account for a verification mail we
-                      just sent to activate your account
-                    </p>
-                    <Button onClick={(e) => history.push('/login')}>
-                      Login Page
-                    </Button>
-                  </Grid>
-                </Fade>
+              <div className="successBox">
+                <Grid item sm={12}>
+                  <h2>Thank you for registering</h2>
+                  <p>
+                    Please check your email account for a verification mail we
+                    just sent to activate your account
+                  </p>
+                  <Button onClick={() => history.push('/login')}>
+                    Login Page
+                  </Button>
+                  {/* //TODO: Remove this section once SMTP is working */}
+                  <p>
+                    Well since SMTP isn't working 🤷, click{' '}
+                    <a
+                      href=""
+                      onClick={() => history.push(`confirm/token=${confirm}`)}
+                    >
+                      here
+                    </a>{' '}
+                    to confirm your account.
+                  </p>
+                </Grid>
               </div>
             ) : (
               <div>
