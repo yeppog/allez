@@ -2,16 +2,17 @@
   display: grid;
 }
 
-.registerForm {
+.registerCard {
   border: 1px solid black;
   border-radius: 5px;
   display: grid;
   min-width: 400px;
   place-self: center;
   padding: 25px;
-  margin-left: auto;
-  margin-right: auto;
-  // margin-top: auto;
+  // margin-left: auto;
+  // margin-right: auto;
+  // margin-top: auto;V
+  margin: 20px;
 
   input {
     margin: 10px 0px;
@@ -31,7 +32,7 @@
 }
 
 @media screen and (max-width: 600px) {
-  .registerForm {
+  .registerCard {
     min-width: 70vw;
   }
 }

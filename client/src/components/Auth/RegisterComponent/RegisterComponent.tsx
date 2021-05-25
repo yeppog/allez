@@ -105,7 +105,7 @@ const RegisterComponent: React.FC = () => {
     <div className="RegisterComponent" data-testid="RegisterComponent">
       <Grid container>
         <Grid item xs={12}>
-          <Card className="registerForm" variant="outlined">
+          <Card className="registerCard" variant="outlined">
             {state.postSuccess ? (
               <div className="successBox">
                 <Grid item sm={12}>
