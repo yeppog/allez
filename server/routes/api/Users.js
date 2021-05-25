@@ -115,7 +115,7 @@ async function handleRegister(req, res) {
                   return res.status(200).json({ message: info });
                 }
               );
-              return res.json(user);
+              return res.status(200).json({ token: token });
             })
             .catch((err) => res.status(500).json(err));
         });
