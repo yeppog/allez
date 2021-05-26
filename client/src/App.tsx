@@ -69,13 +69,7 @@ function App() {
         <Route path="/confirm/token=:token" component={ConfirmComponent} />
         <Route
           path="/login"
-          render={(props) => (
-            <LoginComponent
-              classes={classes}
-              lightTheme={lightTheme}
-              setLightTheme={setLightTheme}
-            />
-          )}
+          render={(props) => <LoginComponent classes={classes} />}
         />
         <Route path="/register" component={RegisterComponent} />
         <Redirect exact from="/" to="/login" />

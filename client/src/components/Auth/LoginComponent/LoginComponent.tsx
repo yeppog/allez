@@ -28,8 +28,6 @@ interface State {
 
 interface Props {
   classes: any;
-  lightTheme: boolean;
-  setLightTheme: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const LoginComponent: React.FC<Props> = (props) => {
