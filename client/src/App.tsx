@@ -84,7 +84,7 @@ function App() {
         />
         <Route path="*" component={NotFoundComponent} />
       </Switch>
-      <footer>
+      <footer className="footer">
         <BotNavComponent />
       </footer>
     </div>
