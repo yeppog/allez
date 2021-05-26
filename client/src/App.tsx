@@ -8,6 +8,7 @@ import ConfirmComponent from './components/Auth/ConfirmComponent/ConfirmComponen
 import HomeComponent from './components/HomeComponent/HomeComponent';
 import LoginComponent from './components/Auth/LoginComponent/LoginComponent';
 import NotFoundComponent from './components/Auth/NotFoundComponent/NotFoundComponent';
+import ProfileComponent from './components/ProfileComponent/ProfileComponent';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import RegisterComponent from './components/Auth/RegisterComponent/RegisterComponent';
 import TopNavComponent from './components/TopNavComponent/TopNavComponent';
@@ -59,7 +60,7 @@ function App() {
       });
   const classes = useStyles();
   return (
-    <div className={'App ' + classes.bars}>
+    <div className={'App '}>
       <TopNavComponent
         classes={classes}
         lightTheme={lightTheme}
@@ -72,7 +73,9 @@ function App() {
           render={(props) => <LoginComponent classes={classes} />}
         />
         <Route path="/register" component={RegisterComponent} />
-        <Redirect exact from="/" to="/login" />
+        <Route path="/profile" component={ProfileComponent} />
+        <Redirect exact from="/" to="/home" />
+
         <ProtectedRoute
           exact
           component={HomeComponent}
