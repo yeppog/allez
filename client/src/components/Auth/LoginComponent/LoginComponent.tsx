@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 
 import { LoginCredentials } from '../../../interface/Credentials';
 import React from 'react';
+import { debug } from 'console';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -25,7 +26,13 @@ interface State {
   showPassword: boolean;
 }
 
-const LoginComponent: React.FC = () => {
+interface Props {
+  classes: any;
+  lightTheme: boolean;
+  setLightTheme: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const LoginComponent: React.FC<Props> = (props) => {
   const [credentials, setCredentials] = useState<State>({
     email: '',
     password: '',
@@ -78,13 +85,13 @@ const LoginComponent: React.FC = () => {
 
   return (
     <div className="LoginComponent" data-testid="LoginComponent">
-      <Card className="loginForm" variant="outlined">
+      <Card className={'loginForm ' + props.classes.dialogs} variant="outlined">
         <h2>Login</h2>
         <form onSubmit={(e) => onSubmit(e)}>
           <Grid>
             <Grid item>
               <FormControl fullWidth variant="filled">
-                <InputLabel>Username / Email</InputLabel>
+                <InputLabel className="label">Username / Email</InputLabel>
                 <Input
                   fullWidth
                   className="username"
@@ -97,7 +104,7 @@ const LoginComponent: React.FC = () => {
             </Grid>
             <Grid item>
               <FormControl fullWidth variant="filled">
-                <InputLabel>Password</InputLabel>
+                <InputLabel className="label">Password</InputLabel>
                 <Input
                   fullWidth
                   className="password"
@@ -125,9 +132,8 @@ const LoginComponent: React.FC = () => {
             <Grid item className="loginButton">
               <Button
                 fullWidth
-                className="loginButton"
+                className={'loginButton ' + props.classes.button}
                 variant="text"
-                color="default"
                 type="submit"
               >
                 Login
@@ -136,9 +142,8 @@ const LoginComponent: React.FC = () => {
             <Grid item className="registerButton">
               <Button
                 fullWidth
-                className="registerButton"
+                className={'registerButton ' + props.classes.button}
                 variant="text"
-                color="default"
                 type="button"
                 onClick={() => history.push('/register')}
               >

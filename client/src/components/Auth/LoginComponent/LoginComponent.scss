@@ -3,7 +3,7 @@
   min-width: 40vw;
   display: grid;
   place-self: center;
-  background: lightsteelblue;
+
   padding: 25px;
   margin-left: auto;
   margin-right: auto;
@@ -22,4 +22,9 @@
 
 .registerButton {
   padding-top: 20px 0px;
+}
+
+.label {
+  font-family: 'Quicksand', Roboto;
+  color: blue;
 }
