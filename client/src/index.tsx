@@ -1,25 +1,47 @@
+import './index.css';
+
+import { CssBaseline, createMuiTheme } from '@material-ui/core';
+import { Route, BrowserRouter as Router } from 'react-router-dom';
+
+import App from './App';
+import { Provider } from 'react-redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import './index.css';
-import App from './App';
+import { ThemeProvider } from '@material-ui/core/styles';
 import reportWebVitals from './reportWebVitals';
-import { Provider } from 'react-redux'
-import store from './components/Redux/store'
+import store from './components/Redux/store';
+
+const theme = createMuiTheme({
+  palette: {
+    type: 'dark',
+  },
+  overrides: {
+    MuiInputBase: {
+      input: {
+        '&:-webkit-autofill': {
+          // hack to remove the autofill
+          transitionDelay: '999999s',
+          transitionProperty: 'background-color, color',
+        },
+      },
+    },
+  },
+});
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store = {store}>
-      <Router>
-        <Route exact path = "/auth">
-
-          </Route>
-        <App />
-        {/* <Route exact path = "/confirm">
-          <ConfirmComponent/>
-        </Route> */}
-      </Router>
-    </Provider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Provider store={store}>
+        <Router>
+          <Route exact path="/auth"></Route>
+          <App />
+          {/* <Route exact path = "/confirm">
+            <ConfirmComponent/>
+          </Route> */}
+        </Router>
+      </Provider>
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
