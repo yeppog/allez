@@ -8,12 +8,14 @@ import { Provider } from 'react-redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ThemeProvider } from '@material-ui/core/styles';
+import { blue } from '@material-ui/core/colors';
 import reportWebVitals from './reportWebVitals';
 import store from './components/Redux/store';
 
 const theme = createMuiTheme({
   palette: {
     type: 'dark',
+    primary: blue,
   },
   overrides: {
     MuiInputBase: {
