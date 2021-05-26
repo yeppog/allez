@@ -34,6 +34,7 @@ const BotNavComponent: React.FC = () => {
           label="Profile"
           value="profile"
           icon={<AccountCircle />}
+          onClick={() => history.push('/profile')}
         />
         {/* <BottomNavigationAction
           label="Folder"
