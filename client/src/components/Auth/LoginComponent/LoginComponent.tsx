@@ -12,12 +12,14 @@ import {
 } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { checkLoggedInUser, loginUser } from '../../Redux/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 
+import { Alert } from '@material-ui/lab';
 import { LoginCredentials } from '../../../interface/Credentials';
 import React from 'react';
+import axios from 'axios';
 import { debug } from 'console';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 interface State {
@@ -37,6 +39,7 @@ const LoginComponent: React.FC<Props> = (props) => {
     showPassword: false,
   });
 
+  const [message, setMessage] = useState<string>();
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -55,35 +58,62 @@ const LoginComponent: React.FC<Props> = (props) => {
     setCredentials({ ...credentials, showPassword: !credentials.showPassword });
   };
 
+  const handleClose = (): void => {
+    setMessage('');
+  };
+
   useEffect(() => {
     dispatch(checkLoggedInUser());
   }, []);
 
   /**
+   * DEPRECATED
    * Passes the credentials the user has entered to the redux handler to log the user in.
    *
    * @param e Event that is passed in when the form is submitted
    */
 
-  const onSubmit = (e: any): void => {
-    // preventDefault prevents the page from refreshing when the form is submitted
+  // const onSubmit = async (e: any) => {
+  //   // preventDefault prevents the page from refreshing when the form is submitted
+  //   e.preventDefault();
+  //   // simple validator for now
+  //   // TODO: Better validation for email and password
+  //   if (credentials.email && credentials.password) {
+  //     const email = credentials.email;
+  //     const password = credentials.password;
+  //     const credential = { email, password } as LoginCredentials;
+  //     dispatch(loginUser(credential));
+  //   } else {
+  //     console.log('Form is invalid');
+  //   }
+  // };
+
+  const HTTPOptions: object = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const onSubmit = async (e: any) => {
     e.preventDefault();
-    // simple validator for now
-    // TODO: Better validation for email and password
-    if (credentials.email && credentials.password) {
-      const email = credentials.email;
-      const password = credentials.password;
-      const credential = { email, password } as LoginCredentials;
-      dispatch(loginUser(credential));
-      console.log('Request dispatched to server');
-    } else {
-      console.log('Form is invalid');
-    }
+    const email = credentials.email;
+    const password = credentials.password;
+    const credential = { email, password } as LoginCredentials;
+    await axios
+      .post('/api/users/login', credential, HTTPOptions)
+      .then((data) => {
+        if (data.status === 200) {
+          history.push('/home');
+        }
+      })
+      .catch((err) => {
+        setMessage(err.message);
+      });
   };
 
   return (
     <div className="LoginComponent" data-testid="LoginComponent">
-      <Card className={'loginForm ' + props.classes.dialogs} variant="outlined">
+      <Card className="loginForm" variant="outlined">
         <h2>Login</h2>
         <form onSubmit={(e) => onSubmit(e)}>
           <Grid>
@@ -127,6 +157,16 @@ const LoginComponent: React.FC<Props> = (props) => {
                 />
               </FormControl>
             </Grid>
+            {message && (
+              <Alert
+                severity="error"
+                onClose={() => handleClose()}
+                style={{ marginTop: '10px' }}
+              >
+                Incorrect Email or Password Combination
+              </Alert>
+            )}
+
             <Grid item className="loginButton">
               <Button
                 fullWidth
