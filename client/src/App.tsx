@@ -1,6 +1,16 @@
 import './App.scss';
 
-import { Redirect, Route, Switch } from 'react-router-dom';
+import {
+  BrowserRouter,
+  NavLink,
+  Redirect,
+  Route,
+  Switch,
+  useLocation,
+  withRouter,
+} from 'react-router-dom';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import React, { PropsWithChildren } from 'react';
 
 import BotNavComponent from './components/BotNavComponent/BotNavComponent';
 import ConfirmComponent from './components/Auth/ConfirmComponent/ConfirmComponent';
@@ -17,25 +27,88 @@ import { getStatus } from './components/Redux/userSlice';
 import { useSelector } from 'react-redux';
 
 function App() {
+  const refNode = React.useRef(null);
+  const routes = [
+    { path: '/login', name: 'Login', Component: LoginComponent },
+    { path: '/register', name: 'Register', Component: RegisterComponent },
+    {
+      path: '/reset/token=:token',
+      name: 'Request Password Reset',
+      Component: ResetRequestComponent,
+    },
+    { path: '/reset/end', name: 'Reset Password', Component: ResetComponent },
+    {
+      path: '/confirm/token=:token',
+      name: 'Confirm',
+      Component: ConfirmComponent,
+    },
+    { path: '/home', name: 'Home', Component: HomeComponent },
+  ];
+
+  /**
+   * Experimental CSS Transition with React Router
+   * Extremely buggy at the moment, needs to be debugged.
+   */
+  const AnimatedSwitch = withRouter(({ location }) => (
+    <div style={{ position: 'relative' }}>
+      <TransitionGroup>
+        <CSSTransition
+          key={location.key}
+          classNames="pages"
+          timeout={1000}
+          refNode={refNode}
+          unmountOnExit
+        >
+          <Switch location={location}>
+            {routes.map((route: { path: string; Component: React.FC }) => (
+              <Route key={route.path} exact path={route.path}>
+                <div
+                  ref={refNode}
+                  style={{ position: 'absolute' }}
+                  className="pages"
+                >
+                  <route.Component />
+                </div>
+              </Route>
+            ))}
+
+            <Redirect exact from="/" to="/home" />
+
+            <Route path="/home">
+              <ProtectedRoute
+                exact
+                component={HomeComponent}
+                path="/home"
+                authenticationPath="login"
+              />
+            </Route>
+            <Route path="*" component={NotFoundComponent} />
+          </Switch>
+        </CSSTransition>
+      </TransitionGroup>
+    </div>
+  ));
+
   return (
     <div className={'App '}>
       <TopNavComponent />
       <Switch>
-        <Route path="/confirm/token=:token" component={ConfirmComponent} />
-        <Route path="/login" component={LoginComponent} />
-        <Route path="/register" component={RegisterComponent} />
-        <Route path="/reset/token=:token" component={ResetComponent} />
-        <Route path="/resetrequest" component={ResetRequestComponent} />
-        <Route path="/profile" component={ProfileComponent} />
-        <Redirect exact from="/" to="/home" />
         <ProtectedRoute
           exact
           component={HomeComponent}
           path="/home"
           authenticationPath="/login"
         />
+        <Route path="/confirm/token=:token" component={ConfirmComponent} />
+        {routes.map((route: { path: string; Component: React.FC }) => (
+          <Route key={route.path} exact path={route.path}>
+            <route.Component />
+          </Route>
+        ))}
+        <Redirect exact from="/" to="/home" />
         <Route path="*" component={NotFoundComponent} />
       </Switch>
+      {/* <AnimatedSwitch /> */}
       <footer className="footer">
         <BotNavComponent />
       </footer>

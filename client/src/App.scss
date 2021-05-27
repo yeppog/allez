@@ -1,12 +1,12 @@
 .App {
-  display: flex;
-  flex-wrap: wrap;
-  // flex-direction: column;
-  margin-left: auto;
-  margin-right: auto;
-  align-content: center;
-  justify-content: center;
-  min-height: 100vh;
+  // display: flex;
+  // flex-wrap: wrap;
+  // // flex-direction: column;
+  // margin-left: auto;
+  // margin-right: auto;
+  // align-content: center;
+  // justify-content: center;
+  // min-height: 100vh;
 }
 
 footer {
@@ -76,4 +76,35 @@ footer {
   opacity: 0;
   max-height: 0;
   transition: opacity 300ms ease-in, max-height 0.5s ease-out;
+}
+
+.pages {
+  position: absolute;
+}
+
+.transform-enter,
+.transform-exit {
+  transition: transform 1000ms ease-out;
+}
+
+.pages-enter {
+  transform: translateX(100%);
+}
+
+.pages-enter-active {
+  transform: translateX(0%);
+  transition: transform 1000ms ease-out;
+}
+
+.pages-exit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateX(0%);
+}
+
+.pages-exit-active {
+  transform: translateX(-100%);
+  transition: transform 1000ms ease-in-out;
 }
