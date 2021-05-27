@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppBar } from '@material-ui/core';
 import EventEmitter from 'events';
 import IconButton from '@material-ui/core/IconButton';
+import { NavLink } from 'react-router-dom';
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { logoutUser } from './../Redux/userSlice';
@@ -40,7 +41,12 @@ const TopNavComponent: React.FC = () => {
             <Menu />
           </IconButton>
           <Typography variant="h6" style={{ flexGrow: 1 }}>
-            Allez
+            <NavLink
+              to="/home"
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              Allez
+            </NavLink>
           </Typography>
           <Switch checked={true} color="default" onChange={handleChange} />
           {loginStatus === 'succeeded' && (
