@@ -46,14 +46,14 @@ const ConfirmComponent: React.FC = () => {
     <div className="ConfirmComponent" data-testid="ConfirmComponent">
       <Card className="message">
         {state === 'idle' && (
-          <div>
+          <div className="messageContent">
             <h3>😎 Confirming your account... 😎</h3>
             <p>Hang on tight! We'll be there in a jiffy!</p>
             <CircularProgress></CircularProgress>
           </div>
         )}
         {state === 'error' && (
-          <div>
+          <div className="messageContent">
             <h3>😕 Woah there! 😕</h3>
             <h4>Something went wrong</h4>
             <p>
@@ -73,7 +73,7 @@ const ConfirmComponent: React.FC = () => {
           </div>
         )}
         {state == 'success' && (
-          <div>
+          <div className="messageContent">
             <h3>🎉 Hooray! 🎉</h3>
             <h4>Your account has been activated</h4>
             <p>You will be redirected to the login page shortly</p>
