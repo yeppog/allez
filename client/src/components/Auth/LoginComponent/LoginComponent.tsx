@@ -58,10 +58,6 @@ const LoginComponent: React.FC = () => {
     setMessage('');
   };
 
-  useEffect(() => {
-    dispatch(checkLoggedInUser());
-  }, []);
-
   /**
    * DEPRECATED
    * Passes the credentials the user has entered to the redux handler to log the user in.
@@ -99,10 +95,12 @@ const LoginComponent: React.FC = () => {
       .post('/api/users/login', credential, HTTPOptions)
       .then((data) => {
         if (data.status === 200) {
+          dispatch(loginUser(data.data));
           history.push('/home');
         }
       })
       .catch((err) => {
+        console.log(err);
         setMessage(err.message);
       });
   };

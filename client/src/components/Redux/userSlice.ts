@@ -38,29 +38,18 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     loginUser: (state, action) => {
-      state.user.concat(action.payload);
+      localStorage.setItem('token', action.payload.token);
+      state.user = [action.payload.user];
+      state.status = 'succeeded';
     },
   },
   extraReducers: (builder) => {
-    // builder.addCase(loginUser.pending, (state, action) => {
-    //   state.status = 'pending';
-    // });
-    // builder.addCase(loginUser.fulfilled, (state, action) => {
-    //   state.status = 'succeeded';
-    //   state.user = state.user.concat(action.payload);
-    //   localStorage.setItem('token', action.payload.token);
-    //   console.log(localStorage.getItem('token'));
-    // });
-    // builder.addCase(loginUser.rejected, (state, action) => {
-    //   state.status = 'failed';
-    //   state.error = action.error.message;
-    // });
     builder.addCase(checkLoggedInUser.pending, (state, action) => {
       state.status = 'pending';
     });
     builder.addCase(checkLoggedInUser.fulfilled, (state, action) => {
       state.status = 'succeeded';
-      state.user = state.user.concat(action.payload);
+      state.user = [action.payload];
     });
     builder.addCase(checkLoggedInUser.rejected, (state, action) => {
       state.status = 'failed';
