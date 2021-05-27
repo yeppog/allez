@@ -196,7 +196,6 @@ async function handleVerify(req, res) {
     } else {
       // decoding the token returns us our objectId that we encoded
       const userId = jwt.decode(token, process.env.JWT_SECRET).id;
-      console.log(userId);
       let user;
       try {
         user = await User.findOne(new ObjectId(userId));
@@ -281,28 +280,27 @@ async function handleReset(req, res) {
       // decode to ensure the token matches the userId
       const id = jwt.decode(req.body.token, secret).id;
       const user = await User.findOne(new ObjectId(id));
+      let password = "";
       if (!user) {
         return res.status(400).json({ message: "Invalid user ID" });
       } else {
-        let password;
         // generate password hash for the new password
         bcrypt.genSalt().then((salt) =>
-          bcrypt.hash(req.body.password, salt, (err, hash) => {
+          bcrypt.hash(req.body.password, salt, async (err, hash) => {
             if (err) {
               return res.status(500).json({ message: "Password error" });
             } else {
-              password = hash;
+              await User.findByIdAndUpdate(
+                new ObjectId(id),
+                {
+                  password: hash,
+                },
+                { useFindAndModify: false }
+              );
             }
           })
         );
         // update the password field for this user
-        await User.findByIdAndUpdate(
-          new ObjectId(id),
-          {
-            password: password,
-          },
-          { useFindAndModify: false }
-        );
         return res
           .status(200)
           .json({ message: "Password successfully updated" });
@@ -339,7 +337,6 @@ async function handleConfirm(req, res) {
         if (user.activated) {
           return res.status(403).json({ message: "Account already activated" });
         }
-        console.log(id);
         await User.findByIdAndUpdate(
           new ObjectId(id),
           { activated: true },
