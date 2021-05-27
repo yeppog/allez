@@ -114,137 +114,135 @@ const RegisterComponent: React.FC = () => {
 
   return (
     <div className="RegisterComponent" data-testid="RegisterComponent">
-      <Grid container>
-        <Grid item xs={12}>
-          <Card className="form" variant="outlined">
-            {state.postSuccess ? (
-              <div className="successBox">
-                <Grid item sm={12}>
-                  <h2>Thank you for registering</h2>
-                  <p>
-                    Please check your email account for a verification mail we
-                    just sent to activate your account
-                  </p>
-                  <Button onClick={() => history.push('/login')}>
-                    Login Page
-                  </Button>
-                  {/* //TODO: Remove this section once SMTP is working */}
-                  <p>
-                    Well since SMTP isn't working 🤷, click{' '}
-                    <a
-                      href=""
-                      onClick={() => history.push(`confirm/token=${confirm}`)}
+      {/* <Grid container>
+        <Grid item xs={12}> */}
+      <Card className="form" variant="outlined">
+        {state.postSuccess ? (
+          <div className="successBox">
+            <Grid item sm={12}>
+              <h2>Thank you for registering</h2>
+              <p>
+                Please check your email account for a verification mail we just
+                sent to activate your account
+              </p>
+              <Button onClick={() => history.push('/login')}>Login Page</Button>
+              {/* //TODO: Remove this section once SMTP is working */}
+              <p>
+                Well since SMTP isn't working 🤷, click{' '}
+                <a
+                  href=""
+                  onClick={() => history.push(`confirm/token=${confirm}`)}
+                >
+                  here
+                </a>{' '}
+                to confirm your account.
+              </p>
+            </Grid>
+          </div>
+        ) : (
+          <div>
+            <h2>Register</h2>
+            <form onSubmit={(e) => onSubmit(e)}>
+              <Grid item sm={12}>
+                <FormControl fullWidth variant="filled">
+                  <InputLabel>Full Name</InputLabel>
+                  <Input
+                    fullWidth
+                    className="name"
+                    type="text"
+                    value={state.name}
+                    onChange={handleChange('name')}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item>
+                <FormControl fullWidth variant="filled">
+                  <InputLabel>Username</InputLabel>
+                  <Input
+                    fullWidth
+                    className="username"
+                    type="text"
+                    value={state.username}
+                    onChange={handleChange('username')}
+                    required
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item>
+                <FormControl fullWidth variant="filled">
+                  <InputLabel>Email</InputLabel>
+                  <Input
+                    fullWidth
+                    className="email"
+                    type="email"
+                    value={state.email}
+                    onChange={handleChange('email')}
+                    required
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item>
+                <FormControl fullWidth variant="filled">
+                  <InputLabel>Password</InputLabel>
+                  <Input
+                    fullWidth
+                    className="password"
+                    type="password"
+                    value={state.password}
+                    onChange={handleChange('password')}
+                    required
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item>
+                <FormControl fullWidth variant="filled">
+                  <InputLabel>Confirm Password</InputLabel>
+                  <Input
+                    fullWidth
+                    className="cpassword"
+                    type="password"
+                    value={state.confirmPassword}
+                    onChange={handleChange('confirmPassword')}
+                    required
+                  />
+                </FormControl>
+              </Grid>
+              <div className="errorAlert">
+                <CSSTransition
+                  nodeRef={nodeRef}
+                  in={state.message ? true : false}
+                  timeout={1000}
+                  unmountOnExit
+                  classNames="errorAlert"
+                >
+                  <div ref={nodeRef}>
+                    <Alert
+                      severity="error"
+                      onClose={() => setState({ ...state, message: '' })}
                     >
-                      here
-                    </a>{' '}
-                    to confirm your account.
-                  </p>
-                </Grid>
-              </div>
-            ) : (
-              <div>
-                <h2>Register</h2>
-                <form onSubmit={(e) => onSubmit(e)}>
-                  <Grid item sm={12}>
-                    <FormControl fullWidth variant="filled">
-                      <InputLabel>Full Name</InputLabel>
-                      <Input
-                        fullWidth
-                        className="name"
-                        type="text"
-                        value={state.name}
-                        onChange={handleChange('name')}
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item>
-                    <FormControl fullWidth variant="filled">
-                      <InputLabel>Username</InputLabel>
-                      <Input
-                        fullWidth
-                        className="username"
-                        type="text"
-                        value={state.username}
-                        onChange={handleChange('username')}
-                        required
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item>
-                    <FormControl fullWidth variant="filled">
-                      <InputLabel>Email</InputLabel>
-                      <Input
-                        fullWidth
-                        className="email"
-                        type="email"
-                        value={state.email}
-                        onChange={handleChange('email')}
-                        required
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item>
-                    <FormControl fullWidth variant="filled">
-                      <InputLabel>Password</InputLabel>
-                      <Input
-                        fullWidth
-                        className="password"
-                        type="password"
-                        value={state.password}
-                        onChange={handleChange('password')}
-                        required
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item>
-                    <FormControl fullWidth variant="filled">
-                      <InputLabel>Confirm Password</InputLabel>
-                      <Input
-                        fullWidth
-                        className="cpassword"
-                        type="password"
-                        value={state.confirmPassword}
-                        onChange={handleChange('confirmPassword')}
-                        required
-                      />
-                    </FormControl>
-                  </Grid>
-                  <div className="errorAlert">
-                    <CSSTransition
-                      nodeRef={nodeRef}
-                      in={state.message ? true : false}
-                      timeout={1000}
-                      unmountOnExit
-                      classNames="errorAlert"
-                    >
-                      <div ref={nodeRef}>
-                        <Alert
-                          severity="error"
-                          onClose={() => setState({ ...state, message: '' })}
-                        >
-                          {state.message}
-                        </Alert>
-                      </div>
-                    </CSSTransition>
+                      {state.message}
+                    </Alert>
                   </div>
-
-                  <Grid item className="button">
-                    <Button
-                      fullWidth
-                      className="registerButton"
-                      variant="text"
-                      color="default"
-                      type="submit"
-                    >
-                      Register
-                    </Button>
-                  </Grid>
-                </form>
+                </CSSTransition>
               </div>
-            )}
-          </Card>
-        </Grid>
-      </Grid>
+
+              <Grid item className="button">
+                <Button
+                  fullWidth
+                  className="registerButton"
+                  variant="text"
+                  color="default"
+                  type="submit"
+                >
+                  Register
+                </Button>
+              </Grid>
+            </form>
+          </div>
+        )}
+      </Card>
+      {/* </Grid>
+      </Grid> */}
 
       {/* <form action="" className="registerForm" onSubmit={e => onSubmit(e)}>
         <h2>Registration</h2>
