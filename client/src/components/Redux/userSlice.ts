@@ -42,6 +42,11 @@ const userSlice = createSlice({
       state.user = [action.payload.user];
       state.status = 'succeeded';
     },
+    logoutUser: (state) => {
+      localStorage.removeItem('token');
+      state.user = [];
+      state.status = 'idle';
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(checkLoggedInUser.pending, (state, action) => {
@@ -65,4 +70,4 @@ const HTTPOptions = {
 export default userSlice.reducer;
 export const getUser = (state: UsersState) => state.user;
 export const getStatus = (state: UsersState) => state.status;
-export const { loginUser } = userSlice.actions;
+export const { loginUser, logoutUser } = userSlice.actions;
