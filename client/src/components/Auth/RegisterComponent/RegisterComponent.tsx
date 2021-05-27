@@ -105,7 +105,7 @@ const RegisterComponent: React.FC = () => {
     <div className="RegisterComponent" data-testid="RegisterComponent">
       <Grid container>
         <Grid item xs={12}>
-          <Card className="registerCard" variant="outlined">
+          <Card className="form" variant="outlined">
             {state.postSuccess ? (
               <div className="successBox">
                 <Grid item sm={12}>
@@ -204,6 +204,7 @@ const RegisterComponent: React.FC = () => {
                         <Alert
                           severity="error"
                           onClose={() => setState({ ...state, message: '' })}
+                          className="errorAlert"
                         >
                           {state.message}
                         </Alert>
@@ -211,7 +212,7 @@ const RegisterComponent: React.FC = () => {
                     </Fade>
                   )}
 
-                  <Grid item className="registerButton">
+                  <Grid item className="button">
                     <Button
                       fullWidth
                       className="registerButton"

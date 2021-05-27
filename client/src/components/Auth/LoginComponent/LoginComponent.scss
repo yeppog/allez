@@ -1,38 +1,3 @@
-.loginForm {
-  border-radius: 5px;
-  min-width: 40vw;
-  display: grid;
-  place-self: center;
-
-  padding: 25px;
-  margin-left: auto;
-  margin-right: auto;
-
-  input {
-    margin: 10px 0px;
-    padding: 10px 10px;
-    border-style: none;
-    border-radius: 5px;
-  }
-}
-
-.loginButton {
-  padding: 20px 0px;
-}
-
-.registerButton {
-  padding-top: 20px 0px;
-}
-
-.label {
-  font-family: 'Quicksand', Roboto;
-  color: blue;
-}
-
-.errorAlert {
-  animation: fadeIn linear 1s;
-}
-
 @keyframes fadeIn {
   0% {
     opacity: 0;

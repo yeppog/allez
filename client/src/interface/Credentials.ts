@@ -12,3 +12,12 @@ export interface RegisterCredentials {
 export interface ConfirmCredentials {
     token: string;
 }
+
+export interface ResetRequestCredentials {
+    email: string;
+}
+
+export interface ResetCredentials {
+    token: string;
+    password: string;
+}

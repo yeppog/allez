@@ -113,7 +113,7 @@ const LoginComponent: React.FC<Props> = (props) => {
 
   return (
     <div className="LoginComponent" data-testid="LoginComponent">
-      <Card className="loginForm" variant="outlined">
+      <Card className="form" variant="outlined">
         <h2>Login</h2>
         <form onSubmit={(e) => onSubmit(e)}>
           <Grid>
@@ -162,25 +162,26 @@ const LoginComponent: React.FC<Props> = (props) => {
                 severity="error"
                 onClose={() => handleClose()}
                 style={{ marginTop: '10px' }}
+                className="errorAlert"
               >
                 Incorrect Email or Password Combination
               </Alert>
             )}
 
-            <Grid item className="loginButton">
+            <Grid item className="button">
               <Button
                 fullWidth
-                className={'loginButton ' + props.classes.button}
+                className={'button ' + props.classes.button}
                 variant="text"
                 type="submit"
               >
                 Login
               </Button>
             </Grid>
-            <Grid item className="registerButton">
+            <Grid item className="button">
               <Button
                 fullWidth
-                className={'registerButton ' + props.classes.button}
+                className={'button ' + props.classes.button}
                 variant="text"
                 type="button"
                 onClick={() => history.push('/register')}

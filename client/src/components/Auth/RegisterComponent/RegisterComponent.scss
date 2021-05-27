@@ -1,38 +1,3 @@
 .RegisterComponent {
   display: grid;
 }
-
-.registerCard {
-  border: 1px solid black;
-  border-radius: 5px;
-  display: grid;
-  min-width: 400px;
-  place-self: center;
-  padding: 25px;
-  // margin-left: auto;
-  // margin-right: auto;
-  // margin-top: auto;V
-  margin: 20px;
-
-  input {
-    margin: 10px 0px;
-    padding: 10px 5px;
-    border-style: none;
-    border-radius: 5px;
-  }
-}
-
-.errorAlert {
-  margin: 10px 0px;
-}
-
-.registerButton {
-  margin: 5px 0px;
-  padding: 10px 0px;
-}
-
-@media screen and (max-width: 600px) {
-  .registerCard {
-    min-width: 70vw;
-  }
-}

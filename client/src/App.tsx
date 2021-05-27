@@ -11,6 +11,8 @@ import NotFoundComponent from './components/Auth/NotFoundComponent/NotFoundCompo
 import ProfileComponent from './components/ProfileComponent/ProfileComponent';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import RegisterComponent from './components/Auth/RegisterComponent/RegisterComponent';
+import ResetComponent from './components/Auth/ResetComponent/ResetComponent';
+import ResetRequestComponent from './components/Auth/ResetRequestComponent/ResetRequestComponent';
 import TopNavComponent from './components/TopNavComponent/TopNavComponent';
 import { getStatus } from './components/Redux/userSlice';
 import { makeStyles } from '@material-ui/core/styles';
@@ -73,9 +75,10 @@ function App() {
           render={(props) => <LoginComponent classes={classes} />}
         />
         <Route path="/register" component={RegisterComponent} />
+        <Route path="/reset/token=:token" component={ResetComponent} />
+        <Route path="/resetrequest" component={ResetRequestComponent} />
         <Route path="/profile" component={ProfileComponent} />
         <Redirect exact from="/" to="/home" />
-
         <ProtectedRoute
           exact
           component={HomeComponent}
