@@ -232,7 +232,7 @@ async function handleResetRequest(req, res) {
       if (!user) {
         return res.status(401).json({ message: "Invalid user" });
       } else {
-        const secret = user._id + "-" + process.env.JWT_TOKEN;
+        const secret = "password_reset - " + process.env.JWT_TOKEN;
         // currently set the token to expire in 10 minutes
         const token = jwt.sign({ id: user._id }, secret, {
           expiresIn: 600,
@@ -251,7 +251,7 @@ async function handleResetRequest(req, res) {
             console.log(info);
           }
         );
-        return res.status(200).send(token);
+        return res.status(200).json({ token: token });
       }
     } catch (err) {
       console.log(err);
@@ -275,44 +275,37 @@ async function handleReset(req, res) {
     return res.status(400).json({ message: "No token" });
   } else {
     try {
-      const id = req.body.id;
+      const secret = "password_reset - " + process.env.JWT_TOKEN;
+      // verify to ensure token has not expired
+      jwt.verify(req.body.token, secret);
+      // decode to ensure the token matches the userId
+      const id = jwt.decode(req.body.token, secret).id;
       const user = await User.findOne(new ObjectId(id));
       if (!user) {
         return res.status(400).json({ message: "Invalid user ID" });
       } else {
-        // verify to ensure token has not expired
-        jwt.verify(req.body.token, user.id + "-" + process.env.JWT_SECRET);
-        // decode to ensure the token matches the userId
-        decoded = jwt.decode(
-          req.body.token,
-          user.id + "-" + process.env.JWT_SECRET
-        ).id;
-        if (decoded == user.id) {
-          let password;
-          // generate password hash for the new password
-          bcrypt.genSalt().then((salt) =>
-            bcrypt.hash(req.body.password, salt, (err, hash) => {
-              if (err) {
-                return res.status(500).json({ message: "Password error" });
-              } else {
-                password = hash;
-              }
-            })
-          );
-          // update the password field for this user
-          await User.findByIdAndUpdate(
-            new ObjectId(req.body.id),
-            {
-              password: password,
-            },
-            { useFindAndModify: false }
-          );
-          return res
-            .status(200)
-            .json({ message: "Password successfully updated" });
-        } else {
-          return res.status(401).json({ message: "Unauthorized" });
-        }
+        let password;
+        // generate password hash for the new password
+        bcrypt.genSalt().then((salt) =>
+          bcrypt.hash(req.body.password, salt, (err, hash) => {
+            if (err) {
+              return res.status(500).json({ message: "Password error" });
+            } else {
+              password = hash;
+            }
+          })
+        );
+        // update the password field for this user
+        await User.findByIdAndUpdate(
+          new ObjectId(id),
+          {
+            password: password,
+          },
+          { useFindAndModify: false }
+        );
+        return res
+          .status(200)
+          .json({ message: "Password successfully updated" });
       }
     } catch (err) {
       // catch the error thrown if the token has expired.
