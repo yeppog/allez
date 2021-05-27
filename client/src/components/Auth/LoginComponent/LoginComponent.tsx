@@ -28,11 +28,7 @@ interface State {
   showPassword: boolean;
 }
 
-interface Props {
-  classes: any;
-}
-
-const LoginComponent: React.FC<Props> = (props) => {
+const LoginComponent: React.FC = () => {
   const [credentials, setCredentials] = useState<State>({
     email: '',
     password: '',
@@ -167,21 +163,20 @@ const LoginComponent: React.FC<Props> = (props) => {
                 Incorrect Email or Password Combination
               </Alert>
             )}
-
-            <Grid item className="button">
+            <Grid item className="spacing">
               <Button
                 fullWidth
-                className={'button ' + props.classes.button}
+                className={'button'}
                 variant="text"
                 type="submit"
               >
                 Login
               </Button>
             </Grid>
-            <Grid item className="button">
+            <Grid item className="spacing">
               <Button
                 fullWidth
-                className={'button ' + props.classes.button}
+                className={'button'}
                 variant="text"
                 type="button"
                 onClick={() => history.push('/register')}

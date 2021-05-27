@@ -145,7 +145,7 @@ const ResetRequestComponent: React.FC = () => {
                       </div>
                     </Fade>
                   )}
-                  <Grid item className="button">
+                  <Grid item>
                     <Button
                       fullWidth
                       className="button"
