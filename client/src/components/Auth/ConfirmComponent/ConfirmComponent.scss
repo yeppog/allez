@@ -1,4 +1,9 @@
 .ConfirmComponent {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
 }
 
 .message {
@@ -7,7 +12,7 @@
 
   text-align: center;
 
-  div {
+  .messageContent {
     padding: 10px 0px;
     margin: 10px 0px;
   }
