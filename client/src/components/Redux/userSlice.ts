@@ -18,14 +18,6 @@ const initialState = {
   error: null,
 } as UsersState;
 
-export const loginUser = createAsyncThunk(
-  'user/loginUser',
-  async (body: LoginCredentials) => {
-    const res = await axios.post('/api/users/login', body, HTTPOptions);
-    return res.data;
-  }
-);
-
 export const checkLoggedInUser = createAsyncThunk(
   'user/checkLoggedInUser',
   async () => {
@@ -44,21 +36,25 @@ export const checkLoggedInUser = createAsyncThunk(
 const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    loginUser: (state, action) => {
+      state.user.concat(action.payload);
+    },
+  },
   extraReducers: (builder) => {
-    builder.addCase(loginUser.pending, (state, action) => {
-      state.status = 'pending';
-    });
-    builder.addCase(loginUser.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-      state.user = state.user.concat(action.payload);
-      localStorage.setItem('token', action.payload.token);
-      console.log(localStorage.getItem('token'));
-    });
-    builder.addCase(loginUser.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action.error.message;
-    });
+    // builder.addCase(loginUser.pending, (state, action) => {
+    //   state.status = 'pending';
+    // });
+    // builder.addCase(loginUser.fulfilled, (state, action) => {
+    //   state.status = 'succeeded';
+    //   state.user = state.user.concat(action.payload);
+    //   localStorage.setItem('token', action.payload.token);
+    //   console.log(localStorage.getItem('token'));
+    // });
+    // builder.addCase(loginUser.rejected, (state, action) => {
+    //   state.status = 'failed';
+    //   state.error = action.error.message;
+    // });
     builder.addCase(checkLoggedInUser.pending, (state, action) => {
       state.status = 'pending';
     });
@@ -80,3 +76,4 @@ const HTTPOptions = {
 export default userSlice.reducer;
 export const getUser = (state: UsersState) => state.user;
 export const getStatus = (state: UsersState) => state.status;
+export const { loginUser } = userSlice.actions;
