@@ -36,11 +36,8 @@ footer {
     border-style: none;
     border-radius: 5px;
   }
-  background-color: var(--bg-color);
-}
 
-.errorAlert {
-  animation: fadeIn linear 1s;
+  background-color: var(--bg-color);
 }
 
 @media screen and (min-width: 600px) {
@@ -52,4 +49,31 @@ footer {
   .form {
     min-width: 70vw;
   }
+}
+
+.errorAlert {
+  margin-top: 10px;
+}
+.errorAlert-enter,
+.errorAlert-appear {
+  opacity: 0;
+  max-height: 0;
+}
+
+.errorAlert-enter-active,
+.errorAlert-appear-active {
+  opacity: 1;
+  transition: opacity 1s ease-in, max-height 1s ease-out;
+  max-height: 200px;
+}
+
+.errorAlert-exit {
+  max-height: 200px;
+  opacity: 1;
+}
+
+.errorAlert-exit-active {
+  opacity: 0;
+  max-height: 0;
+  transition: opacity 300ms ease-in, max-height 0.5s ease-out;
 }

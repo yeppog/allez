@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 
 import { Alert } from '@material-ui/lab';
+import { CSSTransition } from 'react-transition-group';
 import { LoginCredentials } from '../../../interface/Credentials';
 import React from 'react';
 import axios from 'axios';
@@ -27,14 +28,17 @@ interface State {
   password: string;
   showPassword: boolean;
   loginStatus: boolean;
+  message: string;
 }
 
 const LoginComponent: React.FC = () => {
+  const nodeRef = React.useRef(null);
   const [state, setState] = useState<State>({
     email: '',
     password: '',
     showPassword: false,
     loginStatus: false,
+    message: '',
   });
 
   const [message, setMessage] = useState<string>();
@@ -57,7 +61,7 @@ const LoginComponent: React.FC = () => {
   };
 
   const handleClose = (): void => {
-    setMessage('');
+    setState({ ...state, message: '' });
   };
 
   useEffect(() => {
@@ -93,7 +97,7 @@ const LoginComponent: React.FC = () => {
       })
       .catch((err) => {
         console.log(err);
-        setMessage(err.message);
+        setState({ ...state, message: err.message });
       });
   };
 
@@ -144,16 +148,25 @@ const LoginComponent: React.FC = () => {
                   />
                 </FormControl>
               </Grid>
-              {message && (
-                <Alert
-                  severity="error"
-                  onClose={() => handleClose()}
-                  style={{ marginTop: '10px' }}
-                  className="errorAlert"
+              <div className="errorAlert">
+                <CSSTransition
+                  nodeRef={nodeRef}
+                  in={state.message ? true : false}
+                  timeout={1000}
+                  unmountOnExit
+                  classNames="errorAlert"
                 >
-                  Incorrect Email or Password Combination
-                </Alert>
-              )}
+                  <div ref={nodeRef}>
+                    <Alert
+                      severity="error"
+                      onClose={() => handleClose()}
+                      className="errorAlert"
+                    >
+                      Incorrect Email or Password Combination
+                    </Alert>
+                  </div>
+                </CSSTransition>
+              </div>
               <Grid item className="spacing">
                 <Button
                   fullWidth

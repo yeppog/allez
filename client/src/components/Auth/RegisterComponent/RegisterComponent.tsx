@@ -11,6 +11,7 @@ import {
 } from '@material-ui/core';
 
 import { Alert } from '@material-ui/lab';
+import { CSSTransition } from 'react-transition-group';
 import React from 'react';
 import { RegisterCredentials } from '../../../interface/Credentials';
 import axios from 'axios';
@@ -28,6 +29,7 @@ interface State {
 }
 
 const RegisterComponent: React.FC = () => {
+  const nodeRef = React.useRef(null);
   const history = useHistory();
   // temporary workaround as SMTP is not set up
   const [confirm, setConfirm] = useState<string>('');
@@ -62,8 +64,6 @@ const RegisterComponent: React.FC = () => {
       const password = state.password;
       const credential = { username, email, password } as RegisterCredentials;
       registerLogin(credential);
-    } else {
-      console.log('Form is invalid or passwords do not match');
     }
   };
 
@@ -91,8 +91,19 @@ const RegisterComponent: React.FC = () => {
         // regex email checker
         const re =
           /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(email).toLowerCase());
+        if (re.test(String(email).toLowerCase())) {
+          return true;
+        } else {
+          setState({ ...state, message: 'Email is not valid' });
+        }
+      } else {
+        setState({ ...state, message: 'Passwords do not match' });
       }
+    } else {
+      setState({
+        ...state,
+        message: 'Form is invalid. All fields are required',
+      });
     }
     return false;
   };
@@ -198,19 +209,24 @@ const RegisterComponent: React.FC = () => {
                       />
                     </FormControl>
                   </Grid>
-                  {state.message && (
-                    <Fade in={state.message ? true : false}>
-                      <div className="errorAlert">
+                  <div className="errorAlert">
+                    <CSSTransition
+                      nodeRef={nodeRef}
+                      in={state.message ? true : false}
+                      timeout={1000}
+                      unmountOnExit
+                      classNames="errorAlert"
+                    >
+                      <div ref={nodeRef}>
                         <Alert
                           severity="error"
                           onClose={() => setState({ ...state, message: '' })}
-                          className="errorAlert"
                         >
                           {state.message}
                         </Alert>
                       </div>
-                    </Fade>
-                  )}
+                    </CSSTransition>
+                  </div>
 
                   <Grid item className="button">
                     <Button
