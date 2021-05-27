@@ -2,6 +2,7 @@ import './TopNavComponent.scss';
 
 import { Button, Switch, Toolbar } from '@material-ui/core';
 import { Menu, Search } from '@material-ui/icons';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { AppBar } from '@material-ui/core';
 import EventEmitter from 'events';
@@ -9,12 +10,16 @@ import IconButton from '@material-ui/core/IconButton';
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { logoutUser } from './../Redux/userSlice';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 
 const TopNavComponent: React.FC = () => {
   const dispatch = useDispatch();
   const history = useHistory();
+
+  const loginStatus = useSelector(
+    (state: { user: { status: any } }) => state.user.status
+  );
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     //TODO: Handle theme change and checked
   };
@@ -38,9 +43,11 @@ const TopNavComponent: React.FC = () => {
             Allez
           </Typography>
           <Switch checked={true} color="default" onChange={handleChange} />
-          <Button type="button" onClick={logoutHandler}>
-            Logout
-          </Button>
+          {loginStatus === 'succeeded' && (
+            <Button type="button" onClick={logoutHandler}>
+              Logout
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
     </div>
