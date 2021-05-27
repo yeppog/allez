@@ -164,7 +164,7 @@ const ResetComponent: React.FC = () => {
             )}
             {state.postState === 'idle' && (
               <div>
-                <h3>😎 Confirming your account... 😎</h3>
+                <h3>😎 Loading... 😎</h3>
                 <p>Hang on tight! We'll be there in a jiffy!</p>
                 <CircularProgress></CircularProgress>
               </div>
