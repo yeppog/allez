@@ -108,3 +108,8 @@ footer {
   transform: translateX(-100%);
   transition: transform 1000ms ease-in-out;
 }
+
+// disable scroll bar as it messed up width calculation
+::-webkit-scrollbar {
+  display: none;
+}

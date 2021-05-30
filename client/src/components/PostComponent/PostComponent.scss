@@ -1,0 +1,25 @@
+.PostComponent {
+  display: flex;
+  min-height: 100vh;
+  min-width: calc(100vw - (100vw - 100%));
+  align-items: center;
+  justify-content: center;
+}
+
+.cardBody {
+  // min-width: 90vw;
+  min-height: 30vh;
+  position: relative;
+}
+
+.cardActions {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.mediaBody {
+  background-color: 'black !important';
+  left: 0;
+  right: 0;
+}
