@@ -1,3 +1,12 @@
 .ResetRequestComponent {
-  display: grid;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
 }
+
+// .form {
+//   min-height: 20vh;
+//   min-width: 40vw;
+// }
