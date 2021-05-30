@@ -32,11 +32,15 @@ function App() {
     { path: '/login', name: 'Login', Component: LoginComponent },
     { path: '/register', name: 'Register', Component: RegisterComponent },
     {
-      path: '/reset/token=:token',
+      path: '/reset',
       name: 'Request Password Reset',
       Component: ResetRequestComponent,
     },
-    { path: '/reset/end', name: 'Reset Password', Component: ResetComponent },
+    {
+      path: '/reset/token=:token',
+      name: 'Reset Password',
+      Component: ResetComponent,
+    },
     {
       path: '/confirm/token=:token',
       name: 'Confirm',
