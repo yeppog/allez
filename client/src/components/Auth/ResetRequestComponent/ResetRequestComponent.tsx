@@ -89,7 +89,7 @@ const ResetRequestComponent: React.FC = () => {
   return (
     <div className="ResetRequestComponent" data-testid="ResetRequestComponent">
       <Grid container justify="center" alignItems="center" direction="row">
-        <Grid item xs={10} sm={8} md={4} lg={2}>
+        <Grid item xs={10} sm={8} md={4} lg={4}>
           <Card className="form" variant="outlined">
             {state.postSuccess ? (
               <div className="successBox">

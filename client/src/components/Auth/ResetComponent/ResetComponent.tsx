@@ -89,8 +89,8 @@ const ResetComponent: React.FC = () => {
 
   return (
     <div className="ResetComponent" data-testid="ResetComponent">
-      <Grid container>
-        <Grid item xs={12}>
+      <Grid container alignItems="center" justify="center">
+        <Grid item xs={10} sm={8} md={6} lg={4}>
           <Card className="form" variant="outlined">
             {state.postState === 'success' && (
               <div>
