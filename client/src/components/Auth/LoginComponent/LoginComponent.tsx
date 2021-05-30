@@ -177,7 +177,21 @@ const LoginComponent: React.FC = () => {
                   Login
                 </Button>
               </Grid>
-              <Grid item className="spacing">
+              <Grid container justify="center">
+                <Button
+                  disableElevation={true}
+                  size="small"
+                  variant="text"
+                  onClick={() => history.push('/reset')}
+                  className={'button forgot'}
+                >
+                  Forgot your password?
+                </Button>
+              </Grid>
+              <Grid container justify="center">
+                <p>or</p>
+              </Grid>
+              <Grid item>
                 <Button
                   fullWidth
                   className={'button'}
