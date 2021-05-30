@@ -25,8 +25,31 @@ import ResetRequestComponent from './components/Auth/ResetRequestComponent/Reset
 import TopNavComponent from './components/TopNavComponent/TopNavComponent';
 import { getStatus } from './components/Redux/userSlice';
 import { useSelector } from 'react-redux';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { blueGrey } from '@material-ui/core/colors';
+import { CssBaseline } from '@material-ui/core';
 
 function App() {
+  const darkMode = useSelector(
+    (state: { user: { darkMode: boolean } }) => state.user.darkMode
+  );
+  const theme = createMuiTheme({
+    palette: {
+      type: darkMode ? 'dark' : 'light',
+      primary: blueGrey,
+    },
+    overrides: {
+      MuiInputBase: {
+        input: {
+          '&:-webkit-autofill': {
+            transitionDelay: '999999s',
+            // transitionProperty: 'background-color, color',
+          },
+        },
+      },
+    },
+  });
+  console.log(darkMode);
   const refNode = React.useRef(null);
   const routes = [
     { path: '/login', name: 'Login', Component: LoginComponent },
@@ -90,29 +113,32 @@ function App() {
   ));
 
   return (
-    <div className={'App '}>
-      <TopNavComponent />
-      <Switch>
-        <ProtectedRoute
-          exact
-          component={HomeComponent}
-          path="/home"
-          authenticationPath="/login"
-        />
-        <Route path="/confirm/token=:token" component={ConfirmComponent} />
-        {routes.map((route: { path: string; Component: React.FC }) => (
-          <Route key={route.path} exact path={route.path}>
-            <route.Component />
-          </Route>
-        ))}
-        <Redirect exact from="/" to="/home" />
-        <Route path="*" component={NotFoundComponent} />
-      </Switch>
-      {/* <AnimatedSwitch /> */}
-      <footer className="footer">
-        <BotNavComponent />
-      </footer>
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <div className={'App '}>
+        <TopNavComponent />
+        <Switch>
+          <ProtectedRoute
+            exact
+            component={HomeComponent}
+            path="/home"
+            authenticationPath="/login"
+          />
+          <Route path="/confirm/token=:token" component={ConfirmComponent} />
+          {routes.map((route: { path: string; Component: React.FC }) => (
+            <Route key={route.path} exact path={route.path}>
+              <route.Component />
+            </Route>
+          ))}
+          <Redirect exact from="/" to="/home" />
+          <Route path="*" component={NotFoundComponent} />
+        </Switch>
+        {/* <AnimatedSwitch /> */}
+        <footer className="footer">
+          <BotNavComponent />
+        </footer>
+      </div>
+    </ThemeProvider>
   );
 }
 

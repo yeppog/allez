@@ -4,7 +4,7 @@ import { CssBaseline, createMuiTheme } from '@material-ui/core';
 import { Route, BrowserRouter as Router } from 'react-router-dom';
 
 import App from './App';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ThemeProvider } from '@material-ui/core/styles';
@@ -12,39 +12,14 @@ import { blueGrey } from '@material-ui/core/colors';
 import reportWebVitals from './reportWebVitals';
 import store from './components/Redux/store';
 
-const theme = createMuiTheme({
-  palette: {
-    type: 'dark',
-    primary: blueGrey,
-  },
-  overrides: {
-    // MuiCard: {
-    //   root: {
-    //     backgroundColor: 'black',
-    //   },
-    // },
-    MuiInputBase: {
-      input: {
-        '&:-webkit-autofill': {
-          transitionDelay: '999999s',
-          transitionProperty: 'background-color, color',
-        },
-      },
-    },
-  },
-});
-
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Provider store={store}>
-        <Router>
-          <Route exact path="/auth"></Route>
-          <App />
-        </Router>
-      </Provider>
-    </ThemeProvider>
+    <Provider store={store}>
+      <Router>
+        <Route exact path="/auth"></Route>
+        <App />
+      </Router>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

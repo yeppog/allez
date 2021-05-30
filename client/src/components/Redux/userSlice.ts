@@ -10,12 +10,14 @@ interface UsersState {
   user: string[];
   status: 'idle' | 'pending' | 'succeeded' | 'failed';
   error: string | null | undefined;
+  darkMode: boolean;
 }
 
 const initialState = {
   user: [],
   status: 'idle',
   error: null,
+  darkMode: localStorage.getItem('darkMode') === 'true' ? true : false,
 } as UsersState;
 
 export const checkLoggedInUser = createAsyncThunk(
@@ -47,6 +49,11 @@ const userSlice = createSlice({
       state.user = [];
       state.status = 'idle';
     },
+    toggleDarkMode: (state) => {
+      console.log(localStorage.getItem('darkMode'));
+      localStorage.setItem('darkMode', `${!state.darkMode}`);
+      state.darkMode = !state.darkMode;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(checkLoggedInUser.pending, (state, action) => {
@@ -70,4 +77,4 @@ const HTTPOptions = {
 export default userSlice.reducer;
 export const getUser = (state: UsersState) => state.user;
 export const getStatus = (state: UsersState) => state.status;
-export const { loginUser, logoutUser } = userSlice.actions;
+export const { loginUser, logoutUser, toggleDarkMode } = userSlice.actions;

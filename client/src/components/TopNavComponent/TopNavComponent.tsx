@@ -8,21 +8,32 @@ import { AppBar } from '@material-ui/core';
 import EventEmitter from 'events';
 import IconButton from '@material-ui/core/IconButton';
 import { NavLink } from 'react-router-dom';
-import React from 'react';
+import React, { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
-import { logoutUser } from './../Redux/userSlice';
+import { logoutUser, toggleDarkMode } from './../Redux/userSlice';
 import { useHistory } from 'react-router';
 
 const TopNavComponent: React.FC = () => {
   const dispatch = useDispatch();
+  // const [darkMode, setDarkMode] = useState<boolean>(false);
+  // const [loginStatus, setLoginStatus] = useState<string>('');
   const history = useHistory();
 
-  const loginStatus = useSelector(
-    (state: { user: { status: any } }) => state.user.status
+  let loginStatus = null;
+
+  useSelector((state: { user: { status: any; darkMode: boolean } }) => {
+    loginStatus = state.user.status;
+  });
+
+  const darkMode = useSelector(
+    (state: { user: { status: any; darkMode: boolean } }) => state.user.darkMode
   );
 
+  console.log(darkMode);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     //TODO: Handle theme change and checked
+    // setDarkMode(!darkMode);
+    dispatch(toggleDarkMode());
   };
 
   const logoutHandler = (): void => {
@@ -48,7 +59,7 @@ const TopNavComponent: React.FC = () => {
               Allez
             </NavLink>
           </Typography>
-          <Switch checked={true} color="default" onChange={handleChange} />
+          <Switch checked={darkMode} color="default" onChange={handleChange} />
           {loginStatus === 'succeeded' && (
             <Button type="button" onClick={logoutHandler}>
               Logout
