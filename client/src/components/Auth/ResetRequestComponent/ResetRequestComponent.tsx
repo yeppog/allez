@@ -12,6 +12,7 @@ import {
 import React, { useState } from 'react';
 
 import { Alert } from '@material-ui/lab';
+import { CSSTransition } from 'react-transition-group';
 import { ResetRequestCredentials } from '../../../interface/Credentials';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
@@ -23,6 +24,7 @@ interface State {
 }
 
 const ResetRequestComponent: React.FC = () => {
+  const nodeRef = React.useRef(null);
   const history = useHistory();
   const [confirm, setConfirm] = useState<string>('');
   const [state, setState] = useState({
@@ -61,6 +63,10 @@ const ResetRequestComponent: React.FC = () => {
     } catch (err) {
       setState({ ...state, message: err.message });
     }
+  };
+
+  const handleClose = (): void => {
+    setState({ ...state, message: '' });
   };
 
   const validator = (form: State): boolean => {
@@ -132,19 +138,26 @@ const ResetRequestComponent: React.FC = () => {
                       />
                     </FormControl>
                   </Grid>
-                  {state.message && (
-                    <Fade in={state.message ? true : false}>
-                      <div className="errorAlert">
+                  <div className="errorAlert">
+                    <CSSTransition
+                      nodeRef={nodeRef}
+                      in={state.message ? true : false}
+                      timeout={1000}
+                      unmountOnExit
+                      classNames="errorAlert"
+                    >
+                      <div ref={nodeRef}>
                         <Alert
                           severity="error"
-                          onClose={() => setState({ ...state, message: '' })}
+                          onClose={() => handleClose()}
                           className="errorAlert"
                         >
-                          {state.message}
+                          Invalid email
                         </Alert>
                       </div>
-                    </Fade>
-                  )}
+                    </CSSTransition>
+                  </div>
+
                   <Grid item>
                     <Button
                       fullWidth
