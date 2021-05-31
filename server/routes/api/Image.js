@@ -2,82 +2,76 @@ const express = require("express");
 const imageRouter = express.Router();
 const mongoose = require("mongoose");
 const Image = require("../../models/Images");
+const upload = require("../../gridfs");
 // const config = require("../config");
 
-module.exports = (upload) => {
-  const connect = mongoose.createConnection(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+const connect = mongoose.createConnection(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+let gfs;
+
+connect.once("open", () => {
+  gfs = new mongoose.mongo.GridFSBucket(connect.db, {
+    bucketName: "uploads",
+  });
+});
+
+imageRouter
+  .route("/")
+  // .post(upload.single("file"), handleUpload)
+  .get((req, res, next) => {
+    Image.find({})
+      .then((images) => {
+        res.status(200).json({
+          success: true,
+          link: process.env.DOMAIN + "/api/users/images/" + req.file.filename,
+          images,
+        });
+      })
+      .catch((err) => res.status(500).json(err));
   });
 
-  let gfs;
-
-  connect.once("open", () => {
-    gfs = new mongoose.mongo.GridFSBucket(connect.db, {
-      bucketName: "uploads",
-    });
+imageRouter.route("/:filename").get((req, res, next) => {
+  gfs.find({ filename: req.params.filename }).toArray((err, files) => {
+    if (!files[0] || files.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: "No files available",
+      });
+    }
+    if (files[0].contentType === "image/png") {
+      gfs.openDownloadStreamByName(req.params.filename).pipe(res);
+    } else {
+      res.status(404).json({
+        err: "Not an image",
+      });
+    }
   });
+});
 
-  // imageRouter.get("/test", (req, res) =>
-  //   res.send(200).json({ message: "test" })
-  // );
-
-  imageRouter
-    .route("/")
-    .post(upload.single("file"), (req, res, next) => {
-      console.log(req.body);
-      Image.findOne({ caption: req.body.caption })
+async function handleUpload(newImage, caption) {
+  let imageURL = "";
+  await Image.findOne({ caption: caption })
+    .then(async (image) => {
+      if (image) {
+        imageURL = `${process.env.DOMAIN}/api/images/${image.filename}`;
+        // res.status(400).json({ message: "exists" });
+      }
+      await newImage
+        .save()
         .then((image) => {
-          if (image) {
-            return res.status(200).json({
-              success: false,
-              message: "Image already exists",
-            });
-          }
-
-          let newImage = new Image({
-            caption: req.body.caption,
-            filename: req.file.filename,
-            fileId: req.file.id,
-          });
-
-          newImage
-            .save()
-            .then((image) => {
-              res.status(200).json({ message: "Successful" });
-            })
-            .catch((err) => res.status(500).json(err));
+          return `${process.env.DOMAIN}/api/images/${newImage.filename}.${req.file.contentType}`;
         })
-        .catch((err) => res.status(500).json(err));
+        .catch((err) => "brr");
+      // console.log(imageURL);
     })
-    .get((req, res, next) => {
-      Image.find({})
-        .then((images) => {
-          res.status(200).json({
-            success: true,
-            images,
-          });
-        })
-        .catch((err) => res.status(500).json(err));
-    });
+    .catch((err) => "brr");
+  return imageURL;
+}
 
-  imageRouter.route("/:filename").get((req, res, next) => {
-    gfs.find({ filename: req.params.filename }).toArray((err, files) => {
-      if (!files[0] || files.length === 0) {
-        return res.status(200).json({
-          success: false,
-          message: "No files available",
-        });
-      }
-      if (files[0].contentType === "image/png") {
-        gfs.openDownloadStreamByName(req.params.filename).pipe(res);
-      } else {
-        res.status(404).json({
-          err: "Not an image",
-        });
-      }
-    });
-  });
-
-  return imageRouter;
+module.exports = {
+  router: imageRouter,
+  upload: handleUpload,
 };

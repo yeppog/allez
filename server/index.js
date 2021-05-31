@@ -12,34 +12,6 @@ const cors = require("cors");
 swaggerJsdoc = require("swagger-jsdoc");
 swaggerUi = require("swagger-ui-express");
 
-/** Imports for GRIDFS storage */
-const methodOverride = require("method-override");
-const multer = require("multer");
-const GridFsStorage = require("multer-gridfs-storage");
-const crypto = require("crypto");
-const path = require("path");
-
-const storage = new GridFsStorage({
-  url: "mongodb+srv://allez:allez@allez.1bbnv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
-  file: (req, file) => {
-    return new Promise((resolve, reject) => {
-      crypto.randomBytes(16, (err, buff) => {
-        if (err) {
-          return reject(err);
-        }
-        const filename = buff.toString("hex") + path.extname(file.originalname);
-        const fileInfo = {
-          filename: filename,
-          bucketName: "uploads",
-        };
-        resolve(fileInfo);
-      });
-    });
-  },
-});
-
-const upload = multer({ storage });
-
 const options = {
   definition: {
     openapi: "3.0.0",
@@ -90,7 +62,9 @@ const images = require("./routes/api/Image");
  * Route for User API
  */
 app.use("/api/users", users);
-app.use("/api/images", images(upload));
+
+const upload = require("./gridfs");
+app.use("/api/images", images.router);
 app.use(
   "/",
   swaggerUi.serve,

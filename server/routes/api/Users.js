@@ -26,6 +26,9 @@ const transporter = nodemailer.createTransport({
 
 // User model
 const User = require("../../models/User");
+const Image = require("../../models/Images");
+
+const upload = require("./../../gridfs");
 
 /**
  * Handles the POST request of creating a new account.
@@ -312,6 +315,65 @@ async function handleConfirm(req, res) {
   }
 }
 
+async function handleUpdateProfile(req, res, next) {
+  // break out if id is not present
+  if (!req.body.id) {
+    return res.status(400).json({
+      message: "Missing ID",
+    });
+  }
+  // verify to ensure the user is authenticated
+  try {
+    jwt.verify(req.body.token, process.env.JWT_SECRET);
+  } catch (err) {
+    if (err instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: "Missing token or invalid token",
+      });
+    } else if (err instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({
+        message: "Unauthorised. Token expired",
+      });
+    } else {
+      return res.status(500).json(err);
+    }
+  }
+
+  // retrieve the user if verification checks out
+  try {
+    const user = await User.findOne(new ObjectId(req.body.id));
+    if (!user) {
+      return res.status(401).json({
+        message: "User not found. Invalid",
+      });
+    }
+    const caption = `${req.body.id}_profile_picture`;
+    const upload = require("./Image").upload;
+    let image = new Image({
+      filename: `${req.body.id}_${req.file.filename}`,
+      fileId: req.file.id,
+      caption: caption,
+    });
+    let imageURL;
+    await upload(image, caption)
+      .then((data) => (imageURL = data))
+      .catch((err) => console.log(err));
+    // console.log(imageURL);
+    user.avatarPath = "test";
+
+    user
+      .save()
+      .then((data) => {
+        return res.status(200).json(data);
+      })
+      .catch((err) => {
+        return res.status(400).json(err);
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+}
+
 router.post("/register", handleRegister);
 
 /** Provides the route for the API at ./login using the handleLogin function */
@@ -328,5 +390,7 @@ router.post("/reset/end", handleReset);
 
 /** Provides the route for the API at ./confirm, activates a user account. */
 router.get("/confirm", handleConfirm);
+
+router.route("/updateProfile").post(upload.single("file"), handleUpdateProfile);
 
 module.exports = router;
