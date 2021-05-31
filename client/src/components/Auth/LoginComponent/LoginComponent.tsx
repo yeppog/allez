@@ -107,7 +107,7 @@ const LoginComponent: React.FC = () => {
         <Card className="form" variant="outlined">
           <h2>Login</h2>
           <form onSubmit={(e) => onSubmit(e)}>
-            <Grid>
+            <Grid container>
               <Grid item>
                 <FormControl fullWidth variant="filled">
                   <InputLabel className="label">Username / Email</InputLabel>
