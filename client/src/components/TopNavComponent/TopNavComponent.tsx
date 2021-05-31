@@ -2,28 +2,25 @@ import './TopNavComponent.scss';
 
 import { Button, Switch, Toolbar } from '@material-ui/core';
 import { Menu, Search } from '@material-ui/icons';
+import React, { useState } from 'react';
+import { logoutUser, toggleDarkMode } from './../Redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { AppBar } from '@material-ui/core';
 import EventEmitter from 'events';
 import IconButton from '@material-ui/core/IconButton';
 import { NavLink } from 'react-router-dom';
-import React, { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
-import { logoutUser, toggleDarkMode } from './../Redux/userSlice';
 import { useHistory } from 'react-router';
 
 const TopNavComponent: React.FC = () => {
   const dispatch = useDispatch();
-  // const [darkMode, setDarkMode] = useState<boolean>(false);
-  // const [loginStatus, setLoginStatus] = useState<string>('');
+
   const history = useHistory();
 
-  let loginStatus = null;
-
-  useSelector((state: { user: { status: any; darkMode: boolean } }) => {
-    loginStatus = state.user.status;
-  });
+  const loginStatus = useSelector(
+    (state: { user: { status: any; darkMode: boolean } }) => state.user.status
+  );
 
   const darkMode = useSelector(
     (state: { user: { status: any; darkMode: boolean } }) => state.user.darkMode
@@ -31,8 +28,6 @@ const TopNavComponent: React.FC = () => {
 
   console.log(darkMode);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //TODO: Handle theme change and checked
-    // setDarkMode(!darkMode);
     dispatch(toggleDarkMode());
   };
 
