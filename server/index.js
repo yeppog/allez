@@ -64,7 +64,7 @@ const options = {
       },
     ],
   },
-  apis: ["./routes/api/Users.js"],
+  apis: ["./routes/api/Users.apidocs.js"],
 };
 
 require("dotenv").config();
