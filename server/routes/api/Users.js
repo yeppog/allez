@@ -28,7 +28,7 @@ const transporter = nodemailer.createTransport({
 const User = require("../../models/User");
 const Image = require("../../models/Images");
 
-const upload = require("./../../gridfs");
+const uploadAvatar = require("./../../gridfs");
 
 /**
  * Handles the POST request of creating a new account.
@@ -347,19 +347,17 @@ async function handleUpdateProfile(req, res, next) {
         message: "User not found. Invalid",
       });
     }
-    const caption = `${req.body.id}_profile_picture`;
-    const upload = require("./Image").upload;
-    let image = new Image({
-      filename: `${req.body.id}_${req.file.filename}`,
-      fileId: req.file.id,
+    const caption = `${user.id}_avatar`;
+    const upload = require("./Image").uploadAvatar;
+    let newImage = new Image({
+      filename: req.file.filename,
       caption: caption,
     });
     let imageURL;
-    await upload(image, caption)
+    await upload(newImage, caption, req.file)
       .then((data) => (imageURL = data))
-      .catch((err) => console.log(err));
-    // console.log(imageURL);
-    user.avatarPath = "test";
+      .catch((err) => res.status(403).json(err));
+    user.avatarPath = imageURL;
 
     user
       .save()
@@ -391,6 +389,9 @@ router.post("/reset/end", handleReset);
 /** Provides the route for the API at ./confirm, activates a user account. */
 router.get("/confirm", handleConfirm);
 
-router.route("/updateProfile").post(upload.single("file"), handleUpdateProfile);
+/** Provides the route for the API at ./updaetProfile to update a user's profile */
+router
+  .route("/updateProfile")
+  .post(uploadAvatar.single("file"), handleUpdateProfile);
 
 module.exports = router;
