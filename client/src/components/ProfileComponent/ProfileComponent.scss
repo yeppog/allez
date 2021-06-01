@@ -1,1 +1,9 @@
-.ProfileComponent {}
+.ProfileComponent {
+  margin-top: 70px;
+  display: grid;
+}
+
+.img {
+  max-width: 200px;
+  display: block;
+}
