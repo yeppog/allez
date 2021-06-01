@@ -2,7 +2,6 @@ const express = require("express");
 const imageRouter = express.Router();
 const mongoose = require("mongoose");
 const Image = require("../../models/Images");
-const upload = require("../../gridfs");
 // const config = require("../config");
 
 const connect = mongoose.createConnection(process.env.MONGO_URI, {
@@ -10,11 +9,15 @@ const connect = mongoose.createConnection(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
-let gfs;
+let gfsAvatar;
+let gfsPhotos;
 
 connect.once("open", () => {
-  gfs = new mongoose.mongo.GridFSBucket(connect.db, {
-    bucketName: "uploads",
+  gfsAvatar = new mongoose.mongo.GridFSBucket(connect.db, {
+    bucketName: "avatar",
+  });
+  gfsPhotos = new mongoose.mongo.GridFSBucket(connect.db, {
+    bucketName: "images",
   });
 });
 
@@ -33,8 +36,11 @@ imageRouter
       .catch((err) => res.status(500).json(err));
   });
 
-imageRouter.route("/:filename").get((req, res, next) => {
-  gfs.find({ filename: req.params.filename }).toArray((err, files) => {
+/**
+ * Route for rendering avatar photos
+ */
+imageRouter.route("/avatar/:filename").get((req, res, next) => {
+  gfsAvatar.find({ filename: req.params.filename }).toArray((err, files) => {
     if (!files[0] || files.length === 0) {
       return res.status(200).json({
         success: false,
@@ -42,7 +48,7 @@ imageRouter.route("/:filename").get((req, res, next) => {
       });
     }
     if (files[0].contentType === "image/png") {
-      gfs.openDownloadStreamByName(req.params.filename).pipe(res);
+      gfsAvatar.openDownloadStreamByName(req.params.filename).pipe(res);
     } else {
       res.status(404).json({
         err: "Not an image",
@@ -51,27 +57,39 @@ imageRouter.route("/:filename").get((req, res, next) => {
   });
 });
 
-async function handleUpload(newImage, caption) {
+/**
+ * Handles the avatar upload function.
+ * @param {*} newImage An mongo Image.js Schema object
+ * @param {*} caption The submitted caption for the upload request
+ * @returns
+ */
+async function handleAvatarUpload(newImage, caption) {
   let imageURL = "";
   await Image.findOne({ caption: caption })
     .then(async (image) => {
       if (image) {
-        imageURL = `${process.env.DOMAIN}/api/images/${image.filename}`;
-        // res.status(400).json({ message: "exists" });
+        // overrides existing image in the DB for that Image Schema
+        image.filename = newImage.filename;
+        await image
+          .save()
+          .then((data) => {
+            imageURL = `${process.env.domain}/api/images/avatar/${data.filename}`;
+          })
+          .catch((err) => new Error(err));
+      } else {
+        await newImage
+          .save()
+          .then((data) => {
+            imageURL = `${process.env.domain}/api/images/avatar/${data.filename}`;
+          })
+          .catch((err) => new Error(err));
       }
-      await newImage
-        .save()
-        .then((image) => {
-          return `${process.env.DOMAIN}/api/images/${newImage.filename}.${req.file.contentType}`;
-        })
-        .catch((err) => "brr");
-      // console.log(imageURL);
     })
-    .catch((err) => "brr");
+    .catch((err) => new Error(err));
   return imageURL;
 }
 
 module.exports = {
   router: imageRouter,
-  upload: handleUpload,
+  uploadAvatar: handleAvatarUpload,
 };
