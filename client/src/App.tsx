@@ -11,9 +11,11 @@ import {
 } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import React, { PropsWithChildren } from 'react';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import BotNavComponent from './components/BotNavComponent/BotNavComponent';
 import ConfirmComponent from './components/Auth/ConfirmComponent/ConfirmComponent';
+import { CssBaseline } from '@material-ui/core';
 import HomeComponent from './components/HomeComponent/HomeComponent';
 import LoginComponent from './components/Auth/LoginComponent/LoginComponent';
 import NotFoundComponent from './components/Auth/NotFoundComponent/NotFoundComponent';
@@ -23,11 +25,9 @@ import RegisterComponent from './components/Auth/RegisterComponent/RegisterCompo
 import ResetComponent from './components/Auth/ResetComponent/ResetComponent';
 import ResetRequestComponent from './components/Auth/ResetRequestComponent/ResetRequestComponent';
 import TopNavComponent from './components/TopNavComponent/TopNavComponent';
+import { blueGrey } from '@material-ui/core/colors';
 import { getStatus } from './components/Redux/userSlice';
 import { useSelector } from 'react-redux';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import { blueGrey } from '@material-ui/core/colors';
-import { CssBaseline } from '@material-ui/core';
 
 function App() {
   const darkMode = useSelector(
@@ -37,6 +37,11 @@ function App() {
     palette: {
       type: darkMode ? 'dark' : 'light',
       primary: blueGrey,
+    },
+    typography: {
+      button: {
+        textTransform: 'none',
+      },
     },
     overrides: {
       MuiInputBase: {
@@ -70,6 +75,11 @@ function App() {
       Component: ConfirmComponent,
     },
     { path: '/home', name: 'Home', Component: HomeComponent },
+    {
+      path: '/profile/:id',
+      name: 'Profile',
+      Component: ProfileComponent,
+    },
   ];
 
   /**
