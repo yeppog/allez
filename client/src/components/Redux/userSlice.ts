@@ -4,7 +4,7 @@ import { LoginCredentials } from '../../interface/Credentials';
 import axios from 'axios';
 
 // sets the default axios baseURL to the environmental variable
-axios.defaults.baseURL = process.env.REACT_APP_API_URI;
+axios.defaults.baseURL = process.env.REACT_APP_API_URI || '';
 
 interface UsersState {
   user: string[];
@@ -41,7 +41,7 @@ const userSlice = createSlice({
   reducers: {
     loginUser: (state, action) => {
       localStorage.setItem('token', action.payload.token);
-      state.user = [action.payload.user];
+      state.user = action.payload.user;
       state.status = 'succeeded';
     },
     logoutUser: (state) => {
