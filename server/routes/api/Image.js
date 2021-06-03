@@ -68,8 +68,20 @@ async function handleAvatarUpload(newImage, caption) {
   await Image.findOne({ caption: caption })
     .then(async (image) => {
       if (image) {
+        // delete the chunk from the GridFS store
+        await gfsAvatar.delete(
+          new mongoose.Types.ObjectId(image.chunkIDRef),
+          (err, data) => {
+            if (err) {
+              return new Error(err);
+            }
+          }
+        );
+
         // overrides existing image in the DB for that Image Schema
         image.filename = newImage.filename;
+        // update pointer to the new image chunk
+        image.chunkIDRef = newImage.chunkIDRef;
         await image
           .save()
           .then((data) => {

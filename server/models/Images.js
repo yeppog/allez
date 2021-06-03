@@ -14,6 +14,10 @@ const ImageSchema = new Schema({
     default: Date.now(),
     type: Date,
   },
+  chunkIDRef: {
+    required: true,
+    type: String,
+  },
 });
 
 const Image = mongoose.model("Image", ImageSchema);
