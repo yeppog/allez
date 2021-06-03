@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 
 import Image from './../../static/404.png';
 import SettingsIcon from '@material-ui/icons/Settings';
+import axios from 'axios';
 import { useParams } from 'react-router';
 
 interface ID {
@@ -22,6 +23,7 @@ interface State {
   name: string;
   bio: string;
   img: ImageBitmap;
+  avatar: string;
   postNumber: string;
   //TODO:
 
@@ -30,12 +32,15 @@ interface State {
 }
 
 const ProfileComponent: React.FC = () => {
+  const [file, setFile] = useState<File>();
+  const [filePreview, setFilePreview] = useState<string>();
   const id = useParams<ID>();
   const [state, setState] = useState({
     id: id.id,
     name: '',
     bio: '',
     img: '',
+    avatar: '',
     postNumber: 0,
     followNumber: 0,
     myself: true,
@@ -72,6 +77,23 @@ const ProfileComponent: React.FC = () => {
     });
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setFile(e.target.files[0]);
+    setFilePreview(URL.createObjectURL(e.target.files[0]));
+  };
+
+  const onUpdateProfile = () => {
+    const formData = new FormData();
+    const token = localStorage.getItem('token');
+    if (file && token) {
+      formData.append('file', file, file.name);
+      formData.append('token', token);
+
+      axios.post('api/users/updateProfile', formData);
+    }
+  };
+
   useEffect(apiCall, []);
   return (
     <div className="ProfileComponent" data-testid="ProfileComponent">
@@ -88,6 +110,7 @@ const ProfileComponent: React.FC = () => {
             <Grid item>
               <ButtonBase>
                 <img src={state.img} className="img" />
+                <img src={state.avatar} className="img" />
               </ButtonBase>
             </Grid>
             <Grid item>
@@ -111,6 +134,11 @@ const ProfileComponent: React.FC = () => {
                 </Grid>
                 <Grid item>
                   <Typography>followers</Typography>
+                  <input type="file" onChange={(e) => handleFileChange(e)} />
+                  <Button type="button" onClick={() => onUpdateProfile()}>
+                    Upload
+                  </Button>
+                  <img src={filePreview ? filePreview : ''} />
                 </Grid>
               </Grid>
             </Grid>
