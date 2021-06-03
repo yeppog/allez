@@ -8,10 +8,10 @@ import {
   Typography,
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router';
 
 import Image from './../../static/404.png';
 import SettingsIcon from '@material-ui/icons/Settings';
-import { useParams } from 'react-router';
 
 interface ID {
   id: string;
@@ -31,6 +31,7 @@ interface State {
 
 const ProfileComponent: React.FC = () => {
   const id = useParams<ID>();
+  const history = useHistory();
   const [state, setState] = useState({
     id: id.id,
     name: '',
@@ -116,7 +117,12 @@ const ProfileComponent: React.FC = () => {
             </Grid>
             {state.myself ? (
               <Grid container direction="row" justify="flex-end">
-                <IconButton aria-label="settings">
+                <IconButton
+                  aria-label="settings"
+                  onClick={() => {
+                    history.push('/edit/profile');
+                  }}
+                >
                   <SettingsIcon />
                 </IconButton>
               </Grid>
