@@ -20,6 +20,7 @@ import HomeComponent from './components/HomeComponent/HomeComponent';
 import LoginComponent from './components/Auth/LoginComponent/LoginComponent';
 import NotFoundComponent from './components/Auth/NotFoundComponent/NotFoundComponent';
 import ProfileComponent from './components/ProfileComponent/ProfileComponent';
+import ProfileSettingsComponent from './components/ProfileSettingsComponent/ProfileSettingsComponent';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import RegisterComponent from './components/Auth/RegisterComponent/RegisterComponent';
 import ResetComponent from './components/Auth/ResetComponent/ResetComponent';
@@ -79,6 +80,11 @@ function App() {
       path: '/profile/:id',
       name: 'Profile',
       Component: ProfileComponent,
+    },
+    {
+      path: '/edit/profile',
+      name: 'Profile Edit',
+      Component: ProfileSettingsComponent,
     },
   ];
 
