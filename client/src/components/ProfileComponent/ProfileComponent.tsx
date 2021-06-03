@@ -12,7 +12,9 @@ import { useHistory, useParams } from 'react-router';
 
 import Image from './../../static/404.png';
 import SettingsIcon from '@material-ui/icons/Settings';
+import { User } from '../../interface/Schemas';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 interface ID {
   id: string;
@@ -31,9 +33,12 @@ interface State {
   message: string;
 }
 
-const ProfileComponent: React.FC = () => {
+const ProfileComponent: React.FC = (props) => {
   const [file, setFile] = useState<File>();
   const [filePreview, setFilePreview] = useState<string>();
+  const user = useSelector(
+    (state: { user: { user: User[] } }) => state.user.user[0]
+  );
   const id = useParams<ID>();
   const history = useHistory();
   const [state, setState] = useState({
@@ -110,8 +115,8 @@ const ProfileComponent: React.FC = () => {
           >
             <Grid item>
               <ButtonBase>
-                <img src={state.img} className="img" />
-                <img src={state.avatar} className="img" />
+                {/* <img src={state.img} className="img" /> */}
+                <img src={user.avatar} className="img" />
               </ButtonBase>
             </Grid>
             <Grid item>
