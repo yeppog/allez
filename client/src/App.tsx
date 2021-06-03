@@ -76,11 +76,11 @@ function App() {
       Component: ConfirmComponent,
     },
     { path: '/home', name: 'Home', Component: HomeComponent },
-    {
-      path: '/profile/:id',
-      name: 'Profile',
-      Component: ProfileComponent,
-    },
+    // {
+    //   path: '/profile/:id',
+    //   name: 'Profile',
+    //   Component: ProfileComponent,
+    // },
     {
       path: '/edit/profile',
       name: 'Profile Edit',
@@ -92,45 +92,46 @@ function App() {
    * Experimental CSS Transition with React Router
    * Extremely buggy at the moment, needs to be debugged.
    */
-  const AnimatedSwitch = withRouter(({ location }) => (
-    <div style={{ position: 'relative' }}>
-      <TransitionGroup>
-        <CSSTransition
-          key={location.key}
-          classNames="pages"
-          timeout={1000}
-          refNode={refNode}
-          unmountOnExit
-        >
-          <Switch location={location}>
-            {routes.map((route: { path: string; Component: React.FC }) => (
-              <Route key={route.path} exact path={route.path}>
-                <div
-                  ref={refNode}
-                  style={{ position: 'absolute' }}
-                  className="pages"
-                >
-                  <route.Component />
-                </div>
-              </Route>
-            ))}
+  // const AnimatedSwitch = withRouter(({ location }) => (
+  //   <div style={{ position: 'relative' }}>
+  //     <TransitionGroup>
+  //       <CSSTransition
+  //         key={location.key}
+  //         classNames="pages"
+  //         timeout={1000}
+  //         refNode={refNode}
+  //         unmountOnExit
+  //       >
+  //         <Switch location={location}>
+  //           {routes.map((route: { path: string; Component: React.FC }) => (
+  //             <Route key={route.path} exact path={route.path}>
+  //               <div
+  //                 ref={refNode}
+  //                 style={{ position: 'absolute' }}
+  //                 className="pages"
+  //               >
+  //                 <route.Component />
+  //               </div>
+  //             </Route>
+  //           ))}
 
-            <Redirect exact from="/" to="/home" />
+  //           <Redirect exact from="/" to="/home" />
 
-            <Route path="/home">
-              <ProtectedRoute
-                exact
-                component={HomeComponent}
-                path="/home"
-                authenticationPath="login"
-              />
-            </Route>
-            <Route path="*" component={NotFoundComponent} />
-          </Switch>
-        </CSSTransition>
-      </TransitionGroup>
-    </div>
-  ));
+  //           <Route path="/home">
+  //             <ProtectedRoute
+  //               exact
+  //               component={HomeComponent}
+  //               path="/home"
+  //               authenticationPath="login"
+  //             />
+  //           </Route>
+
+  //           <Route path="*" component={NotFoundComponent} />
+  //         </Switch>
+  //       </CSSTransition>
+  //     </TransitionGroup>
+  //   </div>
+  // ));
 
   return (
     <ThemeProvider theme={theme}>
@@ -144,6 +145,14 @@ function App() {
             path="/home"
             authenticationPath="/login"
           />
+          <Route path="/profile/:id">
+            <ProtectedRoute
+              exact
+              component={ProfileComponent}
+              path="/profile/:id"
+              authenticationPath="login"
+            />
+          </Route>
           <Route path="/confirm/token=:token" component={ConfirmComponent} />
           {routes.map((route: { path: string; Component: React.FC }) => (
             <Route key={route.path} exact path={route.path}>
