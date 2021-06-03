@@ -87,16 +87,24 @@ const ProfileSettingsComponent: React.FC = () => {
                 Edit Profile Picture
               </Button>
             </Grid>
-            <Grid item>
-              <form onSubmit={(e) => onSubmit(e)}>
-                <FormControl>
-                  <InputLabel>Display Name</InputLabel>
-                  <Input value={state.name} onChange={handleChange('name')} />
-                </FormControl>
+            <form onSubmit={(e) => onSubmit(e)}>
+              <Grid
+                container
+                direction="column"
+                alignItems="center"
+                justify="center"
+                spacing={2}
+              >
+                <Grid item>
+                  <FormControl>
+                    <InputLabel>Display Name</InputLabel>
+                    <Input value={state.name} onChange={handleChange('name')} />
+                  </FormControl>
+                </Grid>
                 <Grid item>
                   <FormControl>
                     <InputLabel>Username</InputLabel>
-                    <Input value={state.id} onChange={handleChange('name')} />
+                    <Input value={state.id} onChange={handleChange('id')} />
                   </FormControl>
                 </Grid>
                 <Grid item>
@@ -104,8 +112,8 @@ const ProfileSettingsComponent: React.FC = () => {
                     Confirm
                   </Button>
                 </Grid>
-              </form>
-            </Grid>
+              </Grid>
+            </form>
           </Grid>
         </Grid>
       </Grid>
