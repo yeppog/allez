@@ -163,6 +163,7 @@ async function handleVerify(req, res) {
       return res.json({
         username: user.username,
         email: user.email,
+        avatar: user.avatarPath,
       });
     } catch (err) {
       if (err instanceof jwt.JsonWebTokenError) {
