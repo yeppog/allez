@@ -315,16 +315,18 @@ async function handleConfirm(req, res) {
   }
 }
 
+/**
+ * Handles updating of user parameters and supports uploading of images
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
+ */
 async function handleUpdateProfile(req, res, next) {
-  // break out if id is not present
-  if (!req.body.id) {
-    return res.status(400).json({
-      message: "Missing ID",
-    });
-  }
-  // verify to ensure the user is authenticated
+  let id;
   try {
     jwt.verify(req.body.token, process.env.JWT_SECRET);
+    id = jwt.decode(req.body.token, process.env.JWT_SECRET).id;
   } catch (err) {
     if (err instanceof jwt.JsonWebTokenError) {
       return res.status(400).json({
@@ -335,29 +337,34 @@ async function handleUpdateProfile(req, res, next) {
         message: "Unauthorised. Token expired",
       });
     } else {
-      return res.status(500).json(err);
+      return res.status(500).json({ message: err });
     }
   }
 
   // retrieve the user if verification checks out
   try {
-    const user = await User.findOne(new ObjectId(req.body.id));
+    const user = await User.findOne(new ObjectId(id));
     if (!user) {
       return res.status(401).json({
         message: "User not found. Invalid",
       });
     }
-    const caption = `${user.id}_avatar`;
-    const upload = require("./Image").uploadAvatar;
-    let newImage = new Image({
-      filename: req.file.filename,
-      caption: caption,
-    });
-    let imageURL;
-    await upload(newImage, caption, req.file)
-      .then((data) => (imageURL = data))
-      .catch((err) => res.status(403).json(err));
-    user.avatarPath = imageURL;
+    if (req.file) {
+      const caption = `${user.id}_avatar`;
+      const upload = require("./Image").uploadAvatar;
+      let newImage = new Image({
+        filename: req.file.filename,
+        caption: caption,
+        chunkIDRef: req.file.id,
+      });
+      let imageURL;
+      await upload(newImage, caption)
+        .then((data) => (imageURL = data))
+        .catch((err) => res.status(403).json(err));
+
+      // check if the
+      user.avatarPath = imageURL;
+    }
 
     user
       .save()
@@ -368,7 +375,7 @@ async function handleUpdateProfile(req, res, next) {
         return res.status(400).json(err);
       });
   } catch (err) {
-    return res.status(500).json(err);
+    return res.status(500).json("beep");
   }
 }
 
