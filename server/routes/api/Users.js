@@ -398,6 +398,26 @@ async function handleUpdateProfile(req, res, next) {
   }
 }
 
+async function handleGetPublicProfile(req, res) {
+  if (!req.header("username")) {
+    return res.status(400).json({ message: "No username specified!" });
+  } else {
+    const username = req.header("username");
+    const user = await User.findOne({ username: username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({
+      username: user.username,
+      avatarPath: user.avatarPath,
+      followCount: user.followCount,
+      followers: user.followers,
+      bio: user.bio,
+      posts: user.posts,
+    });
+  }
+}
+
 router.post("/register", handleRegister);
 
 /** Provides the route for the API at ./login using the handleLogin function */
@@ -419,5 +439,8 @@ router.get("/confirm", handleConfirm);
 router
   .route("/updateProfile")
   .post(uploadAvatar.single("file"), handleUpdateProfile);
+
+/** Provides the route for the API at ./getPublicProfile to retrieve public user details */
+router.get("/getPublicProfile", handleGetPublicProfile);
 
 module.exports = router;
