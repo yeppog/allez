@@ -164,6 +164,10 @@ async function handleVerify(req, res) {
         username: user.username,
         email: user.email,
         avatar: user.avatarPath,
+        name: user.name,
+        bio: user.bio,
+        followers: user.followers,
+        followCount: user.followCount,
       });
     } catch (err) {
       if (err instanceof jwt.JsonWebTokenError) {
@@ -382,6 +386,8 @@ async function handleUpdateProfile(req, res, next) {
           name: data.name,
           bio: data.bio,
           posts: data.posts,
+          followers: data.followers,
+          followCount: data.followCount,
         });
       })
       .catch((err) => {
