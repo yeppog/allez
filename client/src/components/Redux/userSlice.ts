@@ -1,20 +1,23 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { LoginCredentials } from '../../interface/Credentials';
+import { User } from '../../interface/Schemas';
 import axios from 'axios';
 
 // sets the default axios baseURL to the environmental variable
 axios.defaults.baseURL = process.env.REACT_APP_API_URI || '';
 
 interface UsersState {
-  user: string[];
+  user: User[];
   status: 'idle' | 'pending' | 'succeeded' | 'failed';
+  loginStatus: 'idle' | 'succeeded' | 'failed';
   error: string | null | undefined;
   darkMode: boolean;
 }
 
 const initialState = {
   user: [],
+  loginStatus: 'idle',
   status: 'idle',
   error: null,
   darkMode: localStorage.getItem('darkMode') === 'true' ? true : false,
@@ -32,6 +35,16 @@ export const checkLoggedInUser = createAsyncThunk(
       });
       return res.data;
     }
+  }
+);
+
+export const updateUserProfile = createAsyncThunk(
+  'user/updateUserProfile',
+  async (data: FormData) => {
+    const res = await axios.post('api/users/updateProfile', data, {
+      headers: { 'Content-Type': 'multipart/form' },
+    });
+    return res.data;
   }
 );
 
@@ -61,11 +74,23 @@ const userSlice = createSlice({
     });
     builder.addCase(checkLoggedInUser.fulfilled, (state, action) => {
       state.status = 'succeeded';
+      state.loginStatus = 'succeeded';
       state.user = [action.payload];
     });
     builder.addCase(checkLoggedInUser.rejected, (state, action) => {
       state.status = 'failed';
+      state.loginStatus = 'failed';
       state.error = action.error.message;
+    });
+    builder.addCase(updateUserProfile.pending, (state, action) => {
+      state.status = 'pending';
+    });
+    builder.addCase(updateUserProfile.fulfilled, (state, action) => {
+      state.status = 'succeeded';
+      state.user = [action.payload];
+    });
+    builder.addCase(updateUserProfile.rejected, (state, action) => {
+      state.status = 'failed';
     });
   },
 });
