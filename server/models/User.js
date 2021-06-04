@@ -29,6 +29,16 @@ const UserSchema = new mongoose.Schema({
   avatarPath: {
     type: String,
   },
+  followCount: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  followers: {
+    type: [],
+    required: true,
+    default: [""],
+  },
   posts: {
     type: [],
     default: [""],
