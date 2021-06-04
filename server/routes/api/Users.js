@@ -367,16 +367,28 @@ async function handleUpdateProfile(req, res, next) {
       user.avatarPath = imageURL;
     }
 
+    // assign other fields to update, check if they exist first
+    user.name = req.body.name == null ? user.name : req.body.name;
+    user.bio = req.body.bio == null ? user.bio : req.body.bio;
+    user.posts = req.body.posts == null ? user.posts : req.body.posts;
+
     user
       .save()
       .then((data) => {
-        return res.status(200).json(data);
+        return res.status(200).json({
+          username: data.username,
+          email: data.email,
+          avatarPath: data.avatarPath,
+          name: data.name,
+          bio: data.bio,
+          posts: data.posts,
+        });
       })
       .catch((err) => {
         return res.status(400).json(err);
       });
   } catch (err) {
-    return res.status(500).json("beep");
+    return res.status(500).json(err);
   }
 }
 
