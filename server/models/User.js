@@ -20,14 +20,18 @@ const UserSchema = new mongoose.Schema({
   activated: {
     type: Boolean,
   },
-  firstName: {
+  name: {
     type: String,
   },
-  lastName: {
+  bio: {
     type: String,
   },
   avatarPath: {
     type: String,
+  },
+  posts: {
+    type: [],
+    default: [""],
   },
 });
 
