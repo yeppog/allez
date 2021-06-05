@@ -40,11 +40,6 @@ const uploadAvatar = require("./../../gridfs");
  * @param {object} res Server response
  */
 async function handleRegister(req, res) {
-  // User.findOne({ email: req.body.email }).then((user) => {
-  //   if (user) {
-  //     return res.status(400).json({ email: "Email already exists" });
-  //   } else {
-  // TODO: Insert validator? maybe
   const newUser = new User({
     username: req.body.username,
     email: req.body.email,
