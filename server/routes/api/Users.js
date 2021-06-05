@@ -96,6 +96,7 @@ async function handleRegister(req, res) {
 
 /**
  * Asynchronus function that validates a user to login. Compares the provided credentials to the database credentials.
+ * Allows username or email login
  *
  * @param {object} req The credentials to be validated.
  * @param {object} res The response from the server
@@ -108,13 +109,19 @@ async function handleRegister(req, res) {
 
 async function handleLogin(req, res) {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    const { email, username, password } = req.body;
+    if ((!email || !username) && !password) {
       return res
         .status(400)
         .json({ message: "Not all fields have been entered." });
     } else {
-      const user = await User.findOne({ email: email });
+      let user;
+      // check if user is logging in with username or with email
+      if (!email) {
+        user = await User.findOne({ username: username });
+      } else {
+        user = await User.findOne({ email: email });
+      }
       if (!user) {
         return res.status(401).json({ message: " Invalid user" });
       } else if (!user.activated) {
