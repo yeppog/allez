@@ -24,7 +24,7 @@ import { debug } from 'console';
 import { useHistory } from 'react-router-dom';
 
 interface State {
-  email: string;
+  id: string;
   password: string;
   showPassword: boolean;
   loginStatus: boolean;
@@ -34,7 +34,7 @@ interface State {
 const LoginComponent: React.FC = () => {
   const nodeRef = React.useRef(null);
   const [state, setState] = useState<State>({
-    email: '',
+    id: '',
     password: '',
     showPassword: false,
     loginStatus: false,
@@ -84,9 +84,17 @@ const LoginComponent: React.FC = () => {
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
-    const email = state.email;
+    let credential;
+    const id = state.id;
     const password = state.password;
-    const credential = { email, password } as LoginCredentials;
+    // checks if the id is an email or username to post the correct body to the server
+    const re =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (re.test(String(id).toLowerCase())) {
+      credential = { email: id, password };
+    } else {
+      credential = { username: id, password };
+    }
     await axios
       .post('/api/users/login', credential, HTTPOptions)
       .then((data) => {
@@ -116,8 +124,8 @@ const LoginComponent: React.FC = () => {
                     className="username"
                     type="text"
                     id="email"
-                    value={state.email}
-                    onChange={handleChange('email')}
+                    value={state.id}
+                    onChange={handleChange('id')}
                   ></Input>
                 </FormControl>
               </Grid>
