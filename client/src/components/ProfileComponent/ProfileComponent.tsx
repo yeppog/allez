@@ -8,13 +8,14 @@ import {
   Typography,
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
 import Image from './../../static/404.png';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { User } from '../../interface/Schemas';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { updateUserProfile } from '../Redux/userSlice';
 
 interface ID {
   id: string;
@@ -36,9 +37,11 @@ interface State {
 const ProfileComponent: React.FC = (props) => {
   const [file, setFile] = useState<File>();
   const [filePreview, setFilePreview] = useState<string>();
+  const dispatch = useDispatch();
   const user = useSelector(
     (state: { user: { user: User[] } }) => state.user.user[0]
   );
+  console.log(user);
   const id = useParams<ID>();
   const history = useHistory();
   const [state, setState] = useState({
@@ -93,10 +96,11 @@ const ProfileComponent: React.FC = (props) => {
     const formData = new FormData();
     const token = localStorage.getItem('token');
     if (file && token) {
-      formData.append('file', file, file.name);
-      formData.append('token', token);
+      // formData.append('file', file, file.name);
+      // formData.append('token', token);
 
-      axios.post('api/users/updateProfile', formData);
+      // axios.post('api/users/updateProfile', formData);
+      dispatch(updateUserProfile(formData));
     }
   };
 
@@ -120,10 +124,10 @@ const ProfileComponent: React.FC = (props) => {
               </ButtonBase>
             </Grid>
             <Grid item>
-              <Typography>{state.name}</Typography>
+              <Typography>{user.name}</Typography>
             </Grid>
             <Grid item>
-              <Typography>{state.bio}</Typography>
+              <Typography>{user.bio}</Typography>
             </Grid>
             <Grid item>
               <Grid container direction="row" spacing={1}>
@@ -136,7 +140,7 @@ const ProfileComponent: React.FC = (props) => {
                 <Grid item></Grid>
                 <Grid item></Grid>
                 <Grid item>
-                  <Typography>{formatNumber(state.followNumber)}</Typography>
+                  <Typography>{formatNumber(user.followCount)}</Typography>
                 </Grid>
                 <Grid item>
                   <Typography>followers</Typography>
