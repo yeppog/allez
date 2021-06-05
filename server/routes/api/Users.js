@@ -40,51 +40,62 @@ const uploadAvatar = require("./../../gridfs");
  * @param {object} res Server response
  */
 async function handleRegister(req, res) {
-  User.findOne({ email: req.body.email }).then((user) => {
-    if (user) {
-      return res.status(400).json({ email: "Email already exists" });
-    } else {
-      // TODO: Insert validator? maybe
-      const newUser = new User({
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password,
-        activated: false,
-      });
+  // User.findOne({ email: req.body.email }).then((user) => {
+  //   if (user) {
+  //     return res.status(400).json({ email: "Email already exists" });
+  //   } else {
+  // TODO: Insert validator? maybe
+  const newUser = new User({
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+    activated: false,
+  });
 
-      bcrypt.genSalt().then((salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) {
-            return res.status(400).json(err);
+  bcrypt.genSalt().then((salt) => {
+    bcrypt.hash(newUser.password, salt, (err, hash) => {
+      if (err) {
+        return res.status(400).json(err);
+      }
+      newUser.password = hash;
+      let id;
+      newUser
+        .save()
+        .then(async (user) => {
+          const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+          // sends token to the registered email for confirmation;
+          await transporter.sendMail(
+            {
+              from: '"Allez" <reset@allez.com>',
+              to: `${newUser.email}`,
+              subject: "Please confirm your account",
+              text: `Click here to confirm your account.`,
+              html: `Click <a href = "${process.env.DOMAIN}/confirm/token=${token}">here</a> to confirm your account.`,
+            },
+            (err, info) => {
+              if (err) {
+                return res.status(400).json({ message: err });
+              }
+              return res.status(200).json({ message: info });
+            }
+          );
+          return res.status(200).json({ token: token });
+        })
+        .catch((err) => {
+          if (err.name == "MongoError") {
+            if (err.keyValue.email) {
+              return res
+                .status(400)
+                .json({ message: "Email is already taken" });
+            } else if (err.keyValue.username) {
+              return res
+                .status(400)
+                .json({ message: "Username is already taken" });
+            }
           }
-          newUser.password = hash;
-          let id;
-          newUser
-            .save()
-            .then(async (user) => {
-              const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
-              // sends token to the registered email for confirmation;
-              await transporter.sendMail(
-                {
-                  from: '"Allez" <reset@allez.com>',
-                  to: `${newUser.email}`,
-                  subject: "Please confirm your account",
-                  text: `Click here to confirm your account.`,
-                  html: `Click <a href = "${process.env.DOMAIN}/confirm/token=${token}">here</a> to confirm your account.`,
-                },
-                (err, info) => {
-                  if (err) {
-                    return res.status(400).json({ message: err });
-                  }
-                  return res.status(200).json({ message: info });
-                }
-              );
-              return res.status(200).json({ token: token });
-            })
-            .catch((err) => res.status(500).json(err));
+          return res.status(500).json(err);
         });
-      });
-    }
+    });
   });
 }
 
