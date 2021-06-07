@@ -11,7 +11,7 @@ beforeEach(async () => {
   const mongooseOpts = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateNewIndex: true,
+    useCreateIndex: true,
   };
   // ensure we close the original db connection
   await mongoose.connection
