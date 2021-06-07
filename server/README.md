@@ -1,7 +1,5 @@
 # Node.js and Express Server
 
-[![CircleCI](https://circleci.com/gh/yeppog/allez/tree/master.svg?style=svg))](https://circleci.com/gh/yeppog/allez/tree/master)
-
 This backend server is serviced by Node.js, Express and MongoDB.
 
 ## Getting Started

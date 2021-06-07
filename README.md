@@ -1,6 +1,6 @@
 # Allez - Orbital 2021
 
-[![CircleCI](https://circleci.com/gh/yeppog/allez/tree/master.svg?style=svg))](https://circleci.com/gh/yeppog/allez/tree/master)
+[![CircleCI](https://circleci.com/gh/yeppog/allez.svg?style=svg&circle-token=0a05dd5ab7ba277eb1270303c3ed9d3d01d085f2)](https://circleci.com/gh/yeppog/allez/tree/master.svg)
 
 Proposed Level of Achievement: Apollo 11
 
