@@ -14,6 +14,10 @@ jobs:
     working_directory: ~/allez/server
     docker:
       - image: cimg/node:15.1
+      environment:
+        MONGO_DB_URI: MONGO_URI="mongodb+srv://allez:allez@allez.1bbnv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+        JWT_SECRET: notsomethingallthatsecuretbvh
+
     steps:
       - checkout:
           path: ~/allez
