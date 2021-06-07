@@ -74,16 +74,25 @@ app.use(
 /**
  * Connects to the MongoDB atlas server. Only starts the server if the connection to the DB is successful.
  */
-mongoose
-  .connect(process.env.MONGO_URI, {
+// mongoose
+//   .connect(process.env.MONGO_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   })
+//   .then(() => {
+//     app.listen(process.env.PORT || 3001, () => {
+//       console.log("Server started on port 3001");
+//     });
+//   });
+
+app.listen(process.env.PORT || 3001, () => {
+  console.log("Server started on port 3001");
+  mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-  })
-  .then(() => {
-    app.listen(process.env.PORT || 3001, () => {
-      console.log("Server started on port 3001");
-    });
+    useCreateIndex: true,
   });
+});
 
 /**
  * Boilerplate GET request to test root.
@@ -92,3 +101,5 @@ mongoose
 app.get("/", async (req, res) => {
   res.json("test");
 });
+
+module.exports = app;

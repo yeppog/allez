@@ -9,13 +9,15 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    index: true,
     dropDups: true,
   },
   email: {
     type: String,
     required: true,
     unique: true,
-    dropDups: true,
+    index: true,
+    dropDrups: true,
   },
   password: {
     type: String,
@@ -51,3 +53,4 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model("UserData", UserSchema);
 module.exports = User;
+User.createIndexes();
