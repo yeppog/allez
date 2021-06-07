@@ -1,5 +1,7 @@
 # Allez - Orbital 2021
 
+[![CircleCI](https://circleci.com/gh/yeppog/allez/tree/master.svg?style=svg))](https://circleci.com/gh/yeppog/allez/tree/master)
+
 Proposed Level of Achievement: Apollo 11
 
 **Motivation**
