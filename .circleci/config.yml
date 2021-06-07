@@ -17,6 +17,7 @@ jobs:
         environment:
           MONGO_URI: mongodb+srv://allez:allez@allez.1bbnv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
           JWT_SECRET: notsomethingallthatsecuretbvh
+          DOMAIN: http://localhost:3001
 
     steps:
       - checkout:
