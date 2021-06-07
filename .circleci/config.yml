@@ -8,7 +8,10 @@ orbs:
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/node
   node: circleci/node@4.1
 
-app-dir: /home/circleci/project/server
+working-directory: ~/allez/server
+steps:
+    - checkout:
+        path: ~/allez
 
 jobs:
   # Below is the definition of your job to build and test your app, you can rename and customize it as you want.
@@ -31,7 +34,7 @@ jobs:
       #     pkg-manager: yarn 
       - run:
           name: Run tests
-          command: server/npm test
+          command: npm test
 
 workflows:
   # Below is the definition of your workflow.
