@@ -46,7 +46,8 @@ async function handleRegister(req, res) {
     password: req.body.password,
     activated: false,
   });
-
+  // await User.syncIndexes()
+  // .then(() => {
   bcrypt.genSalt().then((salt) => {
     bcrypt.hash(newUser.password, salt, (err, hash) => {
       if (err) {
@@ -77,21 +78,25 @@ async function handleRegister(req, res) {
           return res.status(200).json({ token: token });
         })
         .catch((err) => {
+          // console.log(err);
           if (err.name == "MongoError") {
-            if (err.keyValue.email) {
+            if (err) {
               return res
-                .status(400)
+                .status(403)
                 .json({ message: "Email is already taken" });
-            } else if (err.keyValue.username) {
+            } else if (err.keyValue.email) {
               return res
-                .status(400)
+                .status(403)
                 .json({ message: "Username is already taken" });
             }
+            return res.status(500).json(err);
           }
           return res.status(500).json(err);
         });
     });
   });
+  // })
+  // .catch((err) => res.json(err));
 }
 
 /**
