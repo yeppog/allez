@@ -85,14 +85,14 @@ app.use(
 //     });
 //   });
 
-app.listen(process.env.PORT || 3001, () => {
-  console.log("Server started on port 3001");
-  mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  });
-});
+// app.listen(process.env.PORT || 3001, () => {
+//   console.log("Server started on port 3001");
+//   mongoose.connect(process.env.MONGO_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//     useCreateIndex: true,
+//   });
+// });
 
 /**
  * Boilerplate GET request to test root.

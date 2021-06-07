@@ -4,9 +4,14 @@ const multer = require("multer");
 const GridFsStorage = require("multer-gridfs-storage");
 const crypto = require("crypto");
 const path = require("path");
-
+const mongoose = require("mongoose");
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+});
 const avatarStorage = new GridFsStorage({
-  url: process.env.MONGO_URI,
+  db: mongoose.connection,
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       crypto.randomBytes(16, (err, buff) => {

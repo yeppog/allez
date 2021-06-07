@@ -4,19 +4,14 @@ const mongoose = require("mongoose");
 const Image = require("../../models/Images");
 // const config = require("../config");
 
-const connect = mongoose.createConnection(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
 let gfsAvatar;
 let gfsPhotos;
 
-connect.once("open", () => {
-  gfsAvatar = new mongoose.mongo.GridFSBucket(connect.db, {
+mongoose.connection.once("open", () => {
+  gfsAvatar = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
     bucketName: "avatar",
   });
-  gfsPhotos = new mongoose.mongo.GridFSBucket(connect.db, {
+  gfsPhotos = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
     bucketName: "images",
   });
 });

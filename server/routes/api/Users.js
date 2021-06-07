@@ -60,21 +60,21 @@ async function handleRegister(req, res) {
         .then(async (user) => {
           const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
           // sends token to the registered email for confirmation;
-          await transporter.sendMail(
-            {
-              from: '"Allez" <reset@allez.com>',
-              to: `${newUser.email}`,
-              subject: "Please confirm your account",
-              text: `Click here to confirm your account.`,
-              html: `Click <a href = "${process.env.DOMAIN}/confirm/token=${token}">here</a> to confirm your account.`,
-            },
-            (err, info) => {
-              if (err) {
-                return res.status(400).json({ message: err });
-              }
-              return res.status(200).json({ message: info });
-            }
-          );
+          // await transporter.sendMail(
+          //   {
+          //     from: '"Allez" <reset@allez.com>',
+          //     to: `${newUser.email}`,
+          //     subject: "Please confirm your account",
+          //     text: `Click here to confirm your account.`,
+          //     html: `Click <a href = "${process.env.DOMAIN}/confirm/token=${token}">here</a> to confirm your account.`,
+          //   },
+          //   (err, info) => {
+          //     if (err) {
+          //       return res.status(400).json({ message: err });
+          //     }
+          //     return res.status(200).json({ message: info });
+          //   }
+          // );
           return res.status(200).json({ token: token });
         })
         .catch((err) => {
