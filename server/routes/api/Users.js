@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const detect = require('./RouteDetection');
+
 
 /** Used to query by ObjectId */
 const ObjectId = require("mongodb").ObjectID;
@@ -460,5 +462,7 @@ router
 
 /** Provides the route for the API at ./getPublicProfile to retrieve public user details */
 router.get("/getPublicProfile", handleGetPublicProfile);
+
+router.get("/detect", detect);
 
 module.exports = router;
