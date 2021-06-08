@@ -25,3 +25,8 @@ client/yarn-error.log*
 server/node_modules
 
 server/.env
+
+
+
+#testing
+server/coverage/lcov-report
