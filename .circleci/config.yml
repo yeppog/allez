@@ -28,7 +28,7 @@ jobs:
           name: Run tests
           command: npm test
       - codecov/upload:
-          file: "~/allez/server/coverage/clover.xml"
+          file: "~/home/circleci/allez/server/coverage/clover.xml"
           token: "966b0ca5-e090-42aa-b307-5ca65cf0dc9b"
 
   # build-and-test:
