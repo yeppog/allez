@@ -51,15 +51,15 @@ Features to be completed by the mid of July:
 3. Frontend main features to be completed (posting, liking, commenting, submission of routes, tags)
 4. Shape detection algorithm to identify route holds for easier route creation.
 
-## Object Diagram\*\*
+## Object Diagram
 
 ![](static/ObjectDiagram.png)
 
-## Program Flow\*\*
+## Program Flow
 
 ![](static/ProgramFlow.png)
 
-## Deployment\*\*
+## Deployment
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/1b060d01-2db2-4025-8133-3eeee2982701/deploy-status)](https://app.netlify.com/sites/allez-orbital/deploys)
 
