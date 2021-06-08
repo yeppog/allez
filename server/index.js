@@ -17,7 +17,7 @@ const options = {
     openapi: "3.0.0",
     info: {
       title: "Allez Express API with Swagger",
-      version: "0.1.0",
+      version: "1.0.0",
       description:
         "This API serves the entire data system for the Allez social network",
       license: {
@@ -26,8 +26,6 @@ const options = {
       },
       contact: {
         name: "Jonathan Lee & Ng Zi Xuan",
-        // url: "https://logrocket.com",
-        // email: "info@email.com",
       },
     },
     servers: [
@@ -68,38 +66,10 @@ app.use("/api/images", images.router);
 app.use(
   "/",
   swaggerUi.serve,
-  swaggerUi.setup(swaggerJsdoc(options), { explorer: true })
+  swaggerUi.setup(
+    swaggerJsdoc(options)
+    // { explorer: true }
+  )
 );
-
-/**
- * Connects to the MongoDB atlas server. Only starts the server if the connection to the DB is successful.
- */
-// mongoose
-//   .connect(process.env.MONGO_URI, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   })
-//   .then(() => {
-//     app.listen(process.env.PORT || 3001, () => {
-//       console.log("Server started on port 3001");
-//     });
-//   });
-
-// app.listen(process.env.PORT || 3001, () => {
-//   console.log("Server started on port 3001");
-//   mongoose.connect(process.env.MONGO_URI, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//     useCreateIndex: true,
-//   });
-// });
-
-/**
- * Boilerplate GET request to test root.
- */
-
-app.get("/", async (req, res) => {
-  res.json("test");
-});
 
 module.exports = app;

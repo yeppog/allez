@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const detect = require('./RouteDetection');
-
+const detect = require("./RouteDetection");
 
 /** Used to query by ObjectId */
 const ObjectId = require("mongodb").ObjectID;
@@ -117,10 +116,10 @@ async function handleRegister(req, res) {
 async function handleLogin(req, res) {
   try {
     const { email, username, password } = req.body;
-    if ((!email || !username) && !password) {
+    if ((!email && !username) || !password) {
       return res
         .status(400)
-        .json({ message: "Not all fields have been entered." });
+        .json({ message: "Not all fields have been entered" });
     } else {
       let user;
       // check if user is logging in with username or with email
@@ -130,7 +129,7 @@ async function handleLogin(req, res) {
         user = await User.findOne({ email: email });
       }
       if (!user) {
-        return res.status(401).json({ message: " Invalid user" });
+        return res.status(401).json({ message: "Invalid user" });
       } else if (!user.activated) {
         return res.status(403).json({ message: "Account not activated" });
       }
@@ -225,19 +224,19 @@ async function handleResetRequest(req, res) {
           expiresIn: 600,
         });
         // auto email sender to send recovery link to reset password.
-        await transporter.sendMail(
-          {
-            from: '"Allez" <reset@allez.com>',
-            to: `${req.body.email}`,
-            subject: "You requested for a password reset",
-            text: `Click here to reset your account.`,
-            html: `Click <a href = "${process.env.DOMAIN}/recover/token=${token}">here</a> to confirm your account.`,
-          },
-          (err, info) => {
-            console.log(err);
-            console.log(info);
-          }
-        );
+        // await transporter.sendMail(
+        //   {
+        //     from: '"Allez" <reset@allez.com>',
+        //     to: `${req.body.email}`,
+        //     subject: "You requested for a password reset",
+        //     text: `Click here to reset your account.`,
+        //     html: `Click <a href = "${process.env.DOMAIN}/recover/token=${token}">here</a> to confirm your account.`,
+        //   },
+        //   (err, info) => {
+        //     console.log(err);
+        //     console.log(info);
+        //   }
+        // );
         return res.status(200).json({ token: token });
       }
     } catch (err) {
@@ -284,14 +283,19 @@ async function handleReset(req, res) {
                   password: hash,
                 },
                 { useFindAndModify: false }
-              );
+              )
+                .then(() => {
+                  return res
+                    .status(200)
+                    .json({ message: "Password successfully updated" });
+                })
+                .catch((err) => {
+                  return res.status(500).json(err);
+                });
             }
           })
         );
         // update the password field for this user
-        return res
-          .status(200)
-          .json({ message: "Password successfully updated" });
       }
     } catch (err) {
       // catch the error thrown if the token has expired.
@@ -299,7 +303,7 @@ async function handleReset(req, res) {
         return res.status(401).json({ message: "Token has expired" });
       }
       // console log for now. TODO: implement error handling
-      console.log(err);
+      return res.status(500).json(err);
     }
   }
 }
@@ -320,6 +324,7 @@ async function handleConfirm(req, res) {
       return res.status(400).json({ message: "Missing token" });
     } else {
       try {
+        jwt.verify(req.headers.token, process.env.JWT_SECRET);
         const id = jwt.decode(req.headers.token, process.env.JWT_SECRET).id;
         const user = await User.findOne(new ObjectId(id));
         if (user.activated) {
@@ -334,6 +339,11 @@ async function handleConfirm(req, res) {
           .status(200)
           .json({ message: "Account successfully activated" });
       } catch (err) {
+        if (err instanceof jwt.JsonWebTokenError) {
+          return res
+            .status(403)
+            .json({ message: "Invalid or expired token. Unauthorised" });
+        }
         return res.status(400).json({ message: err });
       }
     }
