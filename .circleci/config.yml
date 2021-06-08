@@ -7,6 +7,7 @@ orbs:
   # Orbs reduce the amount of configuration required for common tasks.
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/node
   node: circleci/node@4.1
+  codecov: codecov/codecov@1.2.3
 
 jobs:
   # Below is the definition of your job to build and test your app, you can rename and customize it as you want.
@@ -26,6 +27,9 @@ jobs:
       - run:
           name: Run tests
           command: npm test
+      - codecov/upload:
+          file: "~/allez/server/coverage/clover.xml"
+          token: "966b0ca5-e090-42aa-b307-5ca65cf0dc9b"
 
   # build-and-test:
   #   # These next lines define a Docker executor: https://circleci.com/docs/2.0/executor-types/

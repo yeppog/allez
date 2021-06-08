@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "jest --runInBand "
+    "test": "jest --runInBand --collectCoverage=true "
   },
   "jest": {
     "testEnvironment": "node",
