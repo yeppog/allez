@@ -14,7 +14,10 @@
   "jest": {
     "testEnvironment": "node",
     "coveragePathIgnorePatterns": [
-      "/node_modules/"
+      "/node_modules/",
+      "/routes/api/RouteDetection.js",
+      "/gridfs.js",
+      "/server.js"
     ]
   },
   "repository": {
