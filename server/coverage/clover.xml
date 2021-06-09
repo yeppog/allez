@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1623267407710" clover="3.2.0">
-  <project timestamp="1623267407710" name="All files">
-    <metrics statements="252" coveredstatements="169" conditionals="75" coveredconditionals="43" methods="41" coveredmethods="17" elements="368" coveredelements="229" complexity="0" loc="252" ncloc="252" packages="3" files="7" classes="7"/>
+<coverage generated="1623270012953" clover="3.2.0">
+  <project timestamp="1623270012954" name="All files">
+    <metrics statements="250" coveredstatements="172" conditionals="77" coveredconditionals="43" methods="38" coveredmethods="20" elements="365" coveredelements="235" complexity="0" loc="250" ncloc="250" packages="3" files="7" classes="7"/>
     <package name="server">
       <metrics statements="35" coveredstatements="28" conditionals="2" coveredconditionals="0" methods="3" coveredmethods="0"/>
       <file name="gridfs.js" path="C:\Users\jonle\Git\allez\server\gridfs.js">
         <metrics statements="17" coveredstatements="10" conditionals="2" coveredconditionals="0" methods="3" coveredmethods="0"/>
-        <line num="2" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="4" count="1" type="stmt"/>
-        <line num="5" count="1" type="stmt"/>
-        <line num="6" count="1" type="stmt"/>
-        <line num="7" count="1" type="stmt"/>
-        <line num="8" count="1" type="stmt"/>
-        <line num="13" count="1" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="13" count="2" type="stmt"/>
         <line num="16" count="0" type="stmt"/>
         <line num="17" count="0" type="stmt"/>
         <line num="18" count="0" type="cond" truecount="0" falsecount="2"/>
@@ -21,94 +21,92 @@
         <line num="21" count="0" type="stmt"/>
         <line num="22" count="0" type="stmt"/>
         <line num="26" count="0" type="stmt"/>
-        <line num="32" count="1" type="stmt"/>
-        <line num="33" count="1" type="stmt"/>
+        <line num="32" count="2" type="stmt"/>
+        <line num="33" count="2" type="stmt"/>
       </file>
       <file name="index.js" path="C:\Users\jonle\Git\allez\server\index.js">
         <metrics statements="18" coveredstatements="18" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="2" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="6" count="1" type="stmt"/>
-        <line num="9" count="1" type="stmt"/>
-        <line num="12" count="1" type="stmt"/>
-        <line num="13" count="1" type="stmt"/>
-        <line num="15" count="1" type="stmt"/>
-        <line num="40" count="1" type="stmt"/>
-        <line num="42" count="1" type="stmt"/>
-        <line num="43" count="1" type="stmt"/>
-        <line num="53" count="1" type="stmt"/>
-        <line num="54" count="1" type="stmt"/>
-        <line num="57" count="1" type="stmt"/>
-        <line num="62" count="1" type="stmt"/>
-        <line num="64" count="1" type="stmt"/>
-        <line num="65" count="1" type="stmt"/>
-        <line num="66" count="1" type="stmt"/>
-        <line num="75" count="1" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="13" count="2" type="stmt"/>
+        <line num="15" count="2" type="stmt"/>
+        <line num="40" count="2" type="stmt"/>
+        <line num="42" count="2" type="stmt"/>
+        <line num="43" count="2" type="stmt"/>
+        <line num="53" count="2" type="stmt"/>
+        <line num="54" count="2" type="stmt"/>
+        <line num="57" count="2" type="stmt"/>
+        <line num="62" count="2" type="stmt"/>
+        <line num="64" count="2" type="stmt"/>
+        <line num="65" count="2" type="stmt"/>
+        <line num="66" count="2" type="stmt"/>
+        <line num="75" count="2" type="stmt"/>
       </file>
     </package>
     <package name="server.models">
       <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="Images.js" path="C:\Users\jonle\Git\allez\server\models\Images.js">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="2" count="1" type="stmt"/>
-        <line num="4" count="1" type="stmt"/>
-        <line num="23" count="1" type="stmt"/>
-        <line num="25" count="1" type="stmt"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="23" count="2" type="stmt"/>
+        <line num="25" count="2" type="stmt"/>
       </file>
       <file name="User.js" path="C:\Users\jonle\Git\allez\server\models\User.js">
         <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="7" count="1" type="stmt"/>
-        <line num="54" count="1" type="stmt"/>
-        <line num="55" count="1" type="stmt"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="54" count="2" type="stmt"/>
+        <line num="55" count="2" type="stmt"/>
       </file>
     </package>
     <package name="server.routes.api">
-      <metrics statements="208" coveredstatements="132" conditionals="73" coveredconditionals="43" methods="38" coveredmethods="17"/>
+      <metrics statements="206" coveredstatements="135" conditionals="75" coveredconditionals="43" methods="35" coveredmethods="20"/>
       <file name="Image.js" path="C:\Users\jonle\Git\allez\server\routes\api\Image.js">
-        <metrics statements="35" coveredstatements="10" conditionals="10" coveredconditionals="0" methods="14" coveredmethods="1"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="2" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="4" count="1" type="stmt"/>
-        <line num="10" count="1" type="stmt"/>
-        <line num="11" count="1" type="stmt"/>
-        <line num="14" count="1" type="stmt"/>
-        <line num="19" count="1" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
-        <line num="37" count="1" type="stmt"/>
-        <line num="38" count="0" type="stmt"/>
-        <line num="39" count="0" type="cond" truecount="0" falsecount="4"/>
+        <metrics statements="33" coveredstatements="13" conditionals="12" coveredconditionals="0" methods="11" coveredmethods="4"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="11" count="2" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="37" count="2" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="39" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="40" count="0" type="stmt"/>
-        <line num="45" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="48" count="0" type="stmt"/>
-        <line num="62" count="0" type="stmt"/>
-        <line num="63" count="0" type="stmt"/>
-        <line num="65" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="67" count="0" type="stmt"/>
-        <line num="70" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="71" count="0" type="stmt"/>
-        <line num="77" count="0" type="stmt"/>
-        <line num="79" count="0" type="stmt"/>
+        <line num="42" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="48" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="49" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="65" count="1" type="stmt"/>
+        <line num="66" count="1" type="stmt"/>
+        <line num="68" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="73" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="74" count="0" type="stmt"/>
         <line num="80" count="0" type="stmt"/>
+        <line num="82" count="0" type="stmt"/>
         <line num="83" count="0" type="stmt"/>
-        <line num="85" count="0" type="stmt"/>
-        <line num="87" count="0" type="stmt"/>
-        <line num="90" count="0" type="stmt"/>
+        <line num="86" count="0" type="stmt"/>
+        <line num="89" count="0" type="stmt"/>
         <line num="92" count="0" type="stmt"/>
         <line num="95" count="0" type="stmt"/>
-        <line num="96" count="0" type="stmt"/>
-        <line num="99" count="1" type="stmt"/>
+        <line num="98" count="0" type="stmt"/>
+        <line num="103" count="1" type="stmt"/>
+        <line num="105" count="0" type="stmt"/>
+        <line num="108" count="2" type="stmt"/>
       </file>
       <file name="RouteDetection.js" path="C:\Users\jonle\Git\allez\server\routes\api\RouteDetection.js">
         <metrics statements="27" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="2" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
         <line num="7" count="0" type="stmt"/>
         <line num="8" count="0" type="stmt"/>
         <line num="11" count="0" type="stmt"/>
@@ -132,21 +130,21 @@
         <line num="44" count="0" type="stmt"/>
         <line num="45" count="0" type="stmt"/>
         <line num="47" count="0" type="stmt"/>
-        <line num="50" count="1" type="stmt"/>
+        <line num="50" count="2" type="stmt"/>
       </file>
       <file name="Users.js" path="C:\Users\jonle\Git\allez\server\routes\api\Users.js">
         <metrics statements="146" coveredstatements="118" conditionals="63" coveredconditionals="43" methods="20" coveredmethods="16"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="2" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="4" count="1" type="stmt"/>
-        <line num="5" count="1" type="stmt"/>
-        <line num="8" count="1" type="stmt"/>
-        <line num="11" count="1" type="stmt"/>
-        <line num="14" count="1" type="stmt"/>
-        <line num="29" count="1" type="stmt"/>
-        <line num="30" count="1" type="stmt"/>
-        <line num="32" count="1" type="stmt"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="11" count="2" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="29" count="2" type="stmt"/>
+        <line num="30" count="2" type="stmt"/>
+        <line num="32" count="2" type="stmt"/>
         <line num="44" count="13" type="stmt"/>
         <line num="52" count="13" type="stmt"/>
         <line num="53" count="13" type="stmt"/>
@@ -272,16 +270,16 @@
         <line num="437" count="2" type="cond" truecount="2" falsecount="0"/>
         <line num="438" count="1" type="stmt"/>
         <line num="440" count="1" type="stmt"/>
-        <line num="451" count="1" type="stmt"/>
-        <line num="454" count="1" type="stmt"/>
-        <line num="457" count="1" type="stmt"/>
-        <line num="460" count="1" type="stmt"/>
-        <line num="463" count="1" type="stmt"/>
-        <line num="466" count="1" type="stmt"/>
-        <line num="469" count="1" type="stmt"/>
-        <line num="474" count="1" type="stmt"/>
-        <line num="476" count="1" type="stmt"/>
-        <line num="478" count="1" type="stmt"/>
+        <line num="451" count="2" type="stmt"/>
+        <line num="454" count="2" type="stmt"/>
+        <line num="457" count="2" type="stmt"/>
+        <line num="460" count="2" type="stmt"/>
+        <line num="463" count="2" type="stmt"/>
+        <line num="466" count="2" type="stmt"/>
+        <line num="469" count="2" type="stmt"/>
+        <line num="474" count="2" type="stmt"/>
+        <line num="476" count="2" type="stmt"/>
+        <line num="478" count="2" type="stmt"/>
       </file>
     </package>
   </project>

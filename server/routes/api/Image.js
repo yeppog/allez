@@ -16,26 +16,29 @@ mongoose.connection.once("open", () => {
   });
 });
 
-imageRouter
-  .route("/")
-  // .post(upload.single("file"), handleUpload)
-  .get((req, res, next) => {
-    Image.find({})
-      .then((images) => {
-        res.status(200).json({
-          success: true,
-          link: process.env.DOMAIN + "/api/users/images/" + req.file.filename,
-          images,
-        });
-      })
-      .catch((err) => res.status(500).json(err));
-  });
+// imageRouter
+//   .route("/")
+//   // .post(upload.single("file"), handleUpload)
+//   .get((req, res, next) => {
+//     Image.find({})
+//       .then((images) => {
+//         res.status(200).json({
+//           success: true,
+//           link: process.env.DOMAIN + "/api/users/images/" + req.file.filename,
+//           images,
+//         });
+//       })
+//       .catch((err) => res.status(500).json(err));
+//   });
 
 /**
  * Route for rendering avatar photos
  */
 imageRouter.route("/avatar/:filename").get((req, res, next) => {
   gfsAvatar.find({ filename: req.params.filename }).toArray((err, files) => {
+    if (err) {
+      return res.status(400).json(err);
+    }
     if (!files[0] || files.length === 0) {
       return res.status(200).json({
         success: false,
@@ -43,9 +46,9 @@ imageRouter.route("/avatar/:filename").get((req, res, next) => {
       });
     }
     if (files[0].contentType === "image/png") {
-      gfsAvatar.openDownloadStreamByName(req.params.filename).pipe(res);
+      return gfsAvatar.openDownloadStreamByName(req.params.filename).pipe(res);
     } else {
-      res.status(404).json({
+      return res.status(404).json({
         err: "Not an image",
       });
     }
@@ -68,7 +71,7 @@ async function handleAvatarUpload(newImage, caption) {
           new mongoose.Types.ObjectId(image.chunkIDRef),
           (err, data) => {
             if (err) {
-              return new Error(err);
+              throw new Error(err);
             }
           }
         );
@@ -82,17 +85,23 @@ async function handleAvatarUpload(newImage, caption) {
           .then((data) => {
             imageURL = `${process.env.domain}/api/images/avatar/${data.filename}`;
           })
-          .catch((err) => new Error(err));
+          .catch((err) => {
+            throw new Error(err);
+          });
       } else {
         await newImage
           .save()
           .then((data) => {
             imageURL = `${process.env.domain}/api/images/avatar/${data.filename}`;
           })
-          .catch((err) => new Error(err));
+          .catch((err) => {
+            throw Error(err);
+          });
       }
     })
-    .catch((err) => new Error(err));
+    .catch((err) => {
+      throw Error("lul");
+    });
   return imageURL;
 }
 
