@@ -5,8 +5,10 @@ const supertest = require("supertest");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoServer = new MongoMemoryServer();
 const request = supertest(app);
+const multer = require("multer");
+const avatarStorage = require("../gridfs");
 
-beforeEach(async () => {
+beforeAll(async () => {
   const uri = await mongoServer.getUri();
   const mongooseOpts = {
     useNewUrlParser: true,
@@ -14,8 +16,8 @@ beforeEach(async () => {
     useCreateIndex: true,
   };
   // ensure we close the original db connection
-  await mongoose.connection
-    .close()
+  await mongoose
+    .disconnect()
     .then(async () => await mongoose.connect(uri, mongooseOpts));
 });
 
@@ -23,6 +25,9 @@ afterAll(async () => {
   await mongoose.connection.db.dropDatabase();
   await mongoose.connection.close();
   await mongoServer.stop();
+  if (avatarStorage.db != null) {
+    avatarStorage.db.close();
+  }
 });
 
 describe("Testing /api/users/register endpoint", () => {
@@ -421,6 +426,107 @@ describe("Test verify", () => {
   it("Test verify with no token", async () => {
     await request.get("/api/users/verify").then((dataVerify) => {
       expect(dataVerify.status).toBe(400);
+    });
+  });
+});
+
+describe("Test user update profile", () => {
+  it("Test update profile without images", async () => {
+    await request
+      .post("/api/users/register")
+      .send({
+        username: "test",
+        email: "test",
+        password: "test",
+      })
+      .then(async (data) => {
+        await request
+          .get("/api/users/confirm")
+          .set("token", data.body.token)
+          .then(async (confirm) => {
+            expect(confirm.status).toBe(200);
+            await request
+              .post("/api/users/login")
+              .send({
+                username: "test",
+                email: "test",
+                password: "test",
+              })
+              .then(async (data) => {
+                expect(data.status).toBe(200);
+                await request
+                  .post("/api/users/updateProfile")
+                  .send({
+                    token: data.body.token,
+                    bio: "tester",
+                    name: "name",
+                  })
+                  .then((receive) => {
+                    expect(receive.status).toBe(200);
+                    expect(receive.body.name).toBe("name");
+                    expect(receive.body.bio).toBe("tester");
+                  });
+              });
+          });
+      });
+  });
+  it("Test update profile without invalid token", async () => {
+    await request
+      .post("/api/users/updateProfile")
+      .send({
+        token:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+        bio: "tester",
+        name: "name",
+      })
+      .then((receive) => {
+        expect(receive.status).toBe(400);
+        expect(receive.body.message).toBe("Missing token or invalid token");
+      });
+  });
+});
+
+describe("Test public profile", () => {
+  it("Test valid profile search", async () => {
+    await request
+      .post("/api/users/register")
+      .send({
+        username: "test",
+        email: "test",
+        password: "test",
+      })
+      .then(async (data) => {
+        await request
+          .get("/api/users/getPublicProfile")
+          .set("username", "test")
+          .then((test) => {
+            expect(test.status).toBe(200);
+            expect(test.body).toHaveProperty("username");
+          });
+      });
+  });
+  it("Test invalid profile search (invalid username)", async () => {
+    await request
+      .post("/api/users/register")
+      .send({
+        username: "test",
+        email: "test",
+        password: "test",
+      })
+      .then(async (data) => {
+        await request
+          .get("/api/users/getPublicProfile")
+          .set("username", "test1")
+          .then((test) => {
+            expect(test.status).toBe(404);
+            expect(test.body.message).toBe("User not found");
+          });
+      });
+  });
+  it("Test invalid profile search (no username)", async () => {
+    await request.get("/api/users/getPublicProfile").then((test) => {
+      expect(test.status).toBe(400);
+      expect(test.body.message).toBe("No username specified");
     });
   });
 });

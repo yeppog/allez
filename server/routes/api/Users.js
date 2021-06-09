@@ -430,7 +430,7 @@ async function handleUpdateProfile(req, res, next) {
 
 async function handleGetPublicProfile(req, res) {
   if (!req.header("username")) {
-    return res.status(400).json({ message: "No username specified!" });
+    return res.status(400).json({ message: "No username specified" });
   } else {
     const username = req.header("username");
     const user = await User.findOne({ username: username });
