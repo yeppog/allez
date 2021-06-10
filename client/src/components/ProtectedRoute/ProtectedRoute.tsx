@@ -1,10 +1,11 @@
 import './ProtectedRoute.scss';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { checkLoggedInUser } from '../Redux/userSlice';
+import axios from 'axios';
+import { verifyUser } from '../Redux/userSlice';
 
 interface ProtectedRouteProps extends RouteProps {
   authenticationPath: string;
@@ -14,23 +15,26 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   authenticationPath,
   ...routerProps
 }) => {
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(checkLoggedInUser());
-  }, []);
-  const isAuthenticated = useSelector(
-    (state: { user: { loginStatus: any } }) => state.user.loginStatus
-  );
+    const token = localStorage.getItem('token');
+    axios
+      .get('/api/users/verify', { headers: { token: token } })
+      .then((data) => {
+        setLoggedIn(true);
+        dispatch(verifyUser(data.data));
+      })
+      .catch((err) => {
+        setLoggedIn(false);
+      });
+  }, [axios, loggedIn]);
   // }
   return (
     <div>
-      {isAuthenticated === 'succeeded' ? (
-        <Route {...routerProps} />
-      ) : isAuthenticated === 'failed' ? (
-        <Redirect to="/login" />
-      ) : (
-        <div></div>
-      )}
+      {loggedIn == true && <Route {...routerProps} />}
+      {loggedIn == false && <Redirect to="/login" />}
+      {loggedIn == null && <div></div>}
     </div>
   );
 };
