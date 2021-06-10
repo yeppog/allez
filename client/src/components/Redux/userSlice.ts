@@ -1,14 +1,21 @@
+import { PublicUser, User } from '../../interface/Schemas';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { LoginCredentials } from '../../interface/Credentials';
-import { User } from '../../interface/Schemas';
 import axios from 'axios';
 
 // sets the default axios baseURL to the environmental variable
 axios.defaults.baseURL = process.env.REACT_APP_API_URI || '';
 
+/**
+ * User refers to the authenticated user
+ * Users refer to the array of users that were loaded while the app is running.
+ */
+
 interface UsersState {
   user: User[];
+  users: string;
+  // { [key: string]: User | PublicUser };
   status: 'idle' | 'pending' | 'succeeded' | 'failed';
   loginStatus: 'idle' | 'succeeded' | 'failed';
   error: string | null | undefined;
@@ -17,11 +24,28 @@ interface UsersState {
 
 const initialState = {
   user: [],
+  users: '',
   loginStatus: 'idle',
   status: 'idle',
   error: null,
   darkMode: localStorage.getItem('darkMode') === 'true' ? true : false,
 } as UsersState;
+
+export const fetchPublicUser = createAsyncThunk(
+  'user/fetchPublicUser',
+  async (username: string) => {
+    if (!username) {
+      throw Error('No Username');
+    } else {
+      console.log(username);
+      const res = await axios.get('api/users/getPublicProfile', {
+        headers: { ...HTTPOptions.headers, username: username },
+      });
+
+      return res.data;
+    }
+  }
+);
 
 export const checkLoggedInUser = createAsyncThunk(
   'user/checkLoggedInUser',
@@ -53,12 +77,15 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     loginUser: (state, action) => {
+      console.log(action.payload.user.username);
       localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('username', action.payload.user.username);
       state.user = action.payload.user;
       state.status = 'succeeded';
     },
     logoutUser: (state) => {
       localStorage.removeItem('token');
+      localStorage.removeItem('username');
       state.user = [];
       state.status = 'idle';
     },
@@ -92,6 +119,19 @@ const userSlice = createSlice({
     builder.addCase(updateUserProfile.rejected, (state, action) => {
       state.status = 'failed';
     });
+    builder.addCase(fetchPublicUser.pending, (state, action) => {
+      state.status = 'pending';
+    });
+    builder.addCase(fetchPublicUser.fulfilled, (state, action) => {
+      // console.log(action.payload);
+      // state.status = 'succeeded';
+      // const hold = { ...state.users };
+      // hold[action.payload.username] = action.payload;
+      state.users = 'a';
+    });
+    builder.addCase(fetchPublicUser.rejected, (state, action) => {
+      state.status = 'failed';
+    });
   },
 });
 
@@ -100,6 +140,6 @@ const HTTPOptions = {
 };
 
 export default userSlice.reducer;
-export const getUser = (state: UsersState) => state.user;
+export const getUser = () => (state: UsersState) => state.user;
 export const getStatus = (state: UsersState) => state.status;
 export const { loginUser, logoutUser, toggleDarkMode } = userSlice.actions;

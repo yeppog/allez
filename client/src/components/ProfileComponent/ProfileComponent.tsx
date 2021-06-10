@@ -50,12 +50,10 @@ const ProfileComponent: React.FC = (props) => {
   );
   /** Fetch the specified user on load */
   useEffect(() => {
-    if (loggedInUser) {
-      if (loggedInUser.username == username) {
-        setState({ ...state, myself: true });
-        setUser(loggedInUser);
-      }
-    } else if (!username) {
+    if (localStorage.getItem('username') == username) {
+      setState({ ...state, myself: true });
+    }
+    if (!username) {
       throw Error('No Username');
     } else {
       console.log(username);
