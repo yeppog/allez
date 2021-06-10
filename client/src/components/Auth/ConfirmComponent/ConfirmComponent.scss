@@ -72,3 +72,15 @@
     opacity: 1;
   }
 }
+
+.anchorLink {
+  background: none;
+  border: none;
+  color: #069;
+}
+
+.anchorLink:hover {
+  background: none;
+  text-decoration: underline;
+  cursor: pointer;
+}

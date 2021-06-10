@@ -7,19 +7,15 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
-  IconButton,
-  LinearProgress,
   Grid,
+  IconButton,
   Tooltip,
 } from '@material-ui/core';
 import {
   ChatBubble,
-  ChatBubbleOutline,
   Info,
-  InfoOutlined,
   MoreVert as MoreVertIcon,
   Share,
-  ShareOutlined,
   ThumbUpAlt,
   ThumbUpAltOutlined,
 } from '@material-ui/icons';

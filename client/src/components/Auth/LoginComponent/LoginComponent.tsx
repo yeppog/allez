@@ -17,10 +17,8 @@ import { useEffect, useState } from 'react';
 
 import { Alert } from '@material-ui/lab';
 import { CSSTransition } from 'react-transition-group';
-import { LoginCredentials } from '../../../interface/Credentials';
 import React from 'react';
 import axios from 'axios';
-import { debug } from 'console';
 import { useHistory } from 'react-router-dom';
 
 interface State {
@@ -41,7 +39,6 @@ const LoginComponent: React.FC = () => {
     message: '',
   });
 
-  const [message, setMessage] = useState<string>();
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -66,7 +63,7 @@ const LoginComponent: React.FC = () => {
 
   useEffect(() => {
     dispatch(checkLoggedInUser());
-  }, []);
+  }, [dispatch]);
 
   const loginStatus = useSelector(
     (s: { user: { status: any } }) => s.user.status

@@ -41,8 +41,8 @@ const ProfileComponent: React.FC = (props) => {
   const user = useSelector(
     (state: { user: { user: User[] } }) => state.user.user[0]
   );
-  console.log(user);
   const id = useParams<ID>();
+  console.log(id);
   const history = useHistory();
   const [state, setState] = useState({
     id: id.id,

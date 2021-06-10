@@ -40,7 +40,7 @@ const ConfirmComponent: React.FC = () => {
     };
     // TODO: Remove setTimeout when finalising build
     setTimeout(() => confirmUser(token), 5000);
-  }, []);
+  }, [history, token]);
 
   return (
     <div className="ConfirmComponent" data-testid="ConfirmComponent">
@@ -66,7 +66,11 @@ const ConfirmComponent: React.FC = () => {
             </p>
             <p>
               Find your way back! Click{' '}
-              <a href="" onClick={() => history.push('/login')}>
+              <a
+                className="anchorLink"
+                role="button"
+                onClick={() => history.push('/login')}
+              >
                 here.
               </a>
             </p>
