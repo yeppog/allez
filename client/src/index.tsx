@@ -1,14 +1,11 @@
 import './index.css';
 
-import { CssBaseline, createMuiTheme } from '@material-ui/core';
 import { Route, BrowserRouter as Router } from 'react-router-dom';
 
 import App from './App';
-import { Provider, useSelector } from 'react-redux';
+import { Provider } from 'react-redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ThemeProvider } from '@material-ui/core/styles';
-import { blueGrey } from '@material-ui/core/colors';
 import reportWebVitals from './reportWebVitals';
 import store from './components/Redux/store';
 
