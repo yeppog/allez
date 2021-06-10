@@ -59,9 +59,15 @@ const RegisterComponent: React.FC = () => {
     // TODO: Better validation for email and password
     if (validator(state)) {
       const username = state.username;
+      const name = state.name;
       const email = state.email;
       const password = state.password;
-      const credential = { username, email, password } as RegisterCredentials;
+      const credential = {
+        name,
+        username,
+        email,
+        password,
+      } as RegisterCredentials;
       registerLogin(credential);
     }
   };

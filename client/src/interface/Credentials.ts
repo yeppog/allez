@@ -1,23 +1,24 @@
 export interface LoginCredentials {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface RegisterCredentials {
-    username: string;
-    email: string;
-    password: string;
+  name: string;
+  username: string;
+  email: string;
+  password: string;
 }
 
 export interface ConfirmCredentials {
-    token: string;
+  token: string;
 }
 
 export interface ResetRequestCredentials {
-    email: string;
+  email: string;
 }
 
 export interface ResetCredentials {
-    token: string;
-    password: string;
+  token: string;
+  password: string;
 }
