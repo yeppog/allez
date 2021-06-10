@@ -9,17 +9,12 @@ import {
 } from '@material-ui/core';
 import { PublicUser, User } from '../../interface/Schemas';
 import React, { useEffect, useState } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import {
-  fetchPublicUser,
-  getUser,
-  updateUserProfile,
-} from '../Redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
 import Image from './../../static/404.png';
 import SettingsIcon from '@material-ui/icons/Settings';
+import axios from 'axios';
 
 interface ID {
   id: string;
@@ -39,10 +34,6 @@ interface State {
 }
 
 const ProfileComponent: React.FC = (props) => {
-  const [file, setFile] = useState<File>();
-  const [filePreview, setFilePreview] = useState<string>();
-  const dispatch = useDispatch();
-
   const history = useHistory();
   const username = useParams<ID>().id;
   const loggedInUser = useSelector((state: { user: { user: User } }) => {
@@ -102,36 +93,6 @@ const ProfileComponent: React.FC = (props) => {
     //TODO: API calls
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    setFile(e.target.files[0]);
-    setFilePreview(URL.createObjectURL(e.target.files[0]));
-  };
-
-  const onUpdateProfile = () => {
-    const formData = new FormData();
-    const token = localStorage.getItem('token');
-    if (file && token) {
-      formData.append('file', file, file.name);
-      // formData.append('username', user.username);
-      // formData.append('avatar', user.avatar);
-      formData.append('name', 'bruh');
-      formData.append('token', token);
-      formData.append('bio', 'whatzzeofrhweoifhew the fuck???');
-      formData.append('followCount', 1500 as any);
-      // dispatch(updateUserProfile(formData));
-      axios
-        .post('/api/users/updateProfile', formData)
-        .then((data) => {
-          setUser(data.data);
-          setFile(undefined);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
-
   return (
     <div className="ProfileComponent" data-testid="ProfileComponent">
       {/*  direction="row" */}
@@ -175,11 +136,6 @@ const ProfileComponent: React.FC = (props) => {
                 </Grid>
                 <Grid item>
                   <Typography>followers</Typography>
-                  <input type="file" onChange={(e) => handleFileChange(e)} />
-                  <Button type="button" onClick={() => onUpdateProfile()}>
-                    Upload
-                  </Button>
-                  <img src={filePreview ? filePreview : ''} />
                 </Grid>
               </Grid>
             </Grid>
