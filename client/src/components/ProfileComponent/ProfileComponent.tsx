@@ -45,31 +45,9 @@ const ProfileComponent: React.FC = (props) => {
 
   const history = useHistory();
   const username = useParams<ID>().id;
-  const loggedInUser = useSelector(
-    (state: { user: { user: User[] } }) => state.user.user[0]
-  );
-  /** Fetch the specified user on load */
-  useEffect(() => {
-    if (localStorage.getItem('username') == username) {
-      setState({ ...state, myself: true });
-    }
-    if (!username) {
-      throw Error('No Username');
-    } else {
-      console.log(username);
-      axios
-        .get('api/users/getPublicProfile', {
-          headers: { username: username },
-        })
-        .then((data) => {
-          setUser(data.data);
-        });
-    }
-  }, [axios, username]);
-
-  const handleFetchUser = (prop: keyof PublicUser, data: any) => {
-    setState({ ...state, [prop]: data });
-  };
+  const loggedInUser = useSelector((state: { user: { user: User } }) => {
+    return state.user.user;
+  });
   const [user, setUser] = useState<PublicUser>({
     name: '',
     username: '',
@@ -78,6 +56,26 @@ const ProfileComponent: React.FC = (props) => {
     followCount: 0,
     followers: {},
   });
+  /** Fetch the specified user on load */
+  useEffect(() => {
+    if (loggedInUser.username == username) {
+      setState({ ...state, myself: true });
+      setUser(loggedInUser);
+    } else {
+      axios
+        .get('api/users/getPublicProfile', {
+          headers: { username: username },
+        })
+        .then((data) => {
+          setUser(data.data);
+        });
+    }
+  }, [axios, username, loggedInUser]);
+
+  const handleFetchUser = (prop: keyof PublicUser, data: any) => {
+    setState({ ...state, [prop]: data });
+  };
+
   const [state, setState] = useState({
     // to migrate to user in the future
     postNumber: 0,
@@ -113,15 +111,24 @@ const ProfileComponent: React.FC = (props) => {
   const onUpdateProfile = () => {
     const formData = new FormData();
     const token = localStorage.getItem('token');
-    if (token) {
-      // formData.append('file', file, file.name);
+    if (file && token) {
+      formData.append('file', file, file.name);
       // formData.append('username', user.username);
       // formData.append('avatar', user.avatar);
       formData.append('name', 'bruh');
       formData.append('token', token);
       formData.append('bio', 'whatzzeofrhweoifhew the fuck???');
       formData.append('followCount', 1500 as any);
-      dispatch(updateUserProfile(formData));
+      // dispatch(updateUserProfile(formData));
+      axios
+        .post('/api/users/updateProfile', formData)
+        .then((data) => {
+          setUser(data.data);
+          setFile(undefined);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   };
 
@@ -140,7 +147,7 @@ const ProfileComponent: React.FC = (props) => {
             <Grid item>
               <ButtonBase>
                 {/* <img src={state.img} className="img" /> */}
-                <img src={user.avatar} className="img" />
+                <img src={user.avatar ? user.avatar : Image} className="img" />
               </ButtonBase>
             </Grid>
             <Grid item>
@@ -152,7 +159,9 @@ const ProfileComponent: React.FC = (props) => {
             <Grid item>
               <Grid container direction="row" spacing={1}>
                 <Grid item>
-                  <Typography>{formatNumber(state.postNumber)}</Typography>
+                  <Typography>
+                    {state.postNumber ? formatNumber(state.postNumber) : 0}
+                  </Typography>
                 </Grid>
                 <Grid item>
                   <Typography>posts</Typography>
@@ -160,7 +169,9 @@ const ProfileComponent: React.FC = (props) => {
                 <Grid item></Grid>
                 <Grid item></Grid>
                 <Grid item>
-                  <Typography>{formatNumber(user.followCount)}</Typography>
+                  <Typography>
+                    {user.followCount ? formatNumber(user.followCount) : 0}
+                  </Typography>
                 </Grid>
                 <Grid item>
                   <Typography>followers</Typography>
@@ -198,7 +209,6 @@ const ProfileComponent: React.FC = (props) => {
           </Grid>
         </Grid>
       </Grid>
-      )
     </div>
   );
 };
