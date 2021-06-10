@@ -45,7 +45,10 @@ imageRouter.route("/avatar/:filename").get((req, res, next) => {
         message: "No files available",
       });
     }
-    if (files[0].contentType === "image/png") {
+    if (
+      files[0].contentType === "image/png" ||
+      files[0].contentType === "image/jpeg"
+    ) {
       return gfsAvatar.openDownloadStreamByName(req.params.filename).pipe(res);
     } else {
       return res.status(404).json({
