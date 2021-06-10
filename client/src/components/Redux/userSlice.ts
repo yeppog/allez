@@ -79,20 +79,23 @@ const userSlice = createSlice({
     loginUser: (state, action) => {
       console.log(action.payload.user.username);
       localStorage.setItem('token', action.payload.token);
-      localStorage.setItem('username', action.payload.user.username);
       state.user = action.payload.user;
       state.status = 'succeeded';
+      state.loginStatus = 'succeeded';
     },
     logoutUser: (state) => {
       localStorage.removeItem('token');
-      localStorage.removeItem('username');
       state.user = [];
       state.status = 'idle';
     },
     toggleDarkMode: (state) => {
-      console.log(localStorage.getItem('darkMode'));
       localStorage.setItem('darkMode', `${!state.darkMode}`);
       state.darkMode = !state.darkMode;
+    },
+    verifyUser: (state, action) => {
+      state.user = action.payload;
+      state.loginStatus = 'succeeded';
+      state.status = 'succeeded';
     },
   },
   extraReducers: (builder) => {
@@ -142,4 +145,5 @@ const HTTPOptions = {
 export default userSlice.reducer;
 export const getUser = () => (state: UsersState) => state.user;
 export const getStatus = (state: UsersState) => state.status;
-export const { loginUser, logoutUser, toggleDarkMode } = userSlice.actions;
+export const { loginUser, logoutUser, toggleDarkMode, verifyUser } =
+  userSlice.actions;
