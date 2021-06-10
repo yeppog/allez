@@ -27,7 +27,6 @@ import ResetComponent from './components/Auth/ResetComponent/ResetComponent';
 import ResetRequestComponent from './components/Auth/ResetRequestComponent/ResetRequestComponent';
 import TopNavComponent from './components/TopNavComponent/TopNavComponent';
 import { blueGrey } from '@material-ui/core/colors';
-import { getStatus } from './components/Redux/userSlice';
 import { useSelector } from 'react-redux';
 
 function App() {

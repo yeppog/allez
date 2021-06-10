@@ -87,6 +87,7 @@ const userSlice = createSlice({
       localStorage.removeItem('token');
       state.user = [];
       state.status = 'idle';
+      state.loginStatus = 'idle';
     },
     toggleDarkMode: (state) => {
       localStorage.setItem('darkMode', `${!state.darkMode}`);
