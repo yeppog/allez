@@ -144,7 +144,7 @@ const ProfileComponent: React.FC = (props) => {
                 <IconButton
                   aria-label="settings"
                   onClick={() => {
-                    history.push('/edit/profile');
+                    history.push('/editProfile');
                   }}
                 >
                   <SettingsIcon />

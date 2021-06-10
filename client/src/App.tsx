@@ -80,11 +80,11 @@ function App() {
     //   name: 'Profile',
     //   Component: ProfileComponent,
     // },
-    {
-      path: '/edit/profile',
-      name: 'Profile Edit',
-      Component: ProfileSettingsComponent,
-    },
+    // {
+    //   path: '/edit/profile',
+    //   name: 'Profile Edit',
+    //   Component: ProfileSettingsComponent,
+    // },
   ];
 
   /**
@@ -149,6 +149,14 @@ function App() {
               exact
               component={ProfileComponent}
               path="/profile/:id"
+              authenticationPath="login"
+            />
+          </Route>
+          <Route path="/editProfile">
+            <ProtectedRoute
+              exact
+              component={ProfileSettingsComponent}
+              path="/editProfile"
               authenticationPath="login"
             />
           </Route>
