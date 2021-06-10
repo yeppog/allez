@@ -19,7 +19,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     dispatch(checkLoggedInUser());
   }, []);
   const isAuthenticated = useSelector(
-    (state: { user: { status: any } }) => state.user.status
+    (state: { user: { loginStatus: any } }) => state.user.loginStatus
   );
   // }
   return (
