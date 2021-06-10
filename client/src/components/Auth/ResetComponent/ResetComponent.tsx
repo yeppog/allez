@@ -62,21 +62,16 @@ const ResetComponent: React.FC = () => {
 
   const reset = (credentials: ResetCredentials): void => {
     setState({ ...state, postState: 'idle' });
-    try {
-      const url = '/api/users/reset/end';
-      axios
-        .post(url, credentials, HTTPOptions)
-        .then((data) => {
-          console.log(data);
-          setState({ ...state, postState: 'success' });
-        })
-        .catch((err) => {
-          setState({ ...state, postState: 'error', message: err.message });
-        });
-      setTimeout(() => history.push('/login'), 3000);
-    } catch (err) {
-      setState({ ...state, postState: 'error', message: err.message });
-    }
+    const url = '/api/users/reset/end';
+    axios
+      .post(url, credentials, HTTPOptions)
+      .then((data) => {
+        setState({ ...state, postState: 'success' });
+      })
+      .catch((err) => {
+        setState({ ...state, postState: 'error', message: err.message });
+      });
+    setTimeout(() => history.push('/login'), 3000);
   };
 
   const validator = (form: State): boolean => {

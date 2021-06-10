@@ -45,24 +45,20 @@ const ResetRequestComponent: React.FC = () => {
   };
 
   const reset = (credentials: ResetRequestCredentials): void => {
-    try {
-      const url = '/api/users/reset';
-      axios
-        .post(url, credentials, HTTPOptions)
-        .then((data) => {
-          /**
-           * Might not need depending on the API
-           */
-          console.log(data);
-          setConfirm(data.data.token);
-          setState({ ...state, postSuccess: true });
-        })
-        .catch((err) => {
-          setState({ ...state, message: err.message });
-        });
-    } catch (err) {
-      setState({ ...state, message: err.message });
-    }
+    const url = '/api/users/reset';
+    axios
+      .post(url, credentials, HTTPOptions)
+      .then((data) => {
+        /**
+         * Might not need depending on the API
+         */
+        console.log(data);
+        setConfirm(data.data.token);
+        setState({ ...state, postSuccess: true });
+      })
+      .catch((err) => {
+        setState({ ...state, message: err.message });
+      });
   };
 
   const handleClose = (): void => {
