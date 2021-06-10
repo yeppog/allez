@@ -66,7 +66,7 @@ const LoginComponent: React.FC = () => {
   }, [dispatch]);
 
   const loginStatus = useSelector(
-    (s: { user: { status: any } }) => s.user.status
+    (s: { user: { loginStatus: string } }) => s.user.loginStatus
   );
 
   if (loginStatus === 'succeeded') {
@@ -108,7 +108,7 @@ const LoginComponent: React.FC = () => {
 
   return (
     <div className="LoginComponent" data-testid="LoginComponent">
-      {loginStatus && loginStatus !== 'succeeded' && (
+      {loginStatus !== 'succeeded' && (
         <Card className="form" variant="outlined">
           <h2>Login</h2>
           <form onSubmit={(e) => onSubmit(e)}>
