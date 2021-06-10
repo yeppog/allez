@@ -518,7 +518,7 @@ describe("Test public profile", () => {
           .get("/api/users/getPublicProfile")
           .set("username", "test1")
           .then((test) => {
-            expect(test.status).toBe(404);
+            expect(test.status).toBe(403);
             expect(test.body.message).toBe("User not found");
           });
       });
