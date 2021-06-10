@@ -3,7 +3,6 @@ import './RegisterComponent.scss';
 import {
   Button,
   Card,
-  Fade,
   FormControl,
   Grid,
   Input,
@@ -68,20 +67,16 @@ const RegisterComponent: React.FC = () => {
   };
 
   const registerLogin = (credentials: RegisterCredentials): void => {
-    try {
-      const url = '/api/users/register';
-      axios
-        .post(url, credentials, HTTPOptions)
-        .then((data) => {
-          setConfirm(data.data.token);
-          setState({ ...state, postSuccess: true });
-        })
-        .catch((err) => {
-          setState({ ...state, message: err.message });
-        });
-    } catch (err) {
-      setState({ ...state, message: err.message });
-    }
+    const url = '/api/users/register';
+    axios
+      .post(url, credentials, HTTPOptions)
+      .then((data) => {
+        setConfirm(data.data.token);
+        setState({ ...state, postSuccess: true });
+      })
+      .catch((err) => {
+        setState({ ...state, message: err.message });
+      });
   };
 
   const validator = (form: State): boolean => {
