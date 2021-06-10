@@ -7,15 +7,19 @@ import {
   IconButton,
   Typography,
 } from '@material-ui/core';
+import { PublicUser, User } from '../../interface/Schemas';
 import React, { useEffect, useState } from 'react';
+import axios, { AxiosResponse } from 'axios';
+import {
+  fetchPublicUser,
+  getUser,
+  updateUserProfile,
+} from '../Redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
 import Image from './../../static/404.png';
 import SettingsIcon from '@material-ui/icons/Settings';
-import { User } from '../../interface/Schemas';
-import axios from 'axios';
-import { updateUserProfile } from '../Redux/userSlice';
 
 interface ID {
   id: string;
@@ -38,21 +42,49 @@ const ProfileComponent: React.FC = (props) => {
   const [file, setFile] = useState<File>();
   const [filePreview, setFilePreview] = useState<string>();
   const dispatch = useDispatch();
-  const user = useSelector(
+
+  const history = useHistory();
+  const username = useParams<ID>().id;
+  const loggedInUser = useSelector(
     (state: { user: { user: User[] } }) => state.user.user[0]
   );
-  const id = useParams<ID>();
-  console.log(id);
-  const history = useHistory();
-  const [state, setState] = useState({
-    id: id.id,
+  /** Fetch the specified user on load */
+  useEffect(() => {
+    if (loggedInUser) {
+      if (loggedInUser.username == username) {
+        setState({ ...state, myself: true });
+        setUser(loggedInUser);
+      }
+    } else if (!username) {
+      throw Error('No Username');
+    } else {
+      console.log(username);
+      axios
+        .get('api/users/getPublicProfile', {
+          headers: { username: username },
+        })
+        .then((data) => {
+          setUser(data.data);
+        });
+    }
+  }, [axios, username]);
+
+  const handleFetchUser = (prop: keyof PublicUser, data: any) => {
+    setState({ ...state, [prop]: data });
+  };
+  const [user, setUser] = useState<PublicUser>({
     name: '',
-    bio: '',
-    img: '',
+    username: '',
     avatar: '',
+    bio: '',
+    followCount: 0,
+    followers: {},
+  });
+  const [state, setState] = useState({
+    // to migrate to user in the future
     postNumber: 0,
     followNumber: 0,
-    myself: true,
+    myself: false,
     following: false,
 
     postState: '',
@@ -74,18 +106,6 @@ const ProfileComponent: React.FC = (props) => {
     //TODO: API calls
   };
 
-  const apiCall = () => {
-    setState({
-      ...state,
-      name: 'Jon',
-      bio: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto, voluptate soluta assumenda ut aliquam unde maxime? Omnis alias maxime perspiciatis.',
-      img: Image,
-      postNumber: 10,
-      followNumber: 12300,
-      postState: 'sucess',
-    });
-  };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     setFile(e.target.files[0]);
@@ -95,16 +115,18 @@ const ProfileComponent: React.FC = (props) => {
   const onUpdateProfile = () => {
     const formData = new FormData();
     const token = localStorage.getItem('token');
-    if (file && token) {
+    if (token) {
       // formData.append('file', file, file.name);
-      // formData.append('token', token);
-
-      // axios.post('api/users/updateProfile', formData);
+      // formData.append('username', user.username);
+      // formData.append('avatar', user.avatar);
+      formData.append('name', 'bruh');
+      formData.append('token', token);
+      formData.append('bio', 'whatzzeofrhweoifhew the fuck???');
+      formData.append('followCount', 1500 as any);
       dispatch(updateUserProfile(formData));
     }
   };
 
-  useEffect(apiCall, []);
   return (
     <div className="ProfileComponent" data-testid="ProfileComponent">
       {/*  direction="row" */}
@@ -178,6 +200,7 @@ const ProfileComponent: React.FC = (props) => {
           </Grid>
         </Grid>
       </Grid>
+      )
     </div>
   );
 };
