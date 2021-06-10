@@ -405,6 +405,8 @@ async function handleUpdateProfile(req, res, next) {
     user.name = req.body.name == null ? user.name : req.body.name;
     user.bio = req.body.bio == null ? user.bio : req.body.bio;
     user.posts = req.body.posts == null ? user.posts : req.body.posts;
+    user.followCount =
+      req.body.followCount == null ? user.followCount : req.body.followCount;
 
     user
       .save()
@@ -412,7 +414,7 @@ async function handleUpdateProfile(req, res, next) {
         return res.status(200).json({
           username: data.username,
           email: data.email,
-          avatarPath: data.avatarPath,
+          avatar: data.avatarPath,
           name: data.name,
           bio: data.bio,
           posts: data.posts,
@@ -435,15 +437,16 @@ async function handleGetPublicProfile(req, res) {
     const username = req.header("username");
     const user = await User.findOne({ username: username });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(403).json({ message: "User not found" });
     }
     return res.status(200).json({
       username: user.username,
-      avatarPath: user.avatarPath,
-      followCount: user.followCount,
-      followers: user.followers,
+      email: user.email,
+      avatar: user.avatarPath,
+      name: user.name,
       bio: user.bio,
-      posts: user.posts,
+      followers: user.followers,
+      followCount: user.followCount,
     });
   }
 }
