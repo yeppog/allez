@@ -34,7 +34,7 @@ const options = {
       },
     ],
   },
-  apis: ["./routes/api/Users.apidocs.js"],
+  apis: ["./routes/api/docs/Users.apidocs.js"],
 };
 
 require("dotenv").config();
@@ -55,14 +55,17 @@ const { config } = require("dotenv");
 
 /** Import Images API */
 const images = require("./routes/api/Image");
+app.use("/api/images", images.router);
+
+/** Import Videos API */
+const videos = require("./routes/api/Video");
+app.use("/api/videos", videos.router);
 
 /**
  * Route for User API
  */
 app.use("/api/users", users);
 
-const upload = require("./gridfs");
-app.use("/api/images", images.router);
 app.use(
   "/",
   swaggerUi.serve,
