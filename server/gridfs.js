@@ -28,6 +28,25 @@ const avatarStorage = new GridFsStorage({
     });
   },
 });
+const videoStorage = new GridFsStorage({
+  db: mongoose.connection,
+  file: (req, file) => {
+    return new Promise((resolve, reject) => {
+      crypto.randomBytes(16, (err, buff) => {
+        if (err) {
+          return reject(err);
+        }
+        const filename = buff.toString("hex") + path.extname(file.originalname);
+        const fileInfo = {
+          filename: `video_${filename}`,
+          bucketName: "video",
+        };
+        resolve(fileInfo);
+      });
+    });
+  },
+});
 
+const uploadVideo = multer({ storage: videoStorage });
 const uploadAvatar = multer({ storage: avatarStorage });
-module.exports = uploadAvatar;
+module.exports = { uploadAvatar, uploadVideo };

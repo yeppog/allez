@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const detect = require("./RouteDetection");
+const detect = require("./routedetect/RouteDetection");
+const Post = require("./../../models/Post");
 
 /** Used to query by ObjectId */
 const ObjectId = require("mongodb").ObjectID;
@@ -29,7 +30,10 @@ const transporter = nodemailer.createTransport({
 const User = require("../../models/User");
 const Image = require("../../models/Images");
 
-const uploadAvatar = require("./../../gridfs");
+// GridFS Uploads
+const uploadAvatar = require("./../../gridfs").uploadAvatar;
+const uploadVideo = require("./../../gridfs").uploadVideo;
+const Video = require("../../models/Video");
 
 /**
  * Handles the POST request of creating a new account.
@@ -452,6 +456,61 @@ async function handleGetPublicProfile(req, res) {
   }
 }
 
+async function handleCreatePost(req, res, next) {
+  if (!req.header("token")) {
+    return res.status(403).json({ message: "No user token" });
+  } else {
+    try {
+      const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
+      User.findById(new ObjectId(id))
+        .then(async (user) => {
+          const post = new Post({
+            userId: user.id,
+            body: req.body.body,
+            avatarPath: user.avatarPath,
+            mediaPath: "",
+          });
+          let filePath;
+          if (req.file) {
+            const upload = require("./Video").uploadVideo;
+            const caption = `${user.id}_${req.file.filename}`;
+            const video = new Video({
+              caption: caption,
+              filename: req.file.filename,
+              chunkIDRef: req.file.id,
+            });
+            await upload(video, caption)
+              .then((data) => (filePath = data))
+              .catch((err) =>
+                res
+                  .status(500)
+                  .json({ message: "Error saving the video", error: err })
+              );
+          }
+          post.mediaPath = filePath == undefined ? "" : filePath;
+
+          post
+            .save()
+            .then((data) => res.status(200).json(data))
+            .catch((err) =>
+              res
+                .status(400)
+                .json({ message: "Error saving the post", error: err })
+            );
+        })
+        .catch((err) => res.status(403).json(err));
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError) {
+        res.status(403).json({ message: "Token has expired" });
+      } else if (err instanceof jwt.JsonWebTokenError) {
+        res.status(403).json({ message: "Invalid JWT" });
+      } else {
+        res.status(500).json(err);
+      }
+    }
+  }
+}
+
 router.post("/register", handleRegister);
 
 /** Provides the route for the API at ./login using the handleLogin function */
@@ -478,5 +537,7 @@ router
 router.get("/getPublicProfile", handleGetPublicProfile);
 
 router.get("/detect", detect);
+
+router.post("/createpost", uploadVideo.single("file"), handleCreatePost);
 
 module.exports = router;
