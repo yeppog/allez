@@ -68,7 +68,7 @@ videoRouter.route("/:filename").get((req, res, next) => {
       return res.status(400).json(err);
     }
     if (!files[0] || files.length === 0) {
-      return res.status(200).json({
+      return res.status(403).json({
         success: false,
         message: "No files available",
       });
@@ -92,7 +92,7 @@ videoRouter.route("/:filename").get((req, res, next) => {
       return gfsVideo.openDownloadStreamByName(req.params.filename).pipe(res);
     } else {
       return res.status(404).json({
-        err: "Not an video",
+        err: "Not a video",
       });
     }
   });
