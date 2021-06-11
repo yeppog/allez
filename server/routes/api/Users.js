@@ -34,6 +34,7 @@ const Image = require("../../models/Images");
 const uploadAvatar = require("./../../gridfs").uploadAvatar;
 const uploadVideo = require("./../../gridfs").uploadVideo;
 const Video = require("../../models/Video");
+const { createPost } = require("./Post");
 
 /**
  * Handles the POST request of creating a new account.
@@ -466,6 +467,7 @@ async function handleCreatePost(req, res, next) {
         .then(async (user) => {
           const post = new Post({
             userId: user.id,
+            username: user.username,
             body: req.body.body,
             avatarPath: user.avatarPath,
             mediaPath: "",
@@ -489,9 +491,11 @@ async function handleCreatePost(req, res, next) {
           }
           post.mediaPath = filePath == undefined ? "" : filePath;
 
-          post
-            .save()
-            .then((data) => res.status(200).json(data))
+          const createpost = require("./Post").createPost;
+          createPost(post)
+            .then((data) => {
+              res.status(200).json(data);
+            })
             .catch((err) =>
               res
                 .status(400)
