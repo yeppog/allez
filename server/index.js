@@ -34,7 +34,11 @@ const options = {
       },
     ],
   },
-  apis: ["./routes/api/docs/Users.apidocs.js"],
+  apis: [
+    "./routes/api/docs/Users.apidocs.js",
+    "./routes/api/docs/Post.apidocs.js",
+    "./routes/api/docs/Videos.apidocs.js",
+  ],
 };
 
 require("dotenv").config();
@@ -60,6 +64,10 @@ app.use("/api/images", images.router);
 /** Import Videos API */
 const videos = require("./routes/api/Video");
 app.use("/api/videos", videos.router);
+
+/** Import Post API */
+const post = require("./routes/api/Post");
+app.use("/api/posts/", post.postRouter);
 
 /**
  * Route for User API
