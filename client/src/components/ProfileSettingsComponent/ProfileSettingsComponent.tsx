@@ -144,46 +144,58 @@ const ProfileSettingsComponent: React.FC = () => {
                 over it for now
               </h3>
             </Grid>
-            <form onSubmit={(e) => onSubmit(e)}>
-              <Grid
-                container
-                direction="column"
-                alignItems="center"
-                justify="center"
-                spacing={2}
-              >
-                <Grid item>
-                  <FormControl fullWidth>
-                    <InputLabel>Display Name</InputLabel>
-                    <Input
+            <Grid item lg={12}>
+              <form onSubmit={(e) => onSubmit(e)}>
+                <Grid
+                  container
+                  xs={12}
+                  spacing={2}
+                  alignItems="center"
+                  justify="center"
+                >
+                  <Grid item xs={12}>
+                    <FormControl fullWidth>
+                      <InputLabel>Display Name</InputLabel>
+                      <Input
+                        fullWidth
+                        value={state.name}
+                        onChange={handleChange('name')}
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControl fullWidth>
+                      <InputLabel>Username</InputLabel>
+                      <Input
+                        fullWidth
+                        value={state.username}
+                        onChange={handleChange('username')}
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControl fullWidth>
+                      <InputLabel>Bio</InputLabel>
+                      <Input
+                        value={state.bio}
+                        onChange={handleChange('bio')}
+                        fullWidth
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      variant="text"
+                      color="primary"
+                      type="submit"
                       fullWidth
-                      value={state.name}
-                      onChange={handleChange('name')}
-                    />
-                  </FormControl>
+                    >
+                      Confirm
+                    </Button>
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <FormControl>
-                    <InputLabel>Username</InputLabel>
-                    <Input
-                      value={state.username}
-                      onChange={handleChange('username')}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item>
-                  <FormControl>
-                    <InputLabel>Bio</InputLabel>
-                    <Input value={state.bio} onChange={handleChange('bio')} />
-                  </FormControl>
-                </Grid>
-                <Grid item>
-                  <Button variant="text" color="primary" type="submit">
-                    Confirm
-                  </Button>
-                </Grid>
-              </Grid>
-            </form>
+              </form>
+            </Grid>
           </Grid>
         </Grid>
       </Grid>
