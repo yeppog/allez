@@ -59,56 +59,64 @@ imageRouter.route("/avatar/:filename").get((req, res, next) => {
 });
 
 /**
- * Handles the avatar upload function.
- * @param {*} newImage An mongo Image.js Schema object
- * @param {*} caption The submitted caption for the upload request
- * @returns
+ * Handles the creation of an Image or Avatar object for the file that was uploaded.
+ * @param {string} caption The caption of the file
+ * @param {string} filename The name of the file
+ * @param {string} chunkIDRef The objectID of the file
+ * @param {string} options Slug of the image file stored at
+ * @returns {Promise<string>} Promise of the string of the image url.
  */
-async function handleAvatarUpload(newImage, caption) {
-  let imageURL = "";
-  await Image.findOne({ caption: caption })
-    .then(async (image) => {
-      if (image) {
-        // delete the chunk from the GridFS store
-        await gfsAvatar.delete(
-          new mongoose.Types.ObjectId(image.chunkIDRef),
-          (err, data) => {
-            if (err) {
-              throw new Error(err);
-            }
-          }
-        );
 
-        // overrides existing image in the DB for that Image Schema
-        image.filename = newImage.filename;
-        // update pointer to the new image chunk
-        image.chunkIDRef = newImage.chunkIDRef;
-        await image
-          .save()
-          .then((data) => {
-            imageURL = `${process.env.domain}/api/images/avatar/${data.filename}`;
-          })
-          .catch((err) => {
-            throw new Error(err);
+async function handleImageUpload(caption, filename, chunkIDRef, options) {
+  return new Promise(async (resolve, reject) => {
+    await Image.findOne({ caption: caption })
+      .then(async (image) => {
+        if (image) {
+          // delete the chunk from the GridFS store
+          await gfsAvatar.delete(
+            new mongoose.Types.ObjectId(image.chunkIDRef),
+            (err, data) => {
+              if (err) {
+                reject(err);
+              }
+            }
+          );
+
+          // overrides existing image in the DB for that Image Schema
+          image.filename = filename;
+          // update pointer to the new image chunk
+          image.chunkIDRef = chunkIDRef;
+          await image
+            .save()
+            .then((data) => {
+              resolve(`${process.env.domain}${options}${data.filename}`);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        } else {
+          const newImage = new Image({
+            caption: caption,
+            filename: filename,
+            chunkIDRef: chunkIDRef,
           });
-      } else {
-        await newImage
-          .save()
-          .then((data) => {
-            imageURL = `${process.env.domain}/api/images/avatar/${data.filename}`;
-          })
-          .catch((err) => {
-            throw Error(err);
-          });
-      }
-    })
-    .catch((err) => {
-      throw Error("lul");
-    });
-  return imageURL;
+          await newImage
+            .save()
+            .then((data) => {
+              resolve(`${process.env.domain}${options}${data.filename}`);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 }
 
 module.exports = {
   router: imageRouter,
-  uploadAvatar: handleAvatarUpload,
+  uploadImage: handleImageUpload,
 };
