@@ -28,7 +28,7 @@ const avatarStorage = new GridFsStorage({
     });
   },
 });
-const videoStorage = new GridFsStorage({
+const postMedia = new GridFsStorage({
   db: mongoose.connection,
   file: (req, file) => {
     return new Promise((resolve, reject) => {
@@ -37,16 +37,26 @@ const videoStorage = new GridFsStorage({
           return reject(err);
         }
         const filename = buff.toString("hex") + path.extname(file.originalname);
-        const fileInfo = {
-          filename: `video_${filename}`,
-          bucketName: "video",
-        };
-        resolve(fileInfo);
+
+        switch (file.mimetype) {
+          case "video/mp4":
+            const videoFileInfo = {
+              filename: `video_${filename}`,
+              bucketName: "video",
+            };
+            resolve(videoFileInfo);
+          case "image/png" || "image/jpeg":
+            const imgFileInfo = {
+              filename: `image_${filename}`,
+              bucketName: "images",
+            };
+            resolve(imgFileInfo);
+        }
       });
     });
   },
 });
 
-const uploadVideo = multer({ storage: videoStorage });
+const uploadMedia = multer({ storage: postMedia });
 const uploadAvatar = multer({ storage: avatarStorage });
-module.exports = { uploadAvatar, uploadVideo };
+module.exports = { uploadAvatar, uploadMedia };
