@@ -32,7 +32,7 @@ const Image = require("../../models/Images");
 
 // GridFS Uploads
 const uploadAvatar = require("./../../gridfs").uploadAvatar;
-const uploadVideo = require("./../../gridfs").uploadVideo;
+const uploadMedia = require("./../../gridfs").uploadMedia;
 const Video = require("../../models/Video");
 const { createPost } = require("./Post");
 
@@ -392,14 +392,9 @@ async function handleUpdateProfile(req, res, next) {
     }
     if (req.file) {
       const caption = `${user.id}_avatar`;
-      const upload = require("./Image").uploadAvatar;
-      let newImage = new Image({
-        filename: req.file.filename,
-        caption: caption,
-        chunkIDRef: req.file.id,
-      });
+      const upload = require("./Image").uploadImage;
       let imageURL;
-      await upload(newImage, caption)
+      await upload(caption, req.file.filename, chunkIDRef, "/api/users/avatar")
         .then((data) => (imageURL = data))
         .catch((err) => res.status(403).json(err));
 
@@ -453,6 +448,8 @@ async function handleGetPublicProfile(req, res) {
       bio: user.bio,
       followers: user.followers,
       followCount: user.followCount,
+      posts: user.posts,
+      postCount: user.postCount,
     });
   }
 }
@@ -474,27 +471,63 @@ async function handleCreatePost(req, res, next) {
           });
           let filePath;
           if (req.file) {
-            const upload = require("./Video").uploadVideo;
-            const caption = `${user.id}_${req.file.filename}`;
-            const video = new Video({
-              caption: caption,
-              filename: req.file.filename,
-              chunkIDRef: req.file.id,
-            });
-            await upload(video, caption)
-              .then((data) => (filePath = data))
-              .catch((err) =>
-                res
-                  .status(500)
-                  .json({ message: "Error saving the video", error: err })
-              );
+            console.log(req.file);
+            if (req.file.mimetype == "video/mp4") {
+              const upload = require("./Video").uploadVideo;
+              const caption = `${user.id}_${req.file.filename}`;
+
+              await upload(caption, req.file.filename, req.file.id)
+                .then((data) => (filePath = data))
+                .catch((err) =>
+                  res
+                    .status(500)
+                    .json({ message: "Error saving the video", error: err })
+                );
+            } else if (
+              req.file.mimetype == "image/png" ||
+              req.file.mimetype == "image/jpeg"
+            ) {
+              console.log(req.file.mimetype);
+              console.log("test");
+              const imgupload = require("./Image").uploadImage;
+
+              const imgcaption = `${user.id}_${req.file.filename}`;
+              await imgupload(req.file.filename, req.file.id, "/api/images/")
+                .then((data) => (filePath = data))
+                .catch((err) =>
+                  res
+                    .status(500)
+                    .json({ message: "Error saving the image", error: err })
+                );
+            }
           }
           post.mediaPath = filePath == undefined ? "" : filePath;
 
-          const createpost = require("./Post").createPost;
+          const createPost = require("./Post").createPost;
           createPost(post)
             .then((data) => {
-              res.status(200).json(data);
+              user.postCount = user.postCount + 1;
+              // format date to for query
+              const date = `${data.createdAt.getFullYear()}${data.createdAt.getMonth()}${data.createdAt.getDate()}`;
+              // only concatenate to the array if the slug id doesnt exist
+              const posts = { ...user.posts };
+              const datePosts = posts[date];
+              if (datePosts) {
+                if (!datePosts.includes(data.id)) {
+                  posts[date] = [...posts[date], data.id];
+                  user.posts = { ...posts };
+                }
+              } else {
+                posts[date] = [data.id];
+                user.posts = { ...posts };
+              }
+
+              user
+                .save()
+                .then((updateUser) => res.status(200).json(data))
+                .catch((err) =>
+                  res.status(400).json({ message: "Error updating the user" })
+                );
             })
             .catch((err) =>
               res
@@ -542,6 +575,6 @@ router.get("/getPublicProfile", handleGetPublicProfile);
 
 router.get("/detect", detect);
 
-router.post("/createpost", uploadVideo.single("file"), handleCreatePost);
+router.post("/createpost", uploadMedia.single("file"), handleCreatePost);
 
 module.exports = router;
