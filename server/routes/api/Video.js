@@ -11,52 +11,53 @@ mongoose.connection.once("open", async () => {
   });
 });
 
-async function handleVideoUpload(newVideo, caption) {
-  let videoURL = "";
-  await Video.findOne({ caption: caption })
-    .then(async (video) => {
-      if (video) {
-        // delete the chunk from the GridFS store
-        await gfsVideo.delete(
-          new mongoose.Types.ObjectId(video.chunkIDRef),
-          (err, data) => {
-            if (err) {
-              console.log(err);
-              throw new Error(err);
+async function handleVideoUpload(caption, filename, chunkIDRef) {
+  const newVideo = new Video({
+    caption: caption,
+    filename: filename,
+    chunkIDRef: chunkIDRef,
+  });
+  return new Promise(async (resolve, reject) => {
+    await Video.findOne({ caption: caption })
+      .then(async (video) => {
+        if (video) {
+          // delete the chunk from the GridFS store
+          await gfsVideo.delete(
+            new mongoose.Types.ObjectId(video.chunkIDRef),
+            (err, data) => {
+              if (err) {
+                reject(err);
+              }
             }
-          }
-        );
+          );
 
-        // overrides existing video in the DB for that Image Schema
-        video.filename = newVideo.filename;
-        // update pointer to the new video chunk
-        video.chunkIDRef = newVideo.chunkIDRef;
-        await video
-          .save()
-          .then((data) => {
-            videoURL = `${process.env.domain}/api/videos/${data.filename}`;
-          })
-          .catch((err) => {
-            console.log(err);
-            throw new Error(err);
-          });
-      } else {
-        await newVideo
-          .save()
-          .then((data) => {
-            videoURL = `${process.env.domain}/api/videos/${data.filename}`;
-          })
-          .catch((err) => {
-            console.log(err);
-            throw Error(err);
-          });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      throw Error("lul");
-    });
-  return videoURL;
+          // overrides existing video in the DB for that Image Schema
+          video.filename = newVideo.filename;
+          // update pointer to the new video chunk
+          video.chunkIDRef = newVideo.chunkIDRef;
+          await video
+            .save()
+            .then((data) => {
+              resolve(`${process.env.domain}/api/videos/${data.filename}`);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        } else {
+          await newVideo
+            .save()
+            .then((data) => {
+              resolve(`${process.env.domain}/api/videos/${data.filename}`);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 }
 
 videoRouter.route("/:filename").get((req, res, next) => {
