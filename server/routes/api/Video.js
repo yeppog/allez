@@ -2,7 +2,7 @@ const express = require("express");
 const videoRouter = express.Router();
 const mongoose = require("mongoose");
 const Video = require("../../models/Video");
-const upload = require("./../../gridfs").uploadVideo;
+const upload = require("./../../gridfs").uploadMedia;
 let gfsVideo;
 
 mongoose.connection.once("open", async () => {
