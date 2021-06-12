@@ -8,20 +8,30 @@ const jwt = require("jsonwebtoken");
 const User = require("./../../models/User");
 const { use } = require("./Users");
 
-postRouter.get("/getpost", (req, res) => {
+/**
+ * Fetches a post of a particular slug.
+ * @param {Request} req The HTTP request with a header containing a parameter slug.
+ * @param {Response} res The HTTP response to output to.
+ */
+
+async function handleGetPost(req, res) {
   if (!req.header("slug")) {
-    return res.status(400).json({ message: "Post not specified" });
+    res.status(400).json({ message: "Post not specified" });
   } else {
     post
       .findOne({ slug: req.header("slug") })
       .then((data) => {
-        return res.status(200).json(data);
+        if (data == null) {
+          res.status(403).json({ message: "Post not found." });
+        } else {
+          res.status(200).json(data);
+        }
       })
       .catch((err) => {
-        return res.status(403).json(err);
+        rdtaes.status(403).json(err);
       });
   }
-});
+}
 
 async function createPost(post) {
   return new Promise((resolve, reject) => {
@@ -31,8 +41,10 @@ async function createPost(post) {
           reject(err);
         } else {
           post.slug = buff.toString("hex");
-          const res = await post.save();
-          resolve(res);
+          post
+            .save()
+            .then((data) => resolve(data))
+            .catch((err) => reject(err));
         }
       });
     } catch (err) {
@@ -41,65 +53,81 @@ async function createPost(post) {
   });
 }
 
-async function editPost(post) {
-  return new Promise((resolve, reject) => {
-    if (!post.slug) {
-      reject("Post doesnt have an existing slug. Post doesn't exist");
-    } else {
-      post
-        .findOne({ slug: post.slug })
-        .then((data) =>
-          post
-            .save()
-            .then((save) => resolve(save))
-            .catch((err) => reject(err))
-        )
-        .catch((err) => reject(err));
-    }
-  });
-}
+/**
+ * @deprecated
+ * @param {*} post
+ * @returns
+ */
+// async function editPost(post) {
+//   return new Promise((resolve, reject) => {
+//     if (!post.slug) {
+//       reject("Post doesnt have an existing slug. Post doesn't exist");
+//     } else {
+//       post
+//         .findOne({ slug: post.slug })
+//         .then((data) =>
+//           post
+//             .save()
+//             .then((save) => resolve(save))
+//             .catch((err) => reject(err))
+//         )
+//         .catch((err) => reject(err));
+//     }
+//   });
+// }
 
-async function deletePost(postinput) {
-  return new Promise((resolve, reject) => {
-    post
-      .findById(new ObjectId(postinput.id))
-      .then((data) =>
-        post
-          .deleteOne({ _id: new ObjectId(postinput.id) })
-          .then(() => resolve("Deleted successfully"))
-          .catch((err) => reject(err))
-      )
-      .catch((err) => reject(err));
-  });
-}
+// /**
+//  * @deprecated
+//  * @param {*} postinput
+//  * @returns
+//  */
+// async function deletePost(postinput) {
+//   return new Promise((resolve, reject) => {
+//     post
+//       .findById(new ObjectId(postinput.id))
+//       .then((data) =>
+//         post
+//           .deleteOne({ _id: new ObjectId(postinput.id) })
+//           .then(() => resolve("Deleted successfully"))
+//           .catch((err) => reject(err))
+//       )
+//       .catch((err) => reject(err));
+//   });
+// }
 
+/**
+ * Deletes a specified post of a specified user. Updates the user's list of posts.
+ * @param {Request} req The HTTP request containing a body with slug and token as parameters.
+ * @param {Response} res The response to output to.
+ */
 async function handleDeletePost(req, res) {
   if (!req.body.slug || !req.body.token) {
-    return res
+    res
       .status(400)
       .json({ message: "Bad request. Missing post slug or user token." });
   } else {
-    console.log(req.body.slug);
     post
       .findOne({ slug: req.body.slug })
       .then((post) => {
-        console.log(post);
         try {
           const id = jwt.verify(req.body.token, process.env.JWT_SECRET).id;
-          console.log(id);
           const postId = post.id;
           const postDate = post.createdAt;
-          console.log(postId);
           post
             .deleteOne({ _id: new ObjectId(post.id) })
             .then(() => {
-              User.findById(new ObjectId(id)).then((user) => {
-                var posts = user.posts;
+              User.findById(new ObjectId(id)).then(async (user) => {
+                var posts = { ...user.posts };
                 const date = `${postDate.getFullYear()}${postDate.getMonth()}${postDate.getDate()}`;
-                posts = posts[date].filter((post) => post != postId);
-                user.posts = posts;
+                const filtered = posts[date].filter((post) => post != postId);
+                if (filtered.length == 0) {
+                  delete posts[date];
+                } else {
+                  posts[date] = filtered;
+                }
+                user.posts = { ...posts };
                 user.postCount = user.postCount - 1;
-                user
+                await user
                   .save()
                   .then((data) => res.status(200).json(data))
                   .catch((err) =>
@@ -125,6 +153,11 @@ async function handleDeletePost(req, res) {
   }
 }
 
+/**
+ * Takes in a token, slug and a body to add a comment to a specified post by a specified user.
+ * @param {Request} req The HTTP request containing a body with token, slug and body parameters.
+ * @param {Response} res The response to output to.
+ */
 async function addComment(req, res) {
   if (!req.body.token || !req.body.slug) {
     res.status(400).json({
@@ -136,7 +169,6 @@ async function addComment(req, res) {
       .then((post) => {
         try {
           const user = jwt.verify(req.body.token, process.env.JWT_SECRET);
-          console.log(new ObjectId(user.id));
           User.findById(new ObjectId(user.id))
             .then((user) => {
               var comments = post.comments;
@@ -158,18 +190,18 @@ async function addComment(req, res) {
               res.status(403).json({ message: "User not found" })
             );
         } catch (err) {
-          if (err instanceof jwt.TokenExpiredError) {
-            res.status(403).json({ message: "Token has expired" });
-          } else if (err instanceof jwt.JsonWebTokenError) {
-            res.status(403).json({ message: "Invalid JWT" });
-          } else {
-            res.status(500).json(err);
-          }
+          handleJWTError(res, err);
         }
       })
       .catch((err) => res.status(403).json({ message: "Unable to find post" }));
   }
 }
+
+/**
+ * Takes in a token, slug and date to delete a comment of a specific user that was made at a specific time on a specified post.
+ * @param {Request} req The request made to this endpoint. Token, slug and date is required in the body.
+ * @param {Response} res The response to output to.
+ */
 
 async function deleteComment(req, res) {
   if (!req.body.token || !req.body.slug || !req.body.date) {
@@ -183,7 +215,6 @@ async function deleteComment(req, res) {
       .then((post) => {
         try {
           const user = jwt.verify(req.body.token, process.env.JWT_SECRET);
-          console.log(new ObjectId(user.id));
           User.findById(new ObjectId(user.id))
             .then((user) => {
               var comments = post.comments;
@@ -203,18 +234,18 @@ async function deleteComment(req, res) {
               res.status(403).json({ message: "User not found" })
             );
         } catch (err) {
-          if (err instanceof jwt.TokenExpiredError) {
-            res.status(403).json({ message: "Token has expired" });
-          } else if (err instanceof jwt.JsonWebTokenError) {
-            res.status(403).json({ message: "Invalid JWT" });
-          } else {
-            res.status(500).json(err);
-          }
+          handleJWTError(res, err);
         }
       })
       .catch((err) => res.status(403).json({ message: "Unable to find post" }));
   }
 }
+
+/**
+ * Selectively handles the JWT errors. Else, throw the error back out to be catched by the async pipeline.
+ * @param {Response} res The HTTP response to output the response to.
+ * @param {Error} err The error received
+ */
 
 function handleJWTError(res, err) {
   if (err instanceof jwt.TokenExpiredError) {
@@ -225,7 +256,7 @@ function handleJWTError(res, err) {
     throw err;
   }
 }
-
+postRouter.get("/getpost", handleGetPost);
 postRouter.post("/deleteComment", deleteComment);
 postRouter.post("/addComment", addComment);
 postRouter.post("/deletePost", handleDeletePost);
