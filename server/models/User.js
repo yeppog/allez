@@ -49,6 +49,10 @@ const UserSchema = new mongoose.Schema({
     type: {},
     default: [""],
   },
+  postCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const User = mongoose.model("UserData", UserSchema);

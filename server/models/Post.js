@@ -23,16 +23,20 @@ const PostSchema = new mongoose.Schema({
   },
   mediaPath: {
     type: String,
-    required: true,
+    default: "",
   },
   likes: {
     type: Number,
     default: 0,
     required: true,
   },
-  comments: {
+  likedUsers: {
     type: [],
     default: [""],
+  },
+  comments: {
+    type: [],
+    default: [],
   },
   slug: {
     type: String,
