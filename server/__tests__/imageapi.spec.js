@@ -33,15 +33,8 @@ describe("Test image rendering", () => {
 
 describe("Test program flow for upload image", () => {
   it("Test imageless function call", async () => {
-    uploadImage
-      .uploadAvatar(
-        {
-          filename: "test",
-        },
-        "test"
-      )
-      .catch((err) => {
-        expect(err).toBeDefined();
-      });
+    uploadImage.uploadImage("test", "test", "test", "test").catch((err) => {
+      expect(err).toBeDefined();
+    });
   });
 });
