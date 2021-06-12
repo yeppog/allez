@@ -116,27 +116,33 @@ async function handleDeletePost(req, res) {
           post
             .deleteOne({ _id: new ObjectId(post.id) })
             .then(() => {
-              User.findById(new ObjectId(id)).then(async (user) => {
-                var posts = { ...user.posts };
-                const date = `${postDate.getFullYear()}${postDate.getMonth()}${postDate.getDate()}`;
-                const filtered = posts[date].filter((post) => post != postId);
-                if (filtered.length == 0) {
-                  delete posts[date];
-                } else {
-                  posts[date] = filtered;
-                }
-                user.posts = { ...posts };
-                user.postCount = user.postCount - 1;
-                await user
-                  .save()
-                  .then((data) => res.status(200).json(data))
-                  .catch((err) =>
-                    res.status(403).json({
-                      message: "Unable to update user posts",
-                      err: err,
-                    })
-                  );
-              });
+              User.findById(new ObjectId(id))
+                .then(async (user) => {
+                  var posts = { ...user.posts };
+                  const date = `${postDate.getFullYear()}${postDate.getMonth()}${postDate.getDate()}`;
+                  const filtered = posts[date].filter((post) => post != postId);
+                  if (filtered.length == 0) {
+                    delete posts[date];
+                  } else {
+                    posts[date] = filtered;
+                  }
+                  user.posts = { ...posts };
+                  user.postCount = user.postCount - 1;
+                  await user
+                    .save()
+                    .then((data) => res.status(200).json(data))
+                    .catch((err) =>
+                      res.status(403).json({
+                        message: "Unable to update user posts",
+                        err: err,
+                      })
+                    );
+                })
+                .catch((err) =>
+                  res
+                    .status(403)
+                    .json({ message: "Unable to find the user", err: err })
+                );
             })
             .catch((err) =>
               res
@@ -148,7 +154,7 @@ async function handleDeletePost(req, res) {
         }
       })
       .catch((err) =>
-        res.status(400).json({ message: "Unable to find the post.", err: err })
+        res.status(400).json({ message: "Unable to find the post", err: err })
       );
   }
 }
