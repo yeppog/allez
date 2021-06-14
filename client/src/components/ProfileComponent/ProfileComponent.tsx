@@ -80,9 +80,13 @@ const ProfileComponent: React.FC = (props) => {
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
-      return (num / 1000000).toFixed(1).toString() + 'mil';
+      return (num / 100000) % 10 == 0
+        ? (num / 1000000).toFixed().toString() + 'm'
+        : (num / 1000000).toFixed(1).toString() + 'm';
     } else if (num >= 1000) {
-      return (num / 1000).toFixed(1).toString() + 'k';
+      return (num / 100) % 10 == 0
+        ? (num / 1000).toFixed().toString() + 'k'
+        : (num / 1000).toFixed(1).toString() + 'k';
     } else {
       return num.toString();
     }
@@ -97,71 +101,110 @@ const ProfileComponent: React.FC = (props) => {
     <div className="ProfileComponent" data-testid="ProfileComponent">
       {/*  direction="row" */}
       <Grid container direction="row" alignItems="center" justify="center">
-        <Grid item xs={10} sm={8} md={6} lg={4}>
-          <Grid
-            container
-            direction="column"
-            alignItems="center"
-            justify="center"
-            spacing={2}
-          >
+        <Grid
+          item
+          xs={12}
+          sm={8}
+          md={6}
+          lg={4}
+          container
+          direction="column"
+          alignItems="center"
+          justify="center"
+          spacing={2}
+        >
+          <Grid item container direction="row" alignItems="stretch">
             <Grid item>
               <ButtonBase>
                 {/* <img src={state.img} className="img" /> */}
                 <img src={user.avatar ? user.avatar : Image} className="img" />
               </ButtonBase>
             </Grid>
-            <Grid item>
-              <Typography>{user.name}</Typography>
-            </Grid>
-            <Grid item>
-              <Typography>{user.bio}</Typography>
-            </Grid>
-            <Grid item>
-              <Grid container direction="row" spacing={1}>
-                <Grid item>
-                  <Typography>
-                    {state.postNumber ? formatNumber(state.postNumber) : 0}
-                  </Typography>
+            <Grid item alignItems="stretch">
+              <Grid
+                item
+                container
+                direction="column"
+                alignItems="stretch"
+                spacing={4}
+              >
+                <Grid item container alignItems="center" spacing={4}>
+                  <Grid item>
+                    <Typography variant="h5" style={{ fontWeight: 600 }}>
+                      {user.name}
+                    </Typography>
+                  </Grid>
+                  {state.myself ? (
+                    <IconButton
+                      aria-label="settings"
+                      onClick={() => {
+                        history.push('/editProfile');
+                      }}
+                    >
+                      <SettingsIcon />
+                    </IconButton>
+                  ) : (
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="primary"
+                      onClick={handleFollowButton}
+                    >
+                      {state.following ? 'Following' : 'Follow'}
+                    </Button>
+                  )}
                 </Grid>
                 <Grid item>
-                  <Typography>posts</Typography>
-                </Grid>
-                <Grid item></Grid>
-                <Grid item></Grid>
-                <Grid item>
-                  <Typography>
-                    {user.followCount ? formatNumber(user.followCount) : 0}
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Typography>followers</Typography>
+                  <Grid container direction="row" spacing={1}>
+                    <Grid item>
+                      <Grid
+                        container
+                        direction="column"
+                        spacing={1}
+                        alignItems="center"
+                        justify="center"
+                      >
+                        <Grid item>
+                          <Typography>
+                            {state.postNumber
+                              ? formatNumber(state.postNumber)
+                              : 0}
+                          </Typography>
+                        </Grid>
+                        <Grid item>
+                          <Typography>&emsp;Posts&emsp;</Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    <Grid item></Grid>
+                    <Grid item></Grid>
+                    <Grid item>
+                      <Grid
+                        container
+                        direction="column"
+                        spacing={1}
+                        alignItems="center"
+                        justify="center"
+                      >
+                        <Grid item>
+                          <Typography>
+                            {user.followCount
+                              ? formatNumber(user.followCount)
+                              : 0}
+                          </Typography>
+                        </Grid>
+                        <Grid item>
+                          <Typography>&ensp;Followers&ensp;</Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-            {state.myself ? (
-              <Grid container direction="row" justify="flex-end">
-                <IconButton
-                  aria-label="settings"
-                  onClick={() => {
-                    history.push('/editProfile');
-                  }}
-                >
-                  <SettingsIcon />
-                </IconButton>
-              </Grid>
-            ) : (
-              <Grid item>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  onClick={handleFollowButton}
-                >
-                  {state.following ? 'Following' : 'Follow'}
-                </Button>
-              </Grid>
-            )}
+          </Grid>
+          <Grid item>
+            <Typography>{user.bio}</Typography>
           </Grid>
         </Grid>
       </Grid>
