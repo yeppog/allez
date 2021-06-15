@@ -14,7 +14,7 @@
  *     responses:
  *       "200":
  *         description: "Success"
- * @openapi
+ *
  * /api/posts/addComment:
  *   post:
  *     description: Adds a comment to a specified post.
@@ -51,7 +51,7 @@
  *
  *
  * /api/posts/deleteComment:
- *   post:
+ *    post:
  *     description: Removes a specific comment by a specific user on a specific post.
  *     tags: [Posts]
  *     requestBody:
@@ -83,6 +83,30 @@
  *       default:
  *         description: "General error."
  *
+ * /api/posts/like:
+ *    get:
+ *      description: Toggles the like status of a user on a post. If the user has liked the post, remove the like relation. If the user hasn't liked the post, add a like relation.
+ *      tags: [Posts]
+ *      parameters:
+ *      - in: header
+ *        name: token
+ *        schema:
+ *          type: string
+ *          description: The JWT token of the user making the request for authentication.
+ *        example: "49057234r2f8b29f"
+ *      - in: header
+ *        name: slug
+ *        schema:
+ *          type: string
+ *          description: The post slug of the post.
+ *        example: "890ry2fub3f9234yf8034fh043"
+ *      responses:
+ *        "200":
+ *          description: Success
+ *        "403":
+ *          description: Failure. Unable to find user or post based off the parameters given.
+ *        "default":
+ *          description: Server error.
  *
  *
  * components:
