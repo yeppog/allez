@@ -139,10 +139,10 @@ const ProfileSettingsComponent: React.FC = () => {
                 />{' '}
                 Change Profile Picture
               </label>
-              <h3>
+              {/* 
                 Click the photo to remove selection. Im too lazy to draw an X
                 over it for now
-              </h3>
+             */}
             </Grid>
             <Grid item lg={12}>
               <form onSubmit={(e) => onSubmit(e)}>
