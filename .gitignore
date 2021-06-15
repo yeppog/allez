@@ -29,4 +29,4 @@ server/.env
 
 
 #testing
-server/coverage/lcov-report
+server/coverage
