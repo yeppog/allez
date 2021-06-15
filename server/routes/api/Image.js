@@ -58,6 +58,30 @@ imageRouter.route("/avatar/:filename").get((req, res, next) => {
   });
 });
 
+imageRouter.route("/media/:filename").get((req, res, next) => {
+  gfsPhotos.find({ filename: req.params.filename }).toArray((err, files) => {
+    if (err) {
+      return res.status(400).json(err);
+    }
+    if (!files[0] || files.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: "No files available",
+      });
+    }
+    if (
+      files[0].contentType === "image/png" ||
+      files[0].contentType === "image/jpeg"
+    ) {
+      return gfsPhotos.openDownloadStreamByName(req.params.filename).pipe(res);
+    } else {
+      return res.status(404).json({
+        err: "Not an image",
+      });
+    }
+  });
+});
+
 /**
  * Handles the creation of an Image or Avatar object for the file that was uploaded.
  * @param {string} caption The caption of the file
