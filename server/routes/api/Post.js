@@ -113,6 +113,7 @@ async function handleCreatePost(req, res, next) {
             body: req.body.body,
             avatarPath: user.avatarPath,
             mediaPath: "",
+            tag: user.tag,
           });
           let filePath;
           if (req.file) {
