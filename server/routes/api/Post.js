@@ -10,6 +10,7 @@ const { use } = require("./Users");
 const { read } = require("fs");
 const Post = require("./../../models/Post");
 const uploadMedia = require("./../../gridfs").uploadMedia;
+const Comment = require("./../../models/Comment");
 
 /**
  * Fetches a post of a particular slug.
@@ -263,7 +264,7 @@ async function handleDeletePost(req, res) {
  * @param {Request} req The HTTP request containing a body with token, slug and body parameters.
  * @param {Response} res The response to output to.
  */
-async function addComment(req, res) {
+async function addCommentToPost(req, res) {
   if (!req.body.token || !req.body.slug) {
     res.status(400).json({
       message: "Bad request. User token and body slug must be present.",
@@ -276,20 +277,30 @@ async function addComment(req, res) {
           const user = jwt.verify(req.body.token, process.env.JWT_SECRET);
           User.findById(new ObjectId(user.id))
             .then((user) => {
-              var comments = post.comments;
-              comments = [
-                ...comments,
-                {
-                  date: new Date(),
-                  user: user.username,
-                  body: req.body.body,
-                },
-              ];
-              post.comments = comments;
-              post
+              const comment = new Comment({
+                post: post.slug,
+                body: req.body.body,
+                username: user.username,
+                comments: [],
+                edited: false,
+                avatarPath: user.avatarPath,
+                user: user.id,
+              });
+
+              comment
                 .save()
-                .then((data) => res.status(200).json(data))
-                .catch((err) => res.status(400).json(err));
+                .then((savedComment) => {
+                  var comments = post.comments;
+                  comments = [...comments, savedComment.id];
+                  post.comments = comments;
+                  post
+                    .save()
+                    .then((data) => res.status(200).json(savedComment))
+                    .catch((err) => res.status(400).json(err));
+                })
+                .catch((err) =>
+                  res.status(400).json({ message: "Could not save comment" })
+                );
             })
             .catch((err) =>
               res.status(403).json({ message: "User not found" })
@@ -299,6 +310,57 @@ async function addComment(req, res) {
         }
       })
       .catch((err) => res.status(403).json({ message: "Unable to find post" }));
+  }
+}
+
+async function addCommentToComment(req, res) {
+  if (!req.body.token || !req.body.comment) {
+    res.status(400).json({
+      message: "Bad request. User token and body slug must be present.",
+    });
+  } else {
+    Comment.findById(new ObjectId(req.body.comment))
+      .then((cmt) => {
+        console.log(cmt);
+        try {
+          const user = jwt.verify(req.body.token, process.env.JWT_SECRET);
+          User.findById(new ObjectId(user.id))
+            .then((user) => {
+              const comment = new Comment({
+                post: cmt.post,
+                body: req.body.body,
+                username: user.username,
+                comments: [],
+                edited: false,
+                avatarPath: user.avatarPath,
+                user: user.id,
+              });
+
+              comment
+                .save()
+                .then((savedComment) => {
+                  var comments = cmt.comments;
+                  comments = [...comments, savedComment.id];
+                  cmt.comments = comments;
+                  cmt
+                    .save()
+                    .then((data) => res.status(200).json(savedComment))
+                    .catch((err) => res.status(400).json(err));
+                })
+                .catch((err) =>
+                  res.status(400).json({ message: "Could not save comment" })
+                );
+            })
+            .catch((err) =>
+              res.status(403).json({ message: "User not found" })
+            );
+        } catch (err) {
+          handleJWTError(res, err);
+        }
+      })
+      .catch((err) =>
+        res.status(403).json({ message: "Unable to find comment" })
+      );
   }
 }
 
@@ -399,7 +461,8 @@ function handleJWTError(res, err) {
 }
 postRouter.get("/getpost", handleGetPost);
 postRouter.post("/deleteComment", deleteComment);
-postRouter.post("/addComment", addComment);
+postRouter.post("/addCommentToPost", addCommentToPost);
+postRouter.post("/addCommentToComment", addCommentToComment);
 postRouter.post("/deletePost", handleDeletePost);
 postRouter.get("/like", handleLike);
 postRouter.post("/createpost", uploadMedia.single("file"), handleCreatePost);
