@@ -108,128 +108,210 @@
  *        "default":
  *          description: Server error.
  *
+ * /api/posts/createPost:
+ *    post:
+ *      description: Create a post with an attached media file.
+ *      tags: [Posts]
+ *      requestBody:
+ *        content:
+ *          multipart/form-data:
+ *            schema:
+ *              - $ref: "#/components/schemas/CreatePost"
+ *      responses:
+ *        "200":
+ *          description: "Success. Ok"
+ *          content:
+ *            application/json:
+ *              schema:
+ *                - $ref: "#/components/schemas/CreatePostSuccess"
+ *        "400":
+ *          description: "Bad request. Did not have the neccessary fields"
+ *
  *
  * components:
- *   schemas:
- *     AddComment:
- *       type: object
- *       required:
- *         - token
- *         - comment
- *         - slug
- *       properties:
- *         token:
- *           type: string
- *         comment:
- *           type: string
- *         slug:
- *           type: string
- *       example:
- *         token: "e9ri24fh23908f23f"
- *         comment: "This is a comment."
- *         slug: "e49fu23094fn23890fj3290fj"
- *     DeleteComment:
- *       type: object
- *       required:
- *         - token
- *         - date
- *         - slug
- *       properties:
- *         token:
- *           type: string
- *         date:
- *           type: string
- *         slug:
- *           type: string
- *       example:
- *         token: "r9u234f023hf3mf23t"
- *         date: "2021-06-12T11:11:01.967Z"
- *         slug: "fiojn3489fh34f0bn34f"
- *     CommentSuccess:
- *       type: object
- *       properties:
- *         mediaPath:
- *           type: string
- *           description: URL for the attached content.
- *         likes:
- *           type: number
- *           description: The number of likes the post has.
- *         likedUsers:
- *           type: array
- *           description: The users who liked the post.
- *           items:
- *             type: string
- *             description: The username of the user who liked the post.
- *         comments:
- *           type: array
- *           description: The comments the post has
- *           items:
- *             type: object
- *             description: A single comment
- *             properties:
- *               date:
- *                 type: string
- *                 description: The date the comment was made.
- *               user:
- *                 type: string
- *                 description: The username of the user that made the comment
- *               body:
- *                 type: string
- *                 description: The comment
- *         createdAt:
- *           type: string
- *           description: The date the post was made
- *         _id:
- *           type: string
- *           description: The post ID.
- *         userId:
- *           type: string
- *           description: The object ID of the user who made the post.
- *         body:
- *           type: string
- *           description: The body of the post
- *         avatarPath:
- *           type: string
- *           description: The URL of the user avatar of the user that made the post.
- *         slug:
- *           type: string
- *           description: The URL slug for the post.
- *       example:
- *         mediaPath: "http://test.com/api/videos/video_348ry230rfh230f3.mp4"
- *         likes: 0
- *         likedUsers: ["d23f23f32f", '4fihj2349f8h34g']
- *         comments: [{date: "2021-06-12T11:47:15.208Z", user: "yeet", body: "This is a comment"}]
- *         createdAt: "2021-06-12T11:47:15.208Z"
- *         _id: "d082hf823hf23f32f"
- *         userId: "409fh304fn23od32df23"
- *         username: "username"
- *         body: "This is the post body"
- *         avatarPath: "http://test.com/api/avatar/avatar_of_username.png"
- *         slug: "0t94h034hgf0349hgpostslug"
- *     MissingBodyError:
- *       type: object
- *       properties:
- *         message:
- *           type: string
- *           description: The description of the error
- *       example:
- *         message: "Bad request. User token and body slug must be present."
- *     JWTTokenError:
- *       type: object
- *       properties:
- *         message:
- *           type: string
- *           description: The description of the error. JWT error.
- *       example:
- *         message: "Token has expired"
- *     PostFindError:
- *       type: object
- *       properties:
- *         message:
- *           type: string
- *           description: The description of the error. Unable to find the post from the slug.
- *       example:
- *         message: "Unable to find post"
+ *    schemas:
+ *      CreatePost:
+ *        type: object
+ *        required:
+ *          - body
+ *          - token
+ *          - file
+ *          - tag
+ *        properties:
+ *          token:
+ *            type: string
+ *            description: JWT token of the user creating the post.
+ *          body:
+ *            type: string
+ *            description: The text content of the post.
+ *          file:
+ *            type: string
+ *            format: binary
+ *            description: The file that is to be uploaded (jpeg/png/mp4)
+ *          tag:
+ *            type: array
+ *            items:
+ *              type: string
+ *              description: Object references of tagged objects (users or gyms)
+ *            description: The array of object references of tagged objects
+ *        example:
+ *          body: "This is the body of the post!"
+ *          token: "3490r203fhefher89ehwfuewbf923ghr23fn"
+ *          file: "This is a png image"
+ *          tag: ["user1", "gym1"]
+ *
+ *      CreatePostSuccess:
+ *        type: object
+ *        properties:
+ *          mediaPath:
+ *            type: string
+ *            description: The path of the media that was uploaded.
+ *          likes:
+ *            type: number
+ *            description: The total number of likes on the post.
+ *          likedUsers:
+ *            type: object
+ *            description: The users who liked the post as the key, the date liked as the value.
+ *          comments:
+ *            type: array
+ *            items:
+ *              type: string
+ *              description: ObjectID of the comments that are related to the post.
+ *
+ *          createdAt:
+ *            type: string
+ *            description: The time and date the post was created.
+ *          userId:
+ *            type: string
+ *            description: The ID of the user that created the post.
+ *          body:
+ *            type: string
+ *            description: The contents of the post body
+ *          avatarPath:
+ *            type: string
+ *            description: The URL to render the user's avatar.
+ *          slug:
+ *            type: string
+ *            description: The unique post slug of the post.
+ *      AddComment:
+ *        type: object
+ *        required:
+ *          - token
+ *          - comment
+ *          - slug
+ *        properties:
+ *          token:
+ *            type: string
+ *          comment:
+ *            type: string
+ *          slug:
+ *            type: string
+ *        example:
+ *          token: "e9ri24fh23908f23f"
+ *          comment: "This is a comment."
+ *          slug: "e49fu23094fn23890fj3290fj"
+ *      DeleteComment:
+ *        type: object
+ *        required:
+ *          - token
+ *          - date
+ *          - slug
+ *        properties:
+ *          token:
+ *            type: string
+ *          date:
+ *            type: string
+ *          slug:
+ *            type: string
+ *        example:
+ *          token: "r9u234f023hf3mf23t"
+ *          date: "2021-06-12T11:11:01.967Z"
+ *          slug: "fiojn3489fh34f0bn34f"
+ *      CommentSuccess:
+ *        type: object
+ *        properties:
+ *          mediaPath:
+ *            type: string
+ *            description: URL for the attached content.
+ *          likes:
+ *            type: number
+ *            description: The number of likes the post has.
+ *          likedUsers:
+ *            type: array
+ *            description: The users who liked the post.
+ *            items:
+ *              type: string
+ *              description: The username of the user who liked the post.
+ *          comments:
+ *            type: array
+ *            description: The comments the post has
+ *            items:
+ *              type: object
+ *              description: A single comment
+ *              properties:
+ *                date:
+ *                  type: string
+ *                  description: The date the comment was made.
+ *                user:
+ *                  type: string
+ *                  description: The username of the user that made the comment
+ *                body:
+ *                  type: string
+ *                  description: The comment
+ *          createdAt:
+ *            type: string
+ *            description: The date the post was made
+ *          _id:
+ *            type: string
+ *            description: The post ID.
+ *          userId:
+ *            type: string
+ *            description: The object ID of the user who made the post.
+ *          body:
+ *            type: string
+ *            description: The body of the post
+ *          avatarPath:
+ *            type: string
+ *            description: The URL of the user avatar of the user that made the post.
+ *          slug:
+ *            type: string
+ *            description: The URL slug for the post.
+ *        example:
+ *          mediaPath: "http://test.com/api/videos/video_348ry230rfh230f3.mp4"
+ *          likes: 0
+ *          likedUsers: ["d23f23f32f", '4fihj2349f8h34g']
+ *          comments: [{date: "2021-06-12T11:47:15.208Z", user: "yeet", body: "This is a comment"}]
+ *          createdAt: "2021-06-12T11:47:15.208Z"
+ *          _id: "d082hf823hf23f32f"
+ *          userId: "409fh304fn23od32df23"
+ *          username: "username"
+ *          body: "This is the post body"
+ *          avatarPath: "http://test.com/api/avatar/avatar_of_username.png"
+ *          slug: "0t94h034hgf0349hgpostslug"
+ *      MissingBodyError:
+ *        type: object
+ *        properties:
+ *          message:
+ *            type: string
+ *            description: The description of the error
+ *        example:
+ *          message: "Bad request. User token and body slug must be present."
+ *      JWTTokenError:
+ *        type: object
+ *        properties:
+ *          message:
+ *            type: string
+ *            description: The description of the error. JWT error.
+ *        example:
+ *          message: "Token has expired"
+ *      PostFindError:
+ *        type: object
+ *        properties:
+ *          message:
+ *            type: string
+ *            description: The description of the error. Unable to find the post from the slug.
+ *        example:
+ *          message: "Unable to find post"
  *
  *
  *
