@@ -7,6 +7,8 @@ const ObjectId = require("mongodb").ObjectID;
 const jwt = require("jsonwebtoken");
 const User = require("./../../models/User");
 const { use } = require("./Users");
+const { read } = require("fs");
+const Post = require("./../../models/Post");
 
 /**
  * Fetches a post of a particular slug.
@@ -76,24 +78,24 @@ async function createPost(post) {
 //   });
 // }
 
-// /**
-//  * @deprecated
-//  * @param {*} postinput
-//  * @returns
-//  */
-// async function deletePost(postinput) {
-//   return new Promise((resolve, reject) => {
-//     post
-//       .findById(new ObjectId(postinput.id))
-//       .then((data) =>
-//         post
-//           .deleteOne({ _id: new ObjectId(postinput.id) })
-//           .then(() => resolve("Deleted successfully"))
-//           .catch((err) => reject(err))
-//       )
-//       .catch((err) => reject(err));
-//   });
-// }
+/**
+ * @deprecated
+ * @param {*} postinput
+ * @returns
+ */
+async function deletePost(postinput) {
+  return new Promise((resolve, reject) => {
+    post
+      .findById(new ObjectId(postinput.id))
+      .then((data) =>
+        post
+          .deleteOne({ _id: new ObjectId(postinput.id) })
+          .then(() => resolve("Deleted successfully"))
+          .catch((err) => reject(err))
+      )
+      .catch((err) => reject(err));
+  });
+}
 
 /**
  * Deletes a specified post of a specified user. Updates the user's list of posts.
@@ -247,6 +249,41 @@ async function deleteComment(req, res) {
   }
 }
 
+async function handleLike(req, res) {
+  if (!req.header("slug") || !req.header("token")) {
+    res.status(200).json({ message: "Bad request, slug or token not found." });
+  } else {
+    Post.findOne({ slug: req.header("slug") })
+      .then((post) => {
+        try {
+          const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
+          User.findById(new ObjectId(id))
+            .then((user) => {
+              const postLikes = { ...post.likedUsers };
+              const username = user.username;
+              if (username in postLikes) {
+                delete postLikes[username];
+              } else {
+                postLikes[username] = new Date();
+              }
+              postLikes.like = postLikes.like + 1;
+              post.likedUsers = postLikes;
+              post
+                .save()
+                .then((data) => res.status(200).json(data))
+                .catch((err) => res.status(403).json(err));
+            })
+            .catch((err) => res.status(403).json(err));
+        } catch (err) {
+          handleJWTError(res, err);
+        }
+      })
+      .catch((err) =>
+        res.status(403).json({ message: "Post cannot be found." })
+      );
+  }
+}
+
 /**
  * Selectively handles the JWT errors. Else, throw the error back out to be catched by the async pipeline.
  * @param {Response} res The HTTP response to output the response to.
@@ -266,4 +303,5 @@ postRouter.get("/getpost", handleGetPost);
 postRouter.post("/deleteComment", deleteComment);
 postRouter.post("/addComment", addComment);
 postRouter.post("/deletePost", handleDeletePost);
+postRouter.get("/like", handleLike);
 module.exports = { postRouter, createPost };
