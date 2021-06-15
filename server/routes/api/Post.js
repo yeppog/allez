@@ -9,6 +9,7 @@ const User = require("./../../models/User");
 const { use } = require("./Users");
 const { read } = require("fs");
 const Post = require("./../../models/Post");
+const uploadMedia = require("./../../gridfs").uploadMedia;
 
 /**
  * Fetches a post of a particular slug.
@@ -95,6 +96,102 @@ async function deletePost(postinput) {
       )
       .catch((err) => reject(err));
   });
+}
+
+async function handleCreatePost(req, res, next) {
+  if (!req.header("token")) {
+    return res.status(403).json({ message: "No user token" });
+  } else {
+    try {
+      const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
+      User.findById(new ObjectId(id))
+        .then(async (user) => {
+          const post = new Post({
+            userId: user.id,
+            username: user.username,
+            body: req.body.body,
+            avatarPath: user.avatarPath,
+            mediaPath: "",
+          });
+          let filePath;
+          if (req.file) {
+            if (req.file.mimetype == "video/mp4") {
+              const upload = require("./Video").uploadVideo;
+              const caption = `${user.id}_${req.file.filename}`;
+
+              await upload(caption, req.file.filename, req.file.id)
+                .then((data) => (filePath = data))
+                .catch((err) =>
+                  res
+                    .status(500)
+                    .json({ message: "Error saving the video", error: err })
+                );
+            } else if (
+              req.file.mimetype == "image/png" ||
+              req.file.mimetype == "image/jpeg"
+            ) {
+              const imgupload = require("./Image").uploadImage;
+              const options = "/api/images/media/";
+              const imgcaption = `${user.id}_${req.file.filename}`;
+              await imgupload(
+                imgcaption,
+                req.file.filename,
+                req.file.id,
+                options
+              )
+                .then((data) => (filePath = data))
+                .catch((err) =>
+                  res
+                    .status(500)
+                    .json({ message: "Error saving the image", error: err })
+                );
+            }
+          }
+          post.mediaPath = filePath == undefined ? "" : filePath;
+
+          const createPost = require("./Post").createPost;
+          createPost(post)
+            .then((data) => {
+              user.postCount = user.postCount + 1;
+              // format date to for query
+              const date = `${data.createdAt.getFullYear()}${data.createdAt.getMonth()}${data.createdAt.getDate()}`;
+              // only concatenate to the array if the slug id doesnt exist
+              const posts = { ...user.posts };
+              const datePosts = posts[date];
+              if (datePosts) {
+                if (!datePosts.includes(data.id)) {
+                  posts[date] = [...posts[date], data.id];
+                  user.posts = { ...posts };
+                }
+              } else {
+                posts[date] = [data.id];
+                user.posts = { ...posts };
+              }
+
+              user
+                .save()
+                .then((updateUser) => res.status(200).json(data))
+                .catch((err) =>
+                  res.status(400).json({ message: "Error updating the user" })
+                );
+            })
+            .catch((err) =>
+              res
+                .status(400)
+                .json({ message: "Error saving the post", error: err })
+            );
+        })
+        .catch((err) => res.status(403).json(err));
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError) {
+        res.status(403).json({ message: "Token has expired" });
+      } else if (err instanceof jwt.JsonWebTokenError) {
+        res.status(403).json({ message: "Invalid JWT" });
+      } else {
+        res.status(500).json(err);
+      }
+    }
+  }
 }
 
 /**
@@ -263,10 +360,11 @@ async function handleLike(req, res) {
               const username = user.username;
               if (username in postLikes) {
                 delete postLikes[username];
+                postLikes.like = postLikes.like - 1;
               } else {
                 postLikes[username] = new Date();
+                postLikes.like = postLikes.like + 1;
               }
-              postLikes.like = postLikes.like + 1;
               post.likedUsers = postLikes;
               post
                 .save()
@@ -304,4 +402,5 @@ postRouter.post("/deleteComment", deleteComment);
 postRouter.post("/addComment", addComment);
 postRouter.post("/deletePost", handleDeletePost);
 postRouter.get("/like", handleLike);
+postRouter.post("/createpost", uploadMedia.single("file"), handleCreatePost);
 module.exports = { postRouter, createPost };

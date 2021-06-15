@@ -454,97 +454,50 @@ async function handleGetPublicProfile(req, res) {
   }
 }
 
-async function handleCreatePost(req, res, next) {
-  if (!req.header("token")) {
-    return res.status(403).json({ message: "No user token" });
+async function handleFollow(req, res) {
+  if (!req.header("token") || !req.header("username")) {
+    res.status(400).json({ message: "Bad request, missing token or username" });
   } else {
     try {
-      const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
-      User.findById(new ObjectId(id))
-        .then(async (user) => {
-          const post = new Post({
-            userId: user.id,
-            username: user.username,
-            body: req.body.body,
-            avatarPath: user.avatarPath,
-            mediaPath: "",
-          });
-          let filePath;
-          if (req.file) {
-            console.log(req.file);
-            if (req.file.mimetype == "video/mp4") {
-              const upload = require("./Video").uploadVideo;
-              const caption = `${user.id}_${req.file.filename}`;
-
-              await upload(caption, req.file.filename, req.file.id)
-                .then((data) => (filePath = data))
-                .catch((err) =>
-                  res
-                    .status(500)
-                    .json({ message: "Error saving the video", error: err })
-                );
-            } else if (
-              req.file.mimetype == "image/png" ||
-              req.file.mimetype == "image/jpeg"
-            ) {
-              console.log(req.file.mimetype);
-              console.log("test");
-              const imgupload = require("./Image").uploadImage;
-
-              const imgcaption = `${user.id}_${req.file.filename}`;
-              await imgupload(req.file.filename, req.file.id, "/api/images/")
-                .then((data) => (filePath = data))
-                .catch((err) =>
-                  res
-                    .status(500)
-                    .json({ message: "Error saving the image", error: err })
-                );
-            }
-          }
-          post.mediaPath = filePath == undefined ? "" : filePath;
-
-          const createPost = require("./Post").createPost;
-          createPost(post)
-            .then((data) => {
-              user.postCount = user.postCount + 1;
-              // format date to for query
-              const date = `${data.createdAt.getFullYear()}${data.createdAt.getMonth()}${data.createdAt.getDate()}`;
-              // only concatenate to the array if the slug id doesnt exist
-              const posts = { ...user.posts };
-              const datePosts = posts[date];
-              if (datePosts) {
-                if (!datePosts.includes(data.id)) {
-                  posts[date] = [...posts[date], data.id];
-                  user.posts = { ...posts };
-                }
-              } else {
-                posts[date] = [data.id];
-                user.posts = { ...posts };
-              }
-
-              user
-                .save()
-                .then((updateUser) => res.status(200).json(data))
-                .catch((err) =>
-                  res.status(400).json({ message: "Error updating the user" })
-                );
+      const id = jwt.verify(req.header(token), process.env.JWT_SECRET).id;
+      User.findById(new ObjectId(id)).then((user) => {
+        const follow = { ...user.followers };
+        if (username in follow) {
+          delete follow[username];
+          user.followCount = user.followCount - 1;
+        } else {
+          follow[username] = new Date();
+          user.followCount = user.followCount + 1;
+        }
+        user.followers = follow;
+        user
+          .save()
+          .then((data) =>
+            res.status(200).json({
+              followers: user.followers,
+              followCount: user.followCount,
             })
-            .catch((err) =>
-              res
-                .status(400)
-                .json({ message: "Error saving the post", error: err })
-            );
-        })
-        .catch((err) => res.status(403).json(err));
+          )
+          .catch((err) => res.status(403).message(err));
+      });
     } catch (err) {
       if (err instanceof jwt.TokenExpiredError) {
         res.status(403).json({ message: "Token has expired" });
       } else if (err instanceof jwt.JsonWebTokenError) {
         res.status(403).json({ message: "Invalid JWT" });
       } else {
-        res.status(500).json(err);
+        throw err;
       }
     }
+  }
+}
+function handleJWTError(res, err) {
+  if (err instanceof jwt.TokenExpiredError) {
+    res.status(403).json({ message: "Token has expired" });
+  } else if (err instanceof jwt.JsonWebTokenError) {
+    res.status(403).json({ message: "Invalid JWT" });
+  } else {
+    throw err;
   }
 }
 
@@ -575,6 +528,6 @@ router.get("/getPublicProfile", handleGetPublicProfile);
 
 router.get("/detect", detect);
 
-router.post("/createpost", uploadMedia.single("file"), handleCreatePost);
+router.post("/handleFollow", handleFollow);
 
 module.exports = router;
