@@ -140,7 +140,35 @@ async function handleImageUpload(caption, filename, chunkIDRef, options) {
   });
 }
 
+async function handleDeleteImage(filename) {
+  return new Promise((resolve, reject) => {
+    if (!filename) {
+      reject(new Error("Missing filename."));
+    } else {
+      Image.findOne({ filename: filename })
+        .then((img) => {
+          gfsPhotos.delete(
+            new mongoose.Types.ObjectId(img.chunkIDRef),
+            (err, data) => {
+              if (err) {
+                reject(err);
+              }
+              Image.deleteOne({ filename: filename })
+                .then((data) => resolve(data))
+                .catch((err) => {
+                  reject(err);
+                  console.log(err);
+                });
+            }
+          );
+        })
+        .catch((err) => reject(err));
+    }
+  });
+}
+
 module.exports = {
   router: imageRouter,
   uploadImage: handleImageUpload,
+  deleteImage: handleDeleteImage,
 };

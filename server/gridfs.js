@@ -45,12 +45,17 @@ const postMedia = new GridFsStorage({
               bucketName: "video",
             };
             resolve(videoFileInfo);
-          case "image/png" || "image/jpeg":
+          case "image/jpeg":
+          case "image/gif":
+          case "image/png":
             const imgFileInfo = {
               filename: `image_${filename}`,
               bucketName: "images",
             };
             resolve(imgFileInfo);
+
+          default:
+            reject("File type doesnt match");
         }
       });
     });

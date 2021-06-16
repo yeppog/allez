@@ -121,7 +121,34 @@ videoRouter.route("/upload").post(upload.single("file"), (req, res, next) => {
   }
 });
 
+async function handleDeleteVideo(filename) {
+  return new Promise((resolve, reject) => {
+    if (!filename) {
+      reject(new Error("Missing file name"));
+    } else {
+      Video.findOne({ filename: filename })
+        .then((video) => {
+          gfsVideo.delete(
+            new mongoose.Types.ObjectId(video.chunkIDRef),
+            (err, data) => {
+              if (err) {
+                reject(err);
+              }
+              Video.deleteOne({ filename: filename })
+                .then((data) => resolve(data))
+                .catch((err) => {
+                  reject(err);
+                });
+            }
+          );
+        })
+        .catch((err) => reject(err));
+    }
+  });
+}
+
 module.exports = {
   router: videoRouter,
   uploadVideo: handleVideoUpload,
+  deleteVideo: handleDeleteVideo,
 };

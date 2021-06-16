@@ -11,6 +11,7 @@ const { read } = require("fs");
 const Post = require("./../../models/Post");
 const uploadMedia = require("./../../gridfs").uploadMedia;
 const Comment = require("./../../models/Comment");
+const Image = require("./../../models/Images");
 
 /**
  * Fetches a post of a particular slug.
@@ -182,6 +183,96 @@ async function handleCreatePost(req, res, next) {
                 .status(400)
                 .json({ message: "Error saving the post", error: err })
             );
+        })
+        .catch((err) => res.status(403).json(err));
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError) {
+        res.status(403).json({ message: "Token has expired" });
+      } else if (err instanceof jwt.JsonWebTokenError) {
+        res.status(403).json({ message: "Invalid JWT" });
+      } else {
+        res.status(500).json(err);
+      }
+    }
+  }
+}
+
+async function handleEditPost(req, res, next) {
+  if (!req.header("token") || !req.header("slug")) {
+    return res.status(403).json({ message: "No user token or no post slug" });
+  } else {
+    try {
+      const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
+      User.findById(new ObjectId(id))
+        .then(async (user) => {
+          Post.findOne({ slug: req.header("slug") }).then(async (post) => {
+            let filePath;
+            if (req.file) {
+              // step 1: create the new file schema
+              if (req.file.mimetype == "video/mp4") {
+                const upload = require("./Video").uploadVideo;
+                const caption = `${user.id}_${req.file.filename}`;
+
+                await upload(caption, req.file.filename, req.file.id)
+                  .then((data) => (filePath = data))
+                  .catch((err) =>
+                    res
+                      .status(500)
+                      .json({ message: "Error saving the video", error: err })
+                  );
+              } else if (
+                req.file.mimetype == "image/png" ||
+                req.file.mimetype == "image/jpeg"
+              ) {
+                const imgupload = require("./Image").uploadImage;
+                const options = "/api/images/media/";
+                const imgcaption = `${user.id}_${req.file.filename}`;
+                await imgupload(
+                  imgcaption,
+                  req.file.filename,
+                  req.file.id,
+                  options
+                )
+                  .then((data) => (filePath = data))
+                  .catch((err) =>
+                    res
+                      .status(500)
+                      .json({ message: "Error saving the image", error: err })
+                  );
+              }
+              // step 2: ensure the new filePath is generated
+              if (filePath) {
+                // step 3: delete the old file from existence
+                var url = post.mediaPath.split("/");
+                const filename = url[url.length - 1];
+                const type = url[url.length - 2];
+                if (type == "media") {
+                  const deleteImage = require("./Image").deleteImage;
+                  await deleteImage(filename).catch((err) =>
+                    res
+                      .status(403)
+                      .json({ message: "Unable to delete the existing file" })
+                  );
+                } else {
+                  const deleteVideo = require("./Video").deleteVideo;
+                  await deleteVideo(filename).catch((err) =>
+                    res
+                      .status(403)
+                      .json({ message: "Unable to delete the existing file" })
+                  );
+                }
+              }
+            }
+
+            post.mediaPath = filePath == undefined ? post.mediaPath : filePath;
+            post.body = req.body.body == undefined ? post.body : req.body.body;
+            post.tag = req.body.tag == undefined ? post.tag : req.body.tag;
+
+            post
+              .save()
+              .then((data) => res.status(200).json(data))
+              .catch((err) => res.status(403).json(err));
+          });
         })
         .catch((err) => res.status(403).json(err));
     } catch (err) {
@@ -467,4 +558,5 @@ postRouter.post("/addCommentToComment", addCommentToComment);
 postRouter.post("/deletePost", handleDeletePost);
 postRouter.get("/like", handleLike);
 postRouter.post("/createpost", uploadMedia.single("file"), handleCreatePost);
+postRouter.post("/editpost", uploadMedia.single("file"), handleEditPost);
 module.exports = { postRouter, createPost };
