@@ -196,10 +196,15 @@ async function handleCreatePost(req, res, next) {
     }
   }
 }
-
+/**
+ * Edits a post given a slug, token and a new file.  Deletes the old media file if it exists
+ * @param {Request} req Takes in a slug and a token. Body parameters are optional 
+ * @param {Response} res Returns a HTTP response.
+ * @param {*} next Middleware
+ */
 async function handleEditPost(req, res, next) {
   if (!req.header("token") || !req.header("slug")) {
-    return res.status(403).json({ message: "No user token or no post slug" });
+    res.status(403).json({ message: "No user token or no post slug" });
   } else {
     try {
       const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
