@@ -12,6 +12,7 @@ const Post = require("./../../models/Post");
 const uploadMedia = require("./../../gridfs").uploadMedia;
 const Comment = require("./../../models/Comment");
 const Image = require("./../../models/Images");
+const { addPostTagRelation } = require("../../handlers/Route");
 
 /**
  * Fetches a post of a particular slug.
@@ -114,7 +115,7 @@ async function handleCreatePost(req, res, next) {
             body: req.body.body,
             avatarPath: user.avatarPath,
             mediaPath: "",
-            tag: user.tag,
+            tag: tag,
           });
           let filePath;
           if (req.file) {
@@ -152,9 +153,21 @@ async function handleCreatePost(req, res, next) {
           }
           post.mediaPath = filePath == undefined ? "" : filePath;
 
+          // TODO: Remove createPost dependency
           const createPost = require("./Post").createPost;
           createPost(post)
-            .then((data) => {
+            .then((post) => {
+              for (const [key, val] of Object.entries(req.body.tag)) {
+                if (key == "user") {
+                  // TODO: Update user tags
+                } else if (key == "route") {
+                  const addTag =
+                    require("../../handlers/Route").addPostTagRelation;
+                  addPostTagRelation(val, post);
+                }
+              }
+
+              // TODO: Change this to a handler
               user.postCount = user.postCount + 1;
               // format date to for query
               const date = `${data.createdAt.getFullYear()}${data.createdAt.getMonth()}${data.createdAt.getDate()}`;
@@ -198,7 +211,7 @@ async function handleCreatePost(req, res, next) {
 }
 /**
  * Edits a post given a slug, token and a new file.  Deletes the old media file if it exists
- * @param {Request} req Takes in a slug and a token. Body parameters are optional 
+ * @param {Request} req Takes in a slug and a token. Body parameters are optional
  * @param {Response} res Returns a HTTP response.
  * @param {*} next Middleware
  */
