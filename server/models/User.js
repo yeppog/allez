@@ -53,6 +53,10 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  taggedPost: {
+    type: {},
+    default: [""],
+  },
 });
 
 const User = mongoose.model("UserData", UserSchema);
