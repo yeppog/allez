@@ -59,7 +59,8 @@
   },
   "devDependencies": {
     "@types/react-router-dom": "^5.1.7",
-    "prettier": "^2.3.0"
+    "prettier": "^2.3.0",
+    "react-video-thumbnail": "^0.1.3"
   },
   "importSort": {
     ".js, .ts": {
