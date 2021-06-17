@@ -10,3 +10,11 @@ export interface PublicUser {
   followCount: number;
   followers: object;
 }
+
+export interface PostTags {
+    media: string
+    caption: string,
+    gym: string,
+    route: string,
+    people: string,
+}

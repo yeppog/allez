@@ -15,6 +15,7 @@ import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import BotNavComponent from './components/BotNavComponent/BotNavComponent';
 import ConfirmComponent from './components/Auth/ConfirmComponent/ConfirmComponent';
+import CreatePostComponent from './components/CreatePostComponent/CreatePostComponent';
 import { CssBaseline } from '@material-ui/core';
 import HomeComponent from './components/HomeComponent/HomeComponent';
 import LoginComponent from './components/Auth/LoginComponent/LoginComponent';
@@ -75,6 +76,13 @@ function App() {
       Component: ConfirmComponent,
     },
     { path: '/home', name: 'Home', Component: HomeComponent },
+    // For Debugging
+    {
+      path: '/createPost',
+      name: 'Create Post',
+      Component: CreatePostComponent,
+    },
+
     // {
     //   path: '/profile/:id',
     //   name: 'Profile',

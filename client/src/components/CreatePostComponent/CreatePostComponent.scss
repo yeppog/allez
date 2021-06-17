@@ -1,0 +1,50 @@
+.CreatePostComponent {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.pseudoImage {
+  // width: 400px;
+  // height: 400px;
+  position: relative;
+}
+
+.pseuddoImage img {
+  vertical-align: top;
+}
+
+.pseudoImage::after {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: all 1s;
+  -webkit-transition: all 1s;
+}
+
+.img {
+  display: block;
+  transition: all 400ms;
+}
+
+.img:hover {
+  opacity: 0.5;
+}
+
+// .img::after {
+//   content: 'cross';
+// }
+
+.pseudoImage:hover::after {
+  opacity: 1;
+}
+
+input[type='file'] {
+  display: none;
+}
