@@ -47,7 +47,7 @@ const PostSchema = new mongoose.Schema({
     type: Date,
   },
   tag: {
-    default: [],
+    default: {},
     type: Array,
   },
 });
