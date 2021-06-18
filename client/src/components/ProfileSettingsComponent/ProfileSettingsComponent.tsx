@@ -36,18 +36,6 @@ const ProfileSettingsComponent: React.FC = () => {
     }
   }, [user]);
 
-  // const apiCall = () => {
-  //   setState({
-  //     ...state,
-  //     id: '123',
-  //     name: 'Jon',
-  //     bio: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto, voluptate soluta assumenda ut aliquam unde maxime? Omnis alias maxime perspiciatis.',
-  //     img: Image,
-  //     email: 'jon@gmail.com',
-  //     postState: 'sucess',
-  //   });
-  // };
-
   const handleChange =
     (prop: keyof User) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setState({ ...state, [prop]: event.target.value });
@@ -80,7 +68,6 @@ const ProfileSettingsComponent: React.FC = () => {
   const onSubmit = (e: any): void => {
     // preventDefault prevents the page from refreshing when the form is submitted
     e.preventDefault();
-    //TODO: API Stuuf
     const formData = new FormData();
     const token = localStorage.getItem('token') as string;
     if (avatar) {
@@ -89,6 +76,7 @@ const ProfileSettingsComponent: React.FC = () => {
     if (!token) {
       console.log('No token, unable to update');
     }
+    // TODO: create API to change username to ensure no clash in username
     // formData.append('username', user.username);
     formData.append('name', state.name);
     formData.append('token', token);
@@ -101,9 +89,12 @@ const ProfileSettingsComponent: React.FC = () => {
         setAvatar(null);
       })
       .catch((err) => {
+        // TODO: Handle user errors
         console.log(err);
       });
   };
+
+  // TODO: Add a back button to go back to the previous page user was on.
   return (
     <div
       className="ProfileSettingsComponent"

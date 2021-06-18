@@ -94,7 +94,7 @@ const ProfileComponent: React.FC = (props) => {
 
   const handleFollowButton = () => {
     setState({ ...state, following: !state.following });
-    //TODO: API calls
+    //TODO: Implement backend api for following users
   };
 
   return (
