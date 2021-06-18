@@ -491,6 +491,54 @@ async function handleFollow(req, res) {
     }
   }
 }
+
+// TODO: TEST THIS ENDPOINT
+async function addFollowRelation(req, res) {
+  if (!req.body.user || !req.body.target) {
+    res.status(404).json({message: "Missing user or target user to follow."})
+  } else {
+    User.findById(new ObjectId(req.body.user)).then(user => {
+      User.findById(new ObjectId(req.body.target)).then(target => {
+        const userFollowing = [...user.following];
+        const targetFollowers = [...target.followers];
+        userFollowing.push(target.username)
+        targetFollowers.push(user.username)
+        user.following = userFollowing;
+        target.followers = targetFollowers;
+        user.followingCount = user.followCount + 1;
+        target.followCount = target.followCount + 1;
+
+        target.save().then(() => user.save().then(data => res.status(200).json(data)).catch(err => res.status(400).json({message:"Couldn't save the user"}))).catch(err => res.status(400).json({message: "Couldn't save the target."}))
+        
+      })
+    })
+  }
+}
+
+async function removeFollowRelation(req, res) {
+  if (!req.body.user || !req.body.target) {
+    res.status(404).json({message: "Missing user or target user to follow."})
+  } else {
+    User.findById(new ObjectId(req.body.user)).then(user => {
+      User.findById(new ObjectId(req.body.target)).then(target => {
+        const userFollowing = [...user.following];
+        const targetFollowers = [...target.followers];
+        userFollowing.filter(x => x != target.username)
+        targetFollowers.filter(x => x != user.username)
+        user.following = userFollowing;
+        target.followers = targetFollowers;
+        user.followingCount = user.followCount - 1;
+        target.followCount = target.followCount - 1;
+
+        target.save().then(() => user.save().then(data => res.status(200).json(data)).catch(err => res.status(400).json({message:"Couldn't save the user"}))).catch(err => res.status(400).json({message: "Couldn't save the target."}))
+        
+      })
+    })
+  }
+}
+
+
+
 function handleJWTError(res, err) {
   if (err instanceof jwt.TokenExpiredError) {
     res.status(403).json({ message: "Token has expired" });
