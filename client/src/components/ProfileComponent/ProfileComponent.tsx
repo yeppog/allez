@@ -131,7 +131,7 @@ const ProfileComponent: React.FC = (props) => {
                 <Grid item container alignItems="center" spacing={4}>
                   <Grid item>
                     <Typography variant="h5" style={{ fontWeight: 600 }}>
-                      {user.name}
+                      {user.username}
                     </Typography>
                   </Grid>
                   {state.myself ? (
@@ -204,6 +204,8 @@ const ProfileComponent: React.FC = (props) => {
             </Grid>
           </Grid>
           <Grid item>
+            {/* TODO: Needs to align left since this text can overflow */}
+            <Typography><strong>{user.name}</strong></Typography>
             <Typography>{user.bio}</Typography>
           </Grid>
         </Grid>
