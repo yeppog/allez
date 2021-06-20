@@ -69,41 +69,6 @@ describe("Test get post", () => {
   });
 });
 
-describe("Test createPost function", () => {
-  it("Test valid post", async () => {
-    const createPost = require("./../routes/api/Post").createPost;
-    const post = new Post({
-      userId: "test",
-      username: "test",
-      body: "Test post",
-      avatarPath: "avatar",
-      mediaPath: "media",
-      likes: 15,
-      likedUsers: ["test", "test2"],
-      comments: [{ date: "123123", body: "yeet", user: "test3" }],
-      slug: "3490283fn3fndsjkfbdnsf7f23",
-    });
-    await createPost(post)
-      .then((data) => expect(data).toBeDefined())
-      .catch((err) => expect(err).toBeUndefined());
-  });
-  it("Test invalid post", async () => {
-    const createPost = require("./../routes/api/Post").createPost;
-    const post = new Post({
-      userId: "test",
-      username: "test",
-      body: "Test post",
-      likes: 15,
-      likedUsers: ["test", "test2"],
-      comments: [{ date: "123123", body: "yeet", user: "test3" }],
-      slug: "3490283fn3fndsjkfbdnsf7f23",
-    });
-    await createPost(post)
-      .then((data) => expect(data).toBeUndefined())
-      .catch((err) => expect(err).toBeDefined());
-  });
-});
-
 describe("Test delete post", () => {
   const currentDate = new Date();
   it("Create a new post", async () => {
