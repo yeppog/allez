@@ -34,7 +34,6 @@ const Image = require("../../models/Images");
 const uploadAvatar = require("./../../gridfs").uploadAvatar;
 const uploadMedia = require("./../../gridfs").uploadMedia;
 const Video = require("../../models/Video");
-const { createPost } = require("./Post");
 
 /**
  * Handles the POST request of creating a new account.

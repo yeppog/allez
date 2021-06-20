@@ -39,49 +39,6 @@ async function handleGetPost(req, res) {
   }
 }
 
-async function createPost(post) {
-  return new Promise((resolve, reject) => {
-    try {
-      crypto.randomBytes(16, async (err, buff) => {
-        if (err) {
-          reject(err);
-        } else {
-          post.slug = buff.toString("hex");
-          post
-            .save()
-            .then((data) => resolve(data))
-            .catch((err) => reject(err));
-        }
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
-}
-
-/**
- * @deprecated
- * @param {*} post
- * @returns
- */
-// async function editPost(post) {
-//   return new Promise((resolve, reject) => {
-//     if (!post.slug) {
-//       reject("Post doesnt have an existing slug. Post doesn't exist");
-//     } else {
-//       post
-//         .findOne({ slug: post.slug })
-//         .then((data) =>
-//           post
-//             .save()
-//             .then((save) => resolve(save))
-//             .catch((err) => reject(err))
-//         )
-//         .catch((err) => reject(err));
-//     }
-//   });
-// }
-
 /**
  * @deprecated
  * @param {*} postinput
@@ -115,7 +72,8 @@ async function handleCreatePost(req, res, next) {
             body: req.body.body,
             avatarPath: user.avatarPath,
             mediaPath: "",
-            tag: tag,
+            slug: "",
+            tag: req.body.tag,
           });
           let filePath;
           if (req.file) {
@@ -153,49 +111,50 @@ async function handleCreatePost(req, res, next) {
           }
           post.mediaPath = filePath == undefined ? "" : filePath;
 
-          // TODO: Remove createPost dependency
-          const createPost = require("./Post").createPost;
-          createPost(post)
-            .then((post) => {
-              for (const [key, val] of Object.entries(req.body.tag)) {
-                if (key == "user") {
-                  // TODO: Update user tags
-                } else if (key == "route") {
+          await crypto.randomBytes(16, (err, buff) => {
+            if (err) {
+              res
+                .status(500)
+                .json({ message: "Slug generation failed for some reason" });
+            } else {
+              post.slug = buff.toString("hex");
+              // TODO: Find a better way to manage the tagging
+              post
+                .save()
+                .then((post) => {
+                  const updateUserTag =
+                    require("./../../handlers/User").updateUserTag;
+                  const updateUserPost =
+                    require("./../../handlers/User").updateUserPosts;
                   const addTag =
                     require("../../handlers/Route").addPostTagRelation;
-                  addPostTagRelation(val, post);
-                }
-              }
+                  if (req.body.tag) {
+                    for (const [key, val] of Object.entries(req.body.tag)) {
+                      if (key == "user") {
+                        updateUserTag(post, user);
+                      } else if (key == "route") {
+                        addPostTagRelation(val, post);
+                      }
+                    }
+                  }
+                  updateUserPost(post, user);
 
-              // TODO: Change this to a handler
-              user.postCount = user.postCount + 1;
-              // format date to for query
-              const date = `${data.createdAt.getFullYear()}${data.createdAt.getMonth()}${data.createdAt.getDate()}`;
-              // only concatenate to the array if the slug id doesnt exist
-              const posts = { ...user.posts };
-              const datePosts = posts[date];
-              if (datePosts) {
-                if (!datePosts.includes(data.id)) {
-                  posts[date] = [...posts[date], data.id];
-                  user.posts = { ...posts };
-                }
-              } else {
-                posts[date] = [data.id];
-                user.posts = { ...posts };
-              }
-
-              user
-                .save()
-                .then((updateUser) => res.status(200).json(data))
+                  user
+                    .save()
+                    .then((updateUser) => res.status(200).json(post))
+                    .catch((err) =>
+                      res
+                        .status(400)
+                        .json({ message: "Error updating the user" })
+                    );
+                })
                 .catch((err) =>
-                  res.status(400).json({ message: "Error updating the user" })
+                  res
+                    .status(400)
+                    .json({ message: "Error saving the post", error: err })
                 );
-            })
-            .catch((err) =>
-              res
-                .status(400)
-                .json({ message: "Error saving the post", error: err })
-            );
+            }
+          });
         })
         .catch((err) => res.status(403).json(err));
     } catch (err) {
@@ -577,4 +536,4 @@ postRouter.post("/deletePost", handleDeletePost);
 postRouter.get("/like", handleLike);
 postRouter.post("/createpost", uploadMedia.single("file"), handleCreatePost);
 postRouter.post("/editpost", uploadMedia.single("file"), handleEditPost);
-module.exports = { postRouter, createPost };
+module.exports = { postRouter };
