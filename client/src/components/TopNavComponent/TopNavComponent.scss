@@ -1,1 +1,8 @@
-.TopNavComponent {}
+.TopNavComponent {
+}
+
+@media screen and (max-width: 600px) {
+  .desktopNav {
+    display: none;
+  }
+}
