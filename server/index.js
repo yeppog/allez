@@ -46,7 +46,14 @@ require("dotenv").config();
 app.use(express.json());
 app.use(
   cors({
-    allowedHeaders: ["sessionId", "Content-Type", "token", "username"],
+    allowedHeaders: [
+      "sessionId",
+      "Content-Type",
+      "token",
+      "username",
+      "target",
+      "user",
+    ],
     exposedHeaders: ["sessionId"],
     origin: "*",
     methods: "GET, PUT, PATCH, POST, DELETE",

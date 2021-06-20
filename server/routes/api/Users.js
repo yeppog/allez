@@ -183,16 +183,12 @@ async function handleVerify(req, res) {
       const verified = jwt.verify(token, process.env.JWT_SECRET);
       const userId = jwt.decode(token, process.env.JWT_SECRET).id;
       let user;
-      user = await User.findOne(new ObjectId(userId));
-      return res.json({
-        username: user.username,
-        email: user.email,
-        avatar: user.avatarPath,
-        name: user.name,
-        bio: user.bio,
-        followers: user.followers,
-        followCount: user.followCount,
-      });
+      User.findOne(new ObjectId(userId))
+        .then((user) => {
+          // delete user[password];
+          res.status(200).json(user);
+        })
+        .catch((err) => res.status(403).json(err));
     } catch (err) {
       if (err instanceof jwt.JsonWebTokenError) {
         return res.status(403).json(err);
@@ -442,11 +438,13 @@ async function handleGetPublicProfile(req, res) {
     return res.status(200).json({
       username: user.username,
       email: user.email,
-      avatar: user.avatarPath,
+      avatarPath: user.avatarPath,
       name: user.name,
       bio: user.bio,
       followers: user.followers,
       followCount: user.followCount,
+      following: user.following,
+      followingCount: user.followingCount,
       posts: user.posts,
       postCount: user.postCount,
     });
@@ -501,8 +499,8 @@ async function addFollowRelation(req, res) {
   if (!req.header("user") || !req.header("target")) {
     res.status(404).json({ message: "Missing user or target user to follow." });
   } else {
-    User.findById(new ObjectId(req.header("user"))).then((user) => {
-      User.findById(new ObjectId(req.header("target"))).then((target) => {
+    User.findOne({ username: req.header("user") }).then((user) => {
+      User.findOne({ username: req.header("target") }).then((target) => {
         const userFollowing = [...user.following];
         const targetFollowers = [...target.followers];
         if (!userFollowing.includes(target.username)) {
@@ -544,8 +542,8 @@ async function removeFollowRelation(req, res) {
   if (!req.header("user") || !req.header("target")) {
     res.status(404).json({ message: "Missing user or target user to follow." });
   } else {
-    User.findById(new ObjectId(req.header("user"))).then((user) => {
-      User.findById(new ObjectId(req.header("target"))).then((target) => {
+    User.findOne({ username: req.header("user") }).then((user) => {
+      User.findOne({ username: req.header("target") }).then((target) => {
         var userFollowing = [...user.following];
         var targetFollowers = [...target.followers];
         userFollowing = userFollowing.filter((x) => {
