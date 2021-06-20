@@ -37,7 +37,7 @@ async function addPostTagRelation(route, target) {
  * @param {String} target ObjectID of the target to be removed.
  */
 async function removePostTagRelation(route, target) {
-  return new Pormise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     if (!route || !target) {
       reject("Missing route or target parameters");
     } else {
