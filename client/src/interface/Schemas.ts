@@ -5,16 +5,19 @@ export interface User extends PublicUser {
 export interface PublicUser {
   name: string;
   username: string;
-  avatar: string;
+  avatarPath: string;
   bio: string;
   followCount: number;
   followers: object;
+  following: string[];
+  followingCount: number;
+  taggedPost: object;
 }
 
 export interface PostTags {
-    media: string
-    caption: string,
-    gym: string,
-    route: string,
-    people: string,
+  media: string;
+  caption: string;
+  gym: string;
+  route: string;
+  people: string;
 }
