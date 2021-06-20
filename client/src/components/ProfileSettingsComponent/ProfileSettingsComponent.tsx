@@ -22,10 +22,13 @@ const ProfileSettingsComponent: React.FC = () => {
     name: '',
     username: '',
     bio: '',
-    avatar: '',
+    avatarPath: '',
     email: '',
     followCount: 0,
     followers: {},
+    following: [],
+    followingCount: 0,
+    taggedPost: {},
   });
   const user = useSelector(
     (state: { user: { user: User } }) => state.user.user
@@ -113,7 +116,7 @@ const ProfileSettingsComponent: React.FC = () => {
               {/* TODO: Implement hover cross to "delete" the picture */}
               <div className="pseudoImage">
                 <img
-                  src={filePreview != null ? filePreview : state.avatar}
+                  src={filePreview != null ? filePreview : state.avatarPath}
                   className="img"
                   onClick={removeAvatar}
                 />

@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core';
 import { PublicUser, User } from '../../interface/Schemas';
 import React, { useEffect, useState } from 'react';
+import { addFollow, removeFollow } from '../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
@@ -25,7 +26,7 @@ interface State {
   name: string;
   bio: string;
   img: ImageBitmap;
-  avatar: string;
+  avatarPath: string;
   postNumber: string;
   //TODO:
 
@@ -42,26 +43,38 @@ const ProfileComponent: React.FC = (props) => {
   const [user, setUser] = useState<PublicUser>({
     name: '',
     username: '',
-    avatar: '',
+    avatarPath: '',
     bio: '',
     followCount: 0,
     followers: {},
+    following: [],
+    followingCount: 0,
+    taggedPost: {},
   });
   /** Fetch the specified user on load */
   useEffect(() => {
+    console.log('test');
     if (loggedInUser.username == username) {
+      console.log('wat');
       setState({ ...state, myself: true });
       setUser(loggedInUser);
     } else {
+      setState({ ...state, myself: false });
       axios
         .get('api/users/getPublicProfile', {
           headers: { username: username },
         })
         .then((data) => {
           setUser(data.data);
+          if (loggedInUser.following) {
+            if (loggedInUser.following.includes(username)) {
+              // myself is set to false as the async setstate may call the previous ...state value where myself was true
+              setState({ ...state, following: true, myself: false });
+            }
+          }
         });
     }
-  }, [axios, username, loggedInUser]);
+  }, [axios, username, loggedInUser, history]);
 
   const handleFetchUser = (prop: keyof PublicUser, data: any) => {
     setState({ ...state, [prop]: data });
@@ -93,6 +106,13 @@ const ProfileComponent: React.FC = (props) => {
   };
 
   const handleFollowButton = () => {
+    if (state.following) {
+      removeFollow({ user: loggedInUser.username, target: username }).then(
+        (data) => console.log(data)
+      );
+    } else {
+      addFollow({ user: loggedInUser.username, target: username });
+    }
     setState({ ...state, following: !state.following });
     //TODO: Implement backend api for following users
   };
@@ -117,7 +137,10 @@ const ProfileComponent: React.FC = (props) => {
             <Grid item>
               <ButtonBase>
                 {/* <img src={state.img} className="img" /> */}
-                <img src={user.avatar ? user.avatar : Image} className="img" />
+                <img
+                  src={user.avatarPath ? user.avatarPath : Image}
+                  className="img"
+                />
               </ButtonBase>
             </Grid>
             <Grid item alignItems="stretch">
@@ -205,7 +228,9 @@ const ProfileComponent: React.FC = (props) => {
           </Grid>
           <Grid item>
             {/* TODO: Needs to align left since this text can overflow */}
-            <Typography><strong>{user.name}</strong></Typography>
+            <Typography>
+              <strong>{user.name}</strong>
+            </Typography>
             <Typography>{user.bio}</Typography>
           </Grid>
         </Grid>
