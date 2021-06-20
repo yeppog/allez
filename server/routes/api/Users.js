@@ -34,7 +34,6 @@ const Image = require("../../models/Images");
 const uploadAvatar = require("./../../gridfs").uploadAvatar;
 const uploadMedia = require("./../../gridfs").uploadMedia;
 const Video = require("../../models/Video");
-const { createPost } = require("./Post");
 
 /**
  * Handles the POST request of creating a new account.
@@ -491,6 +490,98 @@ async function handleFollow(req, res) {
     }
   }
 }
+
+/**
+ * Adds a follow relation. User will "follow" the target. User following array will append target.
+ * Target follower array will append the user.
+ * @param {Request} req The HTTP request containing the ObjectID of a user and target in the header.
+ * @param {Response} res The HTTP Response of the request.
+ */
+async function addFollowRelation(req, res) {
+  if (!req.header("user") || !req.header("target")) {
+    res.status(404).json({ message: "Missing user or target user to follow." });
+  } else {
+    User.findById(new ObjectId(req.header("user"))).then((user) => {
+      User.findById(new ObjectId(req.header("target"))).then((target) => {
+        const userFollowing = [...user.following];
+        const targetFollowers = [...target.followers];
+        if (!userFollowing.includes(target.username)) {
+          userFollowing.push(target.username);
+          user.followingCount = user.followingCount + 1;
+        }
+        if (!targetFollowers.includes(user.username)) {
+          targetFollowers.push(user.username);
+          target.followCount = target.followCount + 1;
+        }
+        user.following = userFollowing;
+        target.followers = targetFollowers;
+
+        target
+          .save()
+          .then(() =>
+            user
+              .save()
+              .then((data) => res.status(200).json(data))
+              .catch((err) =>
+                res.status(400).json({ message: "Couldn't save the user" })
+              )
+          )
+          .catch((err) =>
+            res.status(400).json({ message: "Couldn't save the target." })
+          );
+      });
+    });
+  }
+}
+
+/**
+ * Removes a follow relation from a user to a target user. Updates the follow count if the follow relation exists.
+ * @param {Request} req The HTTP request that contains a user and target in the header.
+ * @param {Response} res The HTTP respose to output to.
+ */
+
+async function removeFollowRelation(req, res) {
+  if (!req.header("user") || !req.header("target")) {
+    res.status(404).json({ message: "Missing user or target user to follow." });
+  } else {
+    User.findById(new ObjectId(req.header("user"))).then((user) => {
+      User.findById(new ObjectId(req.header("target"))).then((target) => {
+        var userFollowing = [...user.following];
+        var targetFollowers = [...target.followers];
+        userFollowing = userFollowing.filter((x) => {
+          if (x == target.username) {
+            user.followingCount = user.followCount - 1;
+            return false;
+          }
+          return true;
+        });
+        targetFollowers = targetFollowers.filter((x) => {
+          if (x == user.username) {
+            target.followCount = target.followCount - 1;
+          }
+          return true;
+        });
+        user.following = userFollowing;
+        target.followers = targetFollowers;
+
+        target
+          .save()
+          .then(() =>
+            user
+              .save()
+              .then((data) => res.status(200).json(data))
+              .catch((err) =>
+                res.status(400).json({ message: "Couldn't save the user" })
+              )
+          )
+          .catch((err) =>
+            res.status(400).json({ message: "Couldn't save the target." })
+          );
+      });
+    });
+  }
+}
+
 function handleJWTError(res, err) {
   if (err instanceof jwt.TokenExpiredError) {
     res.status(403).json({ message: "Token has expired" });
@@ -529,5 +620,9 @@ router.get("/getPublicProfile", handleGetPublicProfile);
 router.get("/detect", detect);
 
 router.post("/handleFollow", handleFollow);
+
+router.get("/addFollow", addFollowRelation);
+
+router.get("/removeFollow", removeFollowRelation);
 
 module.exports = router;

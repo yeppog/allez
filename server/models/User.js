@@ -45,6 +45,14 @@ const UserSchema = new mongoose.Schema({
     required: true,
     default: [""],
   },
+  followingCount: {
+    type: Number,
+    default: 0
+  },
+  following: {
+    type: [],
+    default: [""],
+  },
   posts: {
     type: {},
     default: [""],
@@ -52,6 +60,10 @@ const UserSchema = new mongoose.Schema({
   postCount: {
     type: Number,
     default: 0,
+  },
+  taggedPost: {
+    type: {},
+    default: [""],
   },
 });
 

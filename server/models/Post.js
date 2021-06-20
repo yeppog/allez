@@ -28,7 +28,6 @@ const PostSchema = new mongoose.Schema({
   likes: {
     type: Number,
     default: 0,
-    required: true,
   },
   likedUsers: {
     type: {},
@@ -47,8 +46,8 @@ const PostSchema = new mongoose.Schema({
     type: Date,
   },
   tag: {
-    default: [],
-    type: Array,
+    default: {},
+    type: Object,
   },
 });
 
