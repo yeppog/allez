@@ -21,3 +21,14 @@ export interface PostTags {
   route: string;
   people: string;
 }
+
+export interface Post {
+  mediaPath: string;
+  likes: number;
+  id: string;
+  username: string;
+  body: string;
+  avatarPath: string;
+  slug: string;
+  tag: object;
+}
