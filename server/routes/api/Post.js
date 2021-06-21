@@ -513,6 +513,57 @@ async function handleLike(req, res) {
   }
 }
 
+async function handleFetchFollowPosts(req, res) {
+  if (!req.header("token") || !req.body.date || !req.body.duration) {
+    res.status(400).json({ message: "Missing token, date or duration." });
+  } else {
+    const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
+    User.findById(new ObjectId(id)).then(async (user) => {
+      // create the date object
+      const dates = [];
+      const posts = {};
+      var date = new Date(req.body.date);
+      for (i = 0; i < req.body.duration; i++) {
+        const formatted = `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
+        dates.push(parseInt(formatted));
+        date.setDate(date.getDate() - 1);
+        posts[parseInt(formatted)] = [];
+      }
+      console.log(dates);
+      console.log(posts);
+      for (i = 0; i < user.following.length; i++) {
+        // console.log(user.following[i]);
+        const username = user.following[i];
+        await User.findOne({ username: username })
+          .then((data) => {
+            for (d = 0; d < dates.length; d++) {
+              if (data) {
+                if (data.posts) {
+                  const userposts = data.posts[dates[d]];
+                  if (userposts) {
+                    var temp = [...posts[dates[d]]];
+                    temp = [...temp, ...userposts];
+                    posts[dates[d]] = [...temp];
+                  }
+                }
+              }
+            }
+          })
+          .catch((err) => console.log("Cant find the user."));
+      }
+      for (const [key, val] of Object.entries(posts)) {
+        const promises = val.map(
+          async (x) => await Post.findById(new ObjectId(x)).then((data) => data)
+        );
+        await Promise.all(promises).then(async (x) => {
+          posts[key] = [...x];
+        });
+      }
+      res.status(200).json(posts);
+    });
+  }
+}
+
 /**
  * Selectively handles the JWT errors. Else, throw the error back out to be catched by the async pipeline.
  * @param {Response} res The HTTP response to output the response to.
@@ -536,4 +587,5 @@ postRouter.post("/deletePost", handleDeletePost);
 postRouter.get("/like", handleLike);
 postRouter.post("/createpost", uploadMedia.single("file"), handleCreatePost);
 postRouter.post("/editpost", uploadMedia.single("file"), handleEditPost);
+postRouter.post("/fetchFollowPosts", handleFetchFollowPosts);
 module.exports = { postRouter };
