@@ -5,6 +5,7 @@ import { Redirect, Route, RouteProps } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import axios from 'axios';
+import { fetchPosts } from '../Redux/postSlice';
 import { verifyUser } from '../Redux/userSlice';
 
 interface ProtectedRouteProps extends RouteProps {
@@ -19,6 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const dispatch = useDispatch();
   useEffect(() => {
     const token = localStorage.getItem('token');
+    // fetch user
     axios
       .get('/api/users/verify', { headers: { token: token } })
       .then((data) => {
@@ -28,6 +30,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       .catch((err) => {
         setLoggedIn(false);
       });
+
+    // fetch posts
+    if (token != null) {
+      dispatch(fetchPosts({ token: token, date: new Date(), duration: 5 }));
+    }
   }, [axios, loggedIn]);
   // }
   return (
