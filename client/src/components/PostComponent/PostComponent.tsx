@@ -22,15 +22,24 @@ import {
 import React, { useState } from 'react';
 
 import Image from './../../static/placeholder.png';
+import { Post } from '../../interface/Schemas';
+import { useHistory } from 'react-router';
 
 interface State {
   liked: boolean;
 }
 
-const PostComponent: React.FC = () => {
+interface PostProps {
+  key: string;
+  post: Post;
+}
+
+const PostComponent: React.FC<PostProps> = ({ post }) => {
   const [state, setState] = useState<State>({
     liked: false,
   });
+  const history = useHistory();
+  console.log(post);
   return (
     <div className="PostComponent" data-testid="PostComponent">
       <Grid container spacing={1} justify="center" alignItems="center">
@@ -39,7 +48,15 @@ const PostComponent: React.FC = () => {
             <CardHeader
               avatar={
                 <Tooltip title="View Profile">
-                  <Avatar aria-label="">P</Avatar>
+                  <Avatar
+                    aria-label=""
+                    onClick={() => history.push(`/profile/${post.username}`)}
+                  >
+                    <img
+                      src={post.avatarPath}
+                      style={{ maxWidth: '40px' }}
+                    ></img>
+                  </Avatar>
                 </Tooltip>
               }
               action={
@@ -49,20 +66,24 @@ const PostComponent: React.FC = () => {
                   </IconButton>
                 </Tooltip>
               }
-              title=""
-              subheader=""
+              title={post.username}
+              subheader={post.id}
               style={{ position: 'relative' }}
             />
-            <CardMedia component="img" title="" src={Image} />
-            <CardContent className="mediaBody">
-              This is a sample card!
-            </CardContent>
+            <CardMedia
+              controls
+              component="video"
+              title=""
+              src={post.mediaPath}
+            />
+            <CardContent className="mediaBody">{post.body}</CardContent>
             <CardActions
               style={{
                 justifyContent: 'flex-end',
                 display: 'flex',
               }}
             >
+              {post.likes}
               <Tooltip title="Like">
                 <IconButton
                   onClick={() => setState({ ...state, liked: !state.liked })}
