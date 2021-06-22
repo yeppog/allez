@@ -438,7 +438,7 @@ async function addCommentToComment(req, res) {
  * @param {Request} req The request made to this endpoint. Token, slug and date is required in the body.
  * @param {Response} res The response to output to.
  */
-
+// TODO: Change this to delete by ID
 async function deleteComment(req, res) {
   if (!req.body.token || !req.body.slug || !req.body.date) {
     res.status(400).json({
