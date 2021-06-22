@@ -489,12 +489,13 @@ async function handleLike(req, res) {
             .then((user) => {
               const postLikes = { ...post.likedUsers };
               const username = user.username;
+              console.log(post);
               if (username in postLikes) {
                 delete postLikes[username];
-                postLikes.like = postLikes.like - 1;
+                post.likes = post.likes - 1;
               } else {
                 postLikes[username] = new Date();
-                postLikes.like = postLikes.like + 1;
+                post.likes = post.likes + 1;
               }
               post.likedUsers = postLikes;
               post

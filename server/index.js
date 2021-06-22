@@ -53,6 +53,7 @@ app.use(
       "username",
       "target",
       "user",
+      "slug",
     ],
     exposedHeaders: ["sessionId"],
     origin: "*",

@@ -12,7 +12,7 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URI || '';
  */
 
 interface PostState {
-  posts: {};
+  posts: { [key: string]: Post[] };
   status: string;
   error: string | null | undefined;
 }
@@ -36,6 +36,15 @@ export const fetchPosts = createAsyncThunk(
   }
 );
 
+export const likePost = createAsyncThunk(
+  'posts/likePost',
+  async (data: { token: string; slug: string }) => {
+    const res = await axios.get('/api/posts/like', { headers: data });
+    console.log(res.data);
+    return res.data;
+  }
+);
+
 const postSlice = createSlice({
   name: 'posts',
   initialState,
@@ -51,6 +60,31 @@ const postSlice = createSlice({
     builder.addCase(fetchPosts.rejected, (state, action) => {
       state.status = 'failed';
       state.error = action.error.message;
+    });
+    builder.addCase(likePost.fulfilled, (state, action) => {
+      const post = { ...state.posts };
+      const slug = action.payload.slug;
+      // TODO: Make this more efficient. Change the structure of the post array perhaps..
+      for (const [key, value] of Object.entries(post)) {
+        for (let i = 0; i < value.length; i++) {
+          for (const [key2, value2] of Object.entries(value[i])) {
+            if (value2 == slug) {
+              const newVal = [...value];
+              newVal[i] = action.payload;
+              post[key] = newVal;
+            }
+          }
+        }
+      }
+      state.posts = post;
+      state.status = 'succeeded';
+    });
+    builder.addCase(likePost.rejected, (state, action) => {
+      state.error = action.error.message;
+      state.status = 'failed';
+    });
+    builder.addCase(likePost.pending, (state, action) => {
+      state.status = 'pending';
     });
   },
 });

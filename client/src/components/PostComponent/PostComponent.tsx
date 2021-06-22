@@ -19,11 +19,13 @@ import {
   ThumbUpAlt,
   ThumbUpAltOutlined,
 } from '@material-ui/icons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Image from './../../static/placeholder.png';
-import { Post } from '../../interface/Schemas';
+import { Post, User } from '../../interface/Schemas';
 import { useHistory } from 'react-router';
+import { useDispatch } from 'react-redux';
+import { likePost } from '../Redux/postSlice';
 
 interface State {
   liked: boolean;
@@ -32,14 +34,37 @@ interface State {
 interface PostProps {
   key: string;
   post: Post;
+  user: User;
 }
 
-const PostComponent: React.FC<PostProps> = ({ post }) => {
+const PostComponent: React.FC<PostProps> = ({ post, user }) => {
+  const dispatch = useDispatch();
   const [state, setState] = useState<State>({
     liked: false,
   });
+
+  // sets the like button to be checked or not
+  useEffect(() => {
+    console.log(post.likedUsers);
+    if (post.likedUsers) {
+      if (user.username in post.likedUsers) {
+        setState({ ...state, liked: true });
+      } else {
+        setState({ ...state, liked: false });
+      }
+    }
+  }, [post, user]);
+
   const history = useHistory();
   console.log(post);
+
+  const handleLike = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      dispatch(likePost({ token: token, slug: post.slug }));
+    }
+  };
+
   return (
     <div className="PostComponent" data-testid="PostComponent">
       <Grid container spacing={1} justify="center" alignItems="center">
@@ -85,9 +110,7 @@ const PostComponent: React.FC<PostProps> = ({ post }) => {
             >
               {post.likes}
               <Tooltip title="Like">
-                <IconButton
-                  onClick={() => setState({ ...state, liked: !state.liked })}
-                >
+                <IconButton onClick={handleLike}>
                   {state.liked ? <ThumbUpAlt /> : <ThumbUpAltOutlined />}
                 </IconButton>
               </Tooltip>

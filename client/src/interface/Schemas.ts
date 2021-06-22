@@ -25,6 +25,7 @@ export interface PostTags {
 export interface Post {
   mediaPath: string;
   likes: number;
+  likedUsers: string[];
   id: string;
   username: string;
   body: string;
