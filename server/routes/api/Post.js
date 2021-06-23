@@ -20,13 +20,41 @@ const { addPostTagRelation } = require("../../handlers/Route");
  * @param {Response} res The HTTP response to output to.
  */
 
+async function recursiveGetComment(arr) {
+  return new Promise((resolve, reject) => {
+    if (arr.length <= 0 || !Array.isArray(arr)) {
+      resolve([]);
+    }
+    const promises = arr.map(
+      async (id) =>
+        await Comment.findById(new ObjectId(id)).then((data) => data)
+    );
+
+    Promise.all(promises).then(async (comments) => {
+      arr = comments;
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].comments.length > 0) {
+          arr[i].comments = await recursiveGetComment(arr[i].comments);
+        }
+      }
+      Promise.all(arr).then((newComments) => {
+        resolve(newComments);
+      });
+    });
+  });
+}
+
 async function handleGetPost(req, res) {
   if (!req.header("slug")) {
     res.status(400).json({ message: "Post not specified" });
   } else {
     post
       .findOne({ slug: req.header("slug") })
-      .then((data) => {
+      .then(async (data) => {
+        await recursiveGetComment(data.comments).then(async (comments) => {
+          data.comments = comments;
+        });
+
         if (data == null) {
           res.status(403).json({ message: "Post not found." });
         } else {
@@ -34,7 +62,7 @@ async function handleGetPost(req, res) {
         }
       })
       .catch((err) => {
-        rdtaes.status(403).json(err);
+        res.status(403).json(err);
       });
   }
 }
