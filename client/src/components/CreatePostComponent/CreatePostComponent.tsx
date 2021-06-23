@@ -14,7 +14,7 @@ import { Group } from '@material-ui/icons';
 import { PostTags } from '../../interface/Schemas';
 import { useSelector } from 'react-redux';
 
-const CreatePostComponent = () => {
+const CreatePostComponent: React.FC = () => {
   const [media, setMedia] = useState<File | null>();
   const [filePreview, setFilePreview] = useState<string | null>();
   const [state, setState] = useState<PostTags>({
