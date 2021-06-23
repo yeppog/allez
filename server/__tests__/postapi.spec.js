@@ -42,7 +42,7 @@ describe("Test get post", () => {
       mediaPath: "media",
       likes: 15,
       likedUsers: ["test", "test2"],
-      comments: [{ date: "123123", body: "yeet", user: "test3" }],
+      comments: ["60d381a2874cfb0640249c52"],
       slug: "3490283fn3fndsjkfbdnsf7f23",
     });
     await post
@@ -80,7 +80,7 @@ describe("Test delete post", () => {
       mediaPath: "media",
       likes: 15,
       likedUsers: ["test", "test2"],
-      comments: [{ date: "123123", body: "yeet", user: "test3" }],
+      comments: ["60d381a2874cfb0640249c52"],
       slug: "testpostslug",
       createdAt: currentDate,
     });
@@ -140,7 +140,7 @@ describe("Test delete post", () => {
       mediaPath: "media",
       likes: 15,
       likedUsers: ["test", "test2"],
-      comments: [{ date: "123123", body: "yeet", user: "test3" }],
+      comments: ["60d381a2874cfb0640249c52"],
       slug: "newslug",
       createdAt: currentDate,
     });

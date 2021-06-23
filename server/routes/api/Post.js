@@ -32,9 +32,12 @@ async function recursiveGetComment(arr) {
 
     Promise.all(promises).then(async (comments) => {
       arr = comments;
+
       for (let i = 0; i < arr.length; i++) {
-        if (arr[i].comments.length > 0) {
-          arr[i].comments = await recursiveGetComment(arr[i].comments);
+        if (arr[i]) {
+          if (arr[i].comments.length > 0) {
+            arr[i].comments = await recursiveGetComment(arr[i].comments);
+          }
         }
       }
       Promise.all(arr).then((newComments) => {
