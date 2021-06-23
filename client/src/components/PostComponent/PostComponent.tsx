@@ -7,6 +7,7 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
+  Drawer,
   Grid,
   IconButton,
   Tooltip,
@@ -19,13 +20,13 @@ import {
   ThumbUpAlt,
   ThumbUpAltOutlined,
 } from '@material-ui/icons';
+import { Post, User } from '../../interface/Schemas';
 import React, { useEffect, useState } from 'react';
 
 import Image from './../../static/placeholder.png';
-import { Post, User } from '../../interface/Schemas';
-import { useHistory } from 'react-router';
-import { useDispatch } from 'react-redux';
 import { likePost } from '../Redux/postSlice';
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router';
 
 interface State {
   liked: boolean;
