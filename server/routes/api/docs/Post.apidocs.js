@@ -116,7 +116,27 @@
  *        content:
  *          multipart/form-data:
  *            schema:
- *              - $ref: "#/components/schemas/CreatePost"
+ *              $ref: '#/components/schemas/CreatePost'
+ *      responses:
+ *        "200":
+ *          description: "Success. Ok"
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: "#/components/schemas/CreatePostSuccess"
+ *        "400":
+ *          description: "Bad request. Did not have the neccessary fields"
+ *
+ * 
+ * /api/posts/editPost:
+ *    post:
+ *      description: Edit a given post with an optional attached media file.
+ *      tags: [Posts]
+ *      requestBody:
+ *        content:
+ *          multipart/form-data:
+ *            schema:
+ *              $ref: '#/components/schemas/EditPost'
  *      responses:
  *        "200":
  *          description: "Success. Ok"
@@ -126,7 +146,80 @@
  *                - $ref: "#/components/schemas/CreatePostSuccess"
  *        "400":
  *          description: "Bad request. Did not have the neccessary fields"
- *
+ * 
+ * 
+ * /api/posts/deletePost:
+ *    post:
+ *      description: Deletes a specific post and removes the related media.
+ *      tags: [Posts]
+ *      requestBody:
+ *        content:
+ *          multipart/form-data:
+ *            schema:
+ *              - $ref: "#/components/schemas/DeletePost"
+ *      responses:
+ *        "200":
+ *          description: "Success. Returns the user data without the deleted post."
+ *          content:
+ *            application/json:
+ *              schema:
+ *                - $ref: "#/components/schemas/CreatePostSuccess"
+ *        "400":
+ *          description: "Bad request. Did not have the neccessary fields"
+ * 
+ * /api/posts/addCommentToComment:
+ *    post:
+ *      description: Takes a comment and adds a new comment to it.
+ *      tags: [Posts]
+ *      requestBody:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              - $ref: "#/components/schemas/addCommentToComment"
+ * 
+ *      responses:
+ *        "200":
+ *          description: "Success. Added teh comment to the comment. Returns the updated comment."
+ *          content:
+ *            application/json:
+ *              schema:
+ *                - $ref: "#/components/schemas/AddCommentToCommentSuccess"
+ *        "400":
+ *          description: "Bad request. Missing fields."
+ *        "403":
+ *          description: "Bad JWT Token."
+ * 
+ * 
+ * /api/posts/addCommentToPost:
+ *    post:
+ *      description: "Adds a comment to a post."
+ *      tags: [Posts]
+ *      requestBody:
+ *        application/json:
+ *          schema:
+ *            - $ref: "#/components/schemas/AddCommentToPost"
+ *      responses:
+ *        "200":
+ *          description: "Success."
+ *        "400":
+ *          description: "Bad request. Missing token."
+ * 
+ * /api/posts/fetchFollowPosts:
+ *    post:
+ *      description: "Fetches the posts from the users following for a specified date range."
+ *      tags: [Posts]
+ *      requestBody:
+ *        application/json:
+ *          schema:
+ *            - $ref: "#/components/schemas/FetchFollowPosts"
+ * 
+ *      responses:
+ *        "200":
+ *          description: "Success. Returns the object of posts."
+ *        "400":
+ *          description: "Bad request. Missing token or neccessary fields."
+ *  
+ * 
  *
  * components:
  *    schemas:
@@ -193,6 +286,26 @@
  *          slug:
  *            type: string
  *            description: The unique post slug of the post.
+ *      EditPost:
+ *        type: object
+ *        required:
+ *          - token
+ *        properties:
+ *          token:
+ *            type: string
+ *            description: JWT token of the user.
+ *          body:
+ *            type: string    
+ *            description: The body of the post.
+ *          file:
+ *            type: string
+ *            format: binary
+ *        example:
+ *          token: "fef38hf943f34fj4f"
+ *          body: "This is the post body."
+ *          file: "The file uploaded"
+ * 
+ * 
  *      AddComment:
  *        type: object
  *        required:
@@ -312,6 +425,7 @@
  *            description: The description of the error. Unable to find the post from the slug.
  *        example:
  *          message: "Unable to find post"
+ *      
  *
  *
  *

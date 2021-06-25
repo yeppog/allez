@@ -1,8 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './userSlice'
+import postReducer from './postSlice';
+import userReducer from './userSlice';
 
 export default configureStore({
-    reducer: {
-        user: userReducer
-    }
-})
+  reducer: {
+    user: userReducer,
+    posts: postReducer,
+  },
+});

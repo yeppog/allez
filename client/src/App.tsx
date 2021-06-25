@@ -20,6 +20,7 @@ import { CssBaseline } from '@material-ui/core';
 import HomeComponent from './components/HomeComponent/HomeComponent';
 import LoginComponent from './components/Auth/LoginComponent/LoginComponent';
 import NotFoundComponent from './components/Auth/NotFoundComponent/NotFoundComponent';
+import PostPageComponent from './components/PostPageComponent/PostPageComponent';
 import ProfileComponent from './components/ProfileComponent/ProfileComponent';
 import ProfileSettingsComponent from './components/ProfileSettingsComponent/ProfileSettingsComponent';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
@@ -169,6 +170,7 @@ function App() {
             />
           </Route>
           <Route path="/confirm/token=:token" component={ConfirmComponent} />
+          <Route path="/post/:id" component={PostPageComponent} />
           {routes.map((route: { path: string; Component: React.FC }) => (
             <Route key={route.path} exact path={route.path}>
               <route.Component />

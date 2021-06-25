@@ -20,13 +20,44 @@ const { addPostTagRelation } = require("../../handlers/Route");
  * @param {Response} res The HTTP response to output to.
  */
 
+async function recursiveGetComment(arr) {
+  return new Promise((resolve, reject) => {
+    if (arr.length <= 0 || !Array.isArray(arr)) {
+      resolve([]);
+    }
+    const promises = arr.map(
+      async (id) =>
+        await Comment.findById(new ObjectId(id)).then((data) => data)
+    );
+
+    Promise.all(promises).then(async (comments) => {
+      arr = comments;
+
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i]) {
+          if (arr[i].comments.length > 0) {
+            arr[i].comments = await recursiveGetComment(arr[i].comments);
+          }
+        }
+      }
+      Promise.all(arr).then((newComments) => {
+        resolve(newComments);
+      });
+    });
+  });
+}
+
 async function handleGetPost(req, res) {
   if (!req.header("slug")) {
     res.status(400).json({ message: "Post not specified" });
   } else {
     post
       .findOne({ slug: req.header("slug") })
-      .then((data) => {
+      .then(async (data) => {
+        await recursiveGetComment(data.comments).then(async (comments) => {
+          data.comments = comments;
+        });
+
         if (data == null) {
           res.status(403).json({ message: "Post not found." });
         } else {
@@ -34,7 +65,7 @@ async function handleGetPost(req, res) {
         }
       })
       .catch((err) => {
-        rdtaes.status(403).json(err);
+        res.status(403).json(err);
       });
   }
 }
@@ -438,7 +469,7 @@ async function addCommentToComment(req, res) {
  * @param {Request} req The request made to this endpoint. Token, slug and date is required in the body.
  * @param {Response} res The response to output to.
  */
-
+// TODO: Change this to delete by ID
 async function deleteComment(req, res) {
   if (!req.body.token || !req.body.slug || !req.body.date) {
     res.status(400).json({
@@ -489,12 +520,13 @@ async function handleLike(req, res) {
             .then((user) => {
               const postLikes = { ...post.likedUsers };
               const username = user.username;
+              console.log(post);
               if (username in postLikes) {
                 delete postLikes[username];
-                postLikes.like = postLikes.like - 1;
+                post.likes = post.likes - 1;
               } else {
                 postLikes[username] = new Date();
-                postLikes.like = postLikes.like + 1;
+                post.likes = post.likes + 1;
               }
               post.likedUsers = postLikes;
               post
@@ -510,6 +542,57 @@ async function handleLike(req, res) {
       .catch((err) =>
         res.status(403).json({ message: "Post cannot be found." })
       );
+  }
+}
+
+async function handleFetchFollowPosts(req, res) {
+  if (!req.header("token") || !req.body.date || !req.body.duration) {
+    res.status(400).json({ message: "Missing token, date or duration." });
+  } else {
+    const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
+    User.findById(new ObjectId(id)).then(async (user) => {
+      // create the date object
+      const dates = [];
+      const posts = {};
+      var date = new Date(req.body.date);
+      for (i = 0; i < req.body.duration; i++) {
+        const formatted = `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
+        dates.push(parseInt(formatted));
+        date.setDate(date.getDate() - 1);
+        posts[parseInt(formatted)] = [];
+      }
+      console.log(dates);
+      console.log(posts);
+      for (i = 0; i < user.following.length; i++) {
+        // console.log(user.following[i]);
+        const username = user.following[i];
+        await User.findOne({ username: username })
+          .then((data) => {
+            for (d = 0; d < dates.length; d++) {
+              if (data) {
+                if (data.posts) {
+                  const userposts = data.posts[dates[d]];
+                  if (userposts) {
+                    var temp = [...posts[dates[d]]];
+                    temp = [...temp, ...userposts];
+                    posts[dates[d]] = [...temp];
+                  }
+                }
+              }
+            }
+          })
+          .catch((err) => console.log("Cant find the user."));
+      }
+      for (const [key, val] of Object.entries(posts)) {
+        const promises = val.map(
+          async (x) => await Post.findById(new ObjectId(x)).then((data) => data)
+        );
+        await Promise.all(promises).then(async (x) => {
+          posts[key] = [...x];
+        });
+      }
+      res.status(200).json(posts);
+    });
   }
 }
 
@@ -536,4 +619,5 @@ postRouter.post("/deletePost", handleDeletePost);
 postRouter.get("/like", handleLike);
 postRouter.post("/createpost", uploadMedia.single("file"), handleCreatePost);
 postRouter.post("/editpost", uploadMedia.single("file"), handleEditPost);
+postRouter.post("/fetchFollowPosts", handleFetchFollowPosts);
 module.exports = { postRouter };

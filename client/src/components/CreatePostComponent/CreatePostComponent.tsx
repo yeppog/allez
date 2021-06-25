@@ -18,7 +18,7 @@ import { PostTags } from '../../interface/Schemas';
 import { gyms } from '../../static/Gyms';
 import { useSelector } from 'react-redux';
 
-const CreatePostComponent = () => {
+const CreatePostComponent: React.FC = () => {
   const [media, setMedia] = useState<File | null>();
   const [filePreview, setFilePreview] = useState<string | null>();
   const [state, setState] = useState<PostTags>({
