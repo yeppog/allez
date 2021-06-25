@@ -1,0 +1,18 @@
+export const gyms = [
+  'Kinetics Climbing',
+  'OYEYO Boulder Home',
+  'Climb Central Novena',
+  'Climb Central Funan',
+  'Climb Central Kallang',
+  'Z-Vertigo Boulder Gym',
+  'The Rock School - Bedok CC',
+  'The Rock School - Our Tampines Hub',
+  'Ground Up Climbing',
+  'Boulder Movement Downtown',
+  'Boulder World',
+  'Boulder Movement Tai Seng',
+  'BFF Climb',
+  'Fit · Bloc',
+  'boulder+',
+  'Lighthouse Climbing',
+];
