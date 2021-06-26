@@ -112,6 +112,13 @@
  *    post:
  *      description: Create a post with an attached media file.
  *      tags: [Posts]
+ *      parameters:
+ *       - in: header
+ *         name: token
+ *         schema:
+ *           type: string
+ *         example:
+ *           token: "c739b62c1141fbed21f597b37c6e2bf6"
  *      requestBody:
  *        content:
  *          multipart/form-data:
@@ -127,7 +134,7 @@
  *        "400":
  *          description: "Bad request. Did not have the neccessary fields"
  *
- * 
+ *
  * /api/posts/editPost:
  *    post:
  *      description: Edit a given post with an optional attached media file.
@@ -146,8 +153,8 @@
  *                - $ref: "#/components/schemas/CreatePostSuccess"
  *        "400":
  *          description: "Bad request. Did not have the neccessary fields"
- * 
- * 
+ *
+ *
  * /api/posts/deletePost:
  *    post:
  *      description: Deletes a specific post and removes the related media.
@@ -166,7 +173,7 @@
  *                - $ref: "#/components/schemas/CreatePostSuccess"
  *        "400":
  *          description: "Bad request. Did not have the neccessary fields"
- * 
+ *
  * /api/posts/addCommentToComment:
  *    post:
  *      description: Takes a comment and adds a new comment to it.
@@ -176,7 +183,7 @@
  *          application/json:
  *            schema:
  *              - $ref: "#/components/schemas/addCommentToComment"
- * 
+ *
  *      responses:
  *        "200":
  *          description: "Success. Added teh comment to the comment. Returns the updated comment."
@@ -188,8 +195,8 @@
  *          description: "Bad request. Missing fields."
  *        "403":
  *          description: "Bad JWT Token."
- * 
- * 
+ *
+ *
  * /api/posts/addCommentToPost:
  *    post:
  *      description: "Adds a comment to a post."
@@ -203,7 +210,7 @@
  *          description: "Success."
  *        "400":
  *          description: "Bad request. Missing token."
- * 
+ *
  * /api/posts/fetchFollowPosts:
  *    post:
  *      description: "Fetches the posts from the users following for a specified date range."
@@ -212,14 +219,14 @@
  *        application/json:
  *          schema:
  *            - $ref: "#/components/schemas/FetchFollowPosts"
- * 
+ *
  *      responses:
  *        "200":
  *          description: "Success. Returns the object of posts."
  *        "400":
  *          description: "Bad request. Missing token or neccessary fields."
- *  
- * 
+ *
+ *
  *
  * components:
  *    schemas:
@@ -227,13 +234,9 @@
  *        type: object
  *        required:
  *          - body
- *          - token
  *          - file
  *          - tag
  *        properties:
- *          token:
- *            type: string
- *            description: JWT token of the user creating the post.
  *          body:
  *            type: string
  *            description: The text content of the post.
@@ -295,7 +298,7 @@
  *            type: string
  *            description: JWT token of the user.
  *          body:
- *            type: string    
+ *            type: string
  *            description: The body of the post.
  *          file:
  *            type: string
@@ -304,8 +307,8 @@
  *          token: "fef38hf943f34fj4f"
  *          body: "This is the post body."
  *          file: "The file uploaded"
- * 
- * 
+ *
+ *
  *      AddComment:
  *        type: object
  *        required:
@@ -425,7 +428,7 @@
  *            description: The description of the error. Unable to find the post from the slug.
  *        example:
  *          message: "Unable to find post"
- *      
+ *
  *
  *
  *
