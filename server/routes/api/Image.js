@@ -113,7 +113,7 @@ async function handleImageUpload(caption, filename, chunkIDRef, options) {
           await image
             .save()
             .then((data) => {
-              resolve(`${process.env.domain}${options}${data.filename}`);
+              resolve(`${process.env.DOMAIN}${options}${data.filename}`);
             })
             .catch((err) => {
               reject(err);
@@ -127,7 +127,7 @@ async function handleImageUpload(caption, filename, chunkIDRef, options) {
           await newImage
             .save()
             .then((data) => {
-              resolve(`${process.env.domain}${options}${data.filename}`);
+              resolve(`${process.env.DOMAIN}${options}${data.filename}`);
             })
             .catch((err) => {
               reject(err);
