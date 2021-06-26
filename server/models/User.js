@@ -70,36 +70,22 @@ const UserSchema = new mongoose.Schema(
   { minimize: false }
 );
 
+const GymSchema = new mongoose.Schema({
+  ...UserSchema.obj,
+  routes: {
+    type: {},
+    default: {},
+  },
+  address: {
+    type: String,
+    default: "",
+  },
+  postalCode: {
+    type: String,
+    default: "",
+  },
+});
+
 const User = mongoose.model("UserData", UserSchema);
-module.exports = User;
-
-// ASSUME post arr
-
-/**
- * 1 post fr ea user => x requests to server
- * x posts => 5 followers => min threshold posts
- * 2nd last post fr ea user => 2x
- *
- *
- *
- * DATE : objectID
- * posts: {date : [objectID]}
- * 12/6 11/6 10/6 9/6
- *
- * 4 [] => 12/6 - 9/6
- * [] => 12/6 - 9/6 => user []
- *
- * users [] => sort(5days)
- *
- * hehehe => hehehe
- *          hehehehhaha
- *
- * hahehehe
- * h
- * afhdefg =>
- *
- * users : [5days sorted, 6-7, 8 - 9,  ] => keep sorting
- *
- *
- *
- */
+const Gym = mongoose.model("GymData", GymSchema);
+module.exports = { User, Gym };
