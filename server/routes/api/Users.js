@@ -389,7 +389,12 @@ async function handleUpdateProfile(req, res, next) {
       const caption = `${user.id}_avatar`;
       const upload = require("./Image").uploadImage;
       let imageURL;
-      await upload(caption, req.file.filename, chunkIDRef, "/api/users/avatar")
+      await upload(
+        caption,
+        req.file.filename,
+        req.file.id,
+        "/api/images/avatar/"
+      )
         .then((data) => (imageURL = data))
         .catch((err) => res.status(403).json(err));
 
