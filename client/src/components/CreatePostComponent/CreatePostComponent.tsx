@@ -2,16 +2,20 @@ import './CreatePostComponent.scss';
 
 import {
   Button,
+  Chip,
   FormControl,
   Grid,
   Input,
   InputLabel,
+  TextField,
   Typography,
 } from '@material-ui/core';
 import React, { useState } from 'react';
 
+import { Autocomplete } from '@material-ui/lab';
 import { Group } from '@material-ui/icons';
 import { PostTags } from '../../interface/Schemas';
+import { gyms } from '../../static/Gyms';
 import { useSelector } from 'react-redux';
 
 const CreatePostComponent: React.FC = () => {
@@ -38,6 +42,12 @@ const CreatePostComponent: React.FC = () => {
     (prop: keyof PostTags) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setState({ ...state, [prop]: event.target.value });
     };
+
+  const getFriends = () => {
+    // TODO: Get Friends
+    const friends = [{ username: 'nzixuan' }, { username: 'lenathonaj' }];
+    return friends;
+  };
 
   const handleEditMedia = (e: React.ChangeEvent<HTMLInputElement>) => {
     // console.log(e.target.files);
@@ -143,11 +153,19 @@ const CreatePostComponent: React.FC = () => {
 
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <InputLabel>Tag Gym</InputLabel>
-                  <Input
+                  <Autocomplete
+                    id="gym"
+                    options={gyms}
+                    getOptionLabel={(option) => option}
                     fullWidth
-                    value={state.gym}
-                    onChange={handleChange('gym')}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Gym"
+                        variant="standard"
+                        onChange={handleChange('gym')}
+                      />
+                    )}
                   />
                 </FormControl>
               </Grid>
@@ -162,14 +180,31 @@ const CreatePostComponent: React.FC = () => {
                   />
                 </FormControl>
               </Grid>
-
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <InputLabel>Tag People</InputLabel>
-                  <Input
-                    value={state.people}
-                    onChange={handleChange('people')}
+                  <Autocomplete
                     fullWidth
+                    multiple
+                    id="tags-filled"
+                    options={getFriends().map((option) => option.username)}
+                    freeSolo
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => (
+                        <Chip
+                          variant="outlined"
+                          label={option}
+                          {...getTagProps({ index })}
+                        />
+                      ))
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="standard"
+                        label="Tag Friends"
+                        onChange={handleChange('people')}
+                      />
+                    )}
                   />
                 </FormControl>
               </Grid>
