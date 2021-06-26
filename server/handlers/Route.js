@@ -58,7 +58,23 @@ async function removePostTagRelation(route, target) {
   });
 }
 
+async function fetchAllRoutes(document) {
+  return new Promise((resolve, reject) => {
+    document
+      .find({})
+      .then((data) => {
+        resolve(
+          data.map((obj) => {
+            return { name: obj.name, grade: obj.grade, color: obj.color };
+          })
+        );
+      })
+      .catch((err) => reject(err));
+  });
+}
+
 module.exports = {
   addPostTagRelation: addPostTagRelation,
   removePostTagRelation: removePostTagRelation,
+  fetchAllRoutes: fetchAllRoutes,
 };
