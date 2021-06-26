@@ -30,6 +30,7 @@ import { useHistory } from 'react-router';
 
 interface State {
   liked: boolean;
+  mediaType: 'image' | 'video' | null;
 }
 
 interface PostProps {
@@ -38,26 +39,39 @@ interface PostProps {
   user: User;
 }
 
+function getMediaType(post: Post): 'video' | 'image' {
+  const split = post.mediaPath.split('.');
+  const fileType = split[split.length - 1];
+
+  if (fileType === 'png' || fileType === 'jpeg') {
+    return 'image';
+  } else {
+    return 'video';
+  }
+}
+
 const PostComponent: React.FC<PostProps> = ({ post, user }) => {
   const dispatch = useDispatch();
   const [state, setState] = useState<State>({
     liked: false,
+    mediaType: null,
   });
 
   // sets the like button to be checked or not
   useEffect(() => {
-    console.log(post.likedUsers);
+    const mediaType = getMediaType(post);
+    console.log(mediaType);
     if (post.likedUsers) {
       if (user.username in post.likedUsers) {
-        setState({ ...state, liked: true });
+        setState({ ...state, liked: true, mediaType: mediaType });
       } else {
-        setState({ ...state, liked: false });
+        setState({ ...state, liked: false, mediaType: mediaType });
       }
     }
   }, [post, user]);
 
   const history = useHistory();
-  console.log(post);
+  console.log(state);
 
   const handleLike = () => {
     const token = localStorage.getItem('token');
@@ -98,8 +112,9 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
             />
             <CardMedia
               controls
-              component="video"
-              title=""
+              className={state.mediaType === 'image' ? 'img' : 'video'}
+              component={state.mediaType === 'image' ? 'img' : 'video'}
+              title="Test"
               src={post.mediaPath}
             />
             <CardContent className="mediaBody">{post.body}</CardContent>
@@ -116,12 +131,12 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
                 </IconButton>
               </Tooltip>
               <Tooltip title="Comment">
-                <IconButton>
+                <IconButton onClick={() => history.push(`/post/${post.slug}`)}>
                   <ChatBubble></ChatBubble>
                 </IconButton>
               </Tooltip>
               <Tooltip title="Share">
-                <IconButton>
+                <IconButton disabled>
                   <Share />
                 </IconButton>
               </Tooltip>
