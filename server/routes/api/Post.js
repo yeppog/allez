@@ -553,18 +553,18 @@ async function handleFetchFollowPosts(req, res) {
     User.findById(new ObjectId(id)).then(async (user) => {
       // create the date object
       const dates = [];
-      const posts = {};
+      const posts = user.posts;
       var date = new Date(req.body.date);
       for (i = 0; i < req.body.duration; i++) {
         const formatted = `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
         dates.push(parseInt(formatted));
         date.setDate(date.getDate() - 1);
-        posts[parseInt(formatted)] = [];
+        const newDate = parseInt(formatted);
+        if (!(newDate in posts)) {
+          posts[newDate] = [];
+        }
       }
-      console.log(dates);
-      console.log(posts);
       for (i = 0; i < user.following.length; i++) {
-        // console.log(user.following[i]);
         const username = user.following[i];
         await User.findOne({ username: username })
           .then((data) => {
@@ -584,6 +584,8 @@ async function handleFetchFollowPosts(req, res) {
           .catch((err) => console.log("Cant find the user."));
       }
       for (const [key, val] of Object.entries(posts)) {
+        console.log(key);
+        console.log(val);
         const promises = val.map(
           async (x) => await Post.findById(new ObjectId(x)).then((data) => data)
         );
