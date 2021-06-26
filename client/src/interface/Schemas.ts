@@ -32,4 +32,14 @@ export interface Post {
   avatarPath: string;
   slug: string;
   tag: object;
+  comments: Comment[];
+}
+
+export interface Comment {
+  comments: Comment[];
+  body: string;
+  edited: boolean;
+  username: string;
+  avatarPath: string;
+  createdAt: Date;
 }
