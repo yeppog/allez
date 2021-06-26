@@ -10,8 +10,14 @@ import {
   withRouter,
 } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useEffect } from 'react';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import {
+  fetchGyms,
+  fetchRoutes,
+  fetchUsers,
+} from './components/Redux/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 import BotNavComponent from './components/BotNavComponent/BotNavComponent';
 import ConfirmComponent from './components/Auth/ConfirmComponent/ConfirmComponent';
@@ -29,9 +35,14 @@ import ResetComponent from './components/Auth/ResetComponent/ResetComponent';
 import ResetRequestComponent from './components/Auth/ResetRequestComponent/ResetRequestComponent';
 import TopNavComponent from './components/TopNavComponent/TopNavComponent';
 import { blueGrey } from '@material-ui/core/colors';
-import { useSelector } from 'react-redux';
 
 function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchGyms());
+    dispatch(fetchUsers());
+    dispatch(fetchRoutes());
+  }, []);
   const darkMode = useSelector(
     (state: { user: { darkMode: boolean } }) => state.user.darkMode
   );
