@@ -121,10 +121,8 @@ describe("Testing Confirm ", () => {
               .get("/api/users/confirm")
               .set("token", data.body.token)
               .then((dataConfirm2) => {
-                expect(dataConfirm2.status).toBe(403);
-                expect(dataConfirm2.body.message).toBe(
-                  "Account already activated"
-                );
+                expect(dataConfirm2.status).toBe(500);
+                expect(dataConfirm2.body).toBe("Account already activated");
               });
           });
       });
@@ -139,9 +137,7 @@ describe("Testing Confirm ", () => {
       )
       .then((data) => {
         expect(data.status).toBe(403);
-        expect(data.body.message).toBe(
-          "Invalid or expired token. Unauthorised"
-        );
+        expect(data.body.message).toBe("Invalid JWT");
       });
   });
   it("Test confirm with empty token", async () => {

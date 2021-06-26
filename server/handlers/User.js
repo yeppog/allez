@@ -74,7 +74,7 @@ async function createUser(document) {
               //     resolve(info)
               //   }
               // );
-              resolve(token);
+              resolve({ token: token });
             })
             .catch((err) => reject(err));
         });
