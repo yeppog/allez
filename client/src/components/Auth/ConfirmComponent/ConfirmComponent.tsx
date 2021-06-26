@@ -76,7 +76,7 @@ const ConfirmComponent: React.FC = () => {
             </p>
           </div>
         )}
-        {state == 'success' && (
+        {state === 'success' && (
           <div className="messageContent">
             <h3>🎉 Hooray! 🎉</h3>
             <h4>Your account has been activated</h4>
