@@ -3,6 +3,11 @@ import './CreatePostComponent.scss';
 import {
   Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   Grid,
   Input,
@@ -15,11 +20,13 @@ import React, { useState } from 'react';
 import { Autocomplete } from '@material-ui/lab';
 import { Group } from '@material-ui/icons';
 import { PostTags } from '../../interface/Schemas';
+import axios from 'axios';
 import { gyms } from '../../static/Gyms';
 import { useSelector } from 'react-redux';
 
 const CreatePostComponent: React.FC = () => {
   const [media, setMedia] = useState<File | null>();
+  const [open, setOpen] = React.useState(false);
   const [filePreview, setFilePreview] = useState<string | null>();
   const [state, setState] = useState<PostTags>({
     media: '',
@@ -37,6 +44,27 @@ const CreatePostComponent: React.FC = () => {
   //     setState(user);
   //   }
   // }, [user]);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setState({ ...state, route: '' });
+  };
+  const handleConfirm = () => {
+    setOpen(false);
+  };
+
+  const handleAutoCompleteChange =
+    (prop: keyof PostTags) => (event: React.ChangeEvent<{}>, value: any) => {
+      if (value == null) {
+        setState({ ...state, [prop]: '' });
+      } else {
+        setState({ ...state, [prop]: value });
+      }
+    };
 
   const handleChange =
     (prop: keyof PostTags) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,9 +99,31 @@ const CreatePostComponent: React.FC = () => {
   };
 
   const onSubmit = (e: any): void => {
+    //TODO: Handle invalid input
     // preventDefault prevents the page from refreshing when the form is submitted
     e.preventDefault();
-    //TODO: API Stuuf
+    const formData = new FormData();
+    const token = localStorage.getItem('token') as string;
+    if (media) {
+      formData.append('file', media, media.name);
+    }
+    if (!token) {
+      console.log('No token, unable to update');
+    }
+    formData.append('body', state.caption);
+    formData.append('tag', state.people);
+    axios
+      .post('/api/posts/createPost', formData, { headers: { token: token } })
+      .then((data) => {
+        setState(data.data);
+        //TODO: return to main page
+        setMedia(null);
+      })
+      .catch((err) => {
+        // TODO: Handle user errors
+        console.log(token);
+        console.log(err);
+      });
   };
 
   return (
@@ -158,27 +208,60 @@ const CreatePostComponent: React.FC = () => {
                     options={gyms}
                     getOptionLabel={(option) => option}
                     fullWidth
+                    onChange={handleAutoCompleteChange('gym')}
                     renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Gym"
-                        variant="standard"
-                        onChange={handleChange('gym')}
-                      />
+                      <TextField {...params} label="Gym" variant="standard" />
                     )}
                   />
                 </FormControl>
               </Grid>
-
               <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Tag Route</InputLabel>
-                  <Input
+                <Button
+                  fullWidth
+                  variant="text"
+                  disabled={state.gym == ''}
+                  onClick={handleClickOpen}
+                >
+                  Tag Route
+                </Button>
+                <Dialog
+                  open={open}
+                  onClose={handleClose}
+                  aria-labelledby="form-dialog-title"
+                >
+                  <DialogTitle id="form-dialog-title">Tag Route</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>Tag your routes here</DialogContentText>
+                    <TextField
+                      margin="dense"
+                      id="grade"
+                      label="Route Grade"
+                      type="email"
+                      fullWidth
+                    />
+                    <TextField
+                      margin="dense"
+                      id="colour"
+                      label="Route Colour"
+                      type="email"
+                      fullWidth
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                      Cancel
+                    </Button>
+                    <Button onClick={handleConfirm} color="primary">
+                      Confirm
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
+                {/* <Input
                     fullWidth
                     value={state.route}
                     onChange={handleChange('route')}
-                  />
-                </FormControl>
+                  /> */}
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth>
@@ -188,6 +271,7 @@ const CreatePostComponent: React.FC = () => {
                     id="tags-filled"
                     options={getFriends().map((option) => option.username)}
                     freeSolo
+                    onChange={handleAutoCompleteChange('people')}
                     renderTags={(value: string[], getTagProps) =>
                       value.map((option: string, index: number) => (
                         <Chip
@@ -202,13 +286,11 @@ const CreatePostComponent: React.FC = () => {
                         {...params}
                         variant="standard"
                         label="Tag Friends"
-                        onChange={handleChange('people')}
                       />
                     )}
                   />
                 </FormControl>
               </Grid>
-
               <Grid item xs={12}>
                 <Button variant="text" color="primary" type="submit" fullWidth>
                   Post
