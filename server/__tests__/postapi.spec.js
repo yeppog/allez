@@ -119,13 +119,15 @@ describe("Test delete post", () => {
           })
           .then(async (data) => {
             expect(data.status).toBe(200);
-            expect(data.body.posts).toBeUndefined();
+            expect(data.body.posts).toStrictEqual({});
             expect(data).toBeDefined();
             await User.findOne({ username: "test" })
               .then((data) => {
                 expect(data.posts).toStrictEqual({});
               })
-              .catch((err) => expect(err).toBeUndefined());
+              .catch((err) => {
+                expect(err).toBeUndefined();
+              });
           });
       })
       .catch((err) => expect(err).toBeUndefined());
