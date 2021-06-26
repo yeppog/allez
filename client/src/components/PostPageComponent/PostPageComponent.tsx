@@ -7,10 +7,12 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
+  Divider,
   Drawer,
   Grid,
   IconButton,
   Tooltip,
+  Typography,
 } from '@material-ui/core';
 import {
   ChatBubble,
@@ -21,26 +23,39 @@ import {
   ThumbUpAltOutlined,
 } from '@material-ui/icons';
 import { Post, User } from '../../interface/Schemas';
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { fetchPost, likePost } from '../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
 import Image from './../../static/placeholder.png';
 
-interface State {
-  liked: boolean;
-}
-
 interface ID {
   id: string;
+}
+interface State {
+  liked: boolean;
+  mediaType: 'image' | 'video' | null;
+}
+
+function getMediaType(post: Post): 'video' | 'image' {
+  const split = post.mediaPath.split('.');
+  const fileType = split[split.length - 1];
+
+  if (fileType === 'png' || fileType === 'jpeg') {
+    return 'image';
+  } else {
+    return 'video';
+  }
 }
 
 const PostPageComponent: React.FC = () => {
   const slug = useParams<ID>().id;
   const dispatch = useDispatch();
+  const [mappedComponent, setMappedComponent] = useState<ReactNode>();
   const [state, setState] = useState<State>({
     liked: false,
+    mediaType: null,
   });
   const [post, setPost] = useState<Post>();
 
@@ -53,15 +68,28 @@ const PostPageComponent: React.FC = () => {
     console.log(slug);
     fetchPost({ slug: slug }).then((data) => {
       const temp = data as Post;
-      console.log(temp);
       setPost(temp);
-      if (temp.likedUsers) {
-        if (user) {
-          if (user.username in temp.likedUsers) {
-            setState({ ...state, liked: true });
-          } else {
-            setState({ ...state, liked: false });
-          }
+
+      console.log(temp);
+      if (temp.comments) {
+        setMappedComponent(
+          temp.comments.map((comment) => {
+            return (
+              <Card>
+                <CardContent>{comment.username}</CardContent>
+                <CardContent>{comment.body}</CardContent>
+                <CardContent>{comment.createdAt}</CardContent>
+              </Card>
+            );
+          })
+        );
+      }
+
+      if (temp.likedUsers && user) {
+        if (user.username in temp.likedUsers) {
+          setState({ ...state, liked: true, mediaType: getMediaType(temp) });
+        } else {
+          setState({ ...state, liked: false, mediaType: getMediaType(temp) });
         }
       }
     });
@@ -82,7 +110,7 @@ const PostPageComponent: React.FC = () => {
   };
 
   return (
-    <div className="PostPageComponent" data-testid="PostComponent">
+    <div className="PostPageComponent" data-testid="PostPageComponent">
       {post && (
         <Grid container spacing={1} justify="center" alignItems="center">
           <Grid item xs={10} sm={8} md={6} lg={4}>
@@ -114,8 +142,9 @@ const PostPageComponent: React.FC = () => {
               />
               <CardMedia
                 controls
-                component="video"
-                title=""
+                className={state.mediaType === 'image' ? 'img' : 'video'}
+                component={state.mediaType === 'image' ? 'img' : 'video'}
+                title="Test"
                 src={post.mediaPath}
               />
               <CardContent className="mediaBody">{post.body}</CardContent>
@@ -137,7 +166,7 @@ const PostPageComponent: React.FC = () => {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Share">
-                  <IconButton>
+                  <IconButton disabled>
                     <Share />
                   </IconButton>
                 </Tooltip>
@@ -147,6 +176,9 @@ const PostPageComponent: React.FC = () => {
                   </IconButton>
                 </Tooltip>
               </CardActions>
+              <Divider />
+              <CardContent>Comments</CardContent>
+              {mappedComponent}
             </Card>
           </Grid>
         </Grid>
