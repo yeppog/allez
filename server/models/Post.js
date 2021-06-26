@@ -19,7 +19,7 @@ const PostSchema = new mongoose.Schema({
   },
   avatarPath: {
     type: String,
-    required: true,
+    default: "",
   },
   mediaPath: {
     type: String,
