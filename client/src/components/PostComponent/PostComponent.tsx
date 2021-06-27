@@ -48,7 +48,7 @@ function getMediaType(post: Post): 'video' | 'image' {
   const split = post.mediaPath.split('.');
   const fileType = split[split.length - 1];
 
-  if (fileType === 'png' || fileType === 'jpeg') {
+  if (fileType === 'png' || fileType === 'jpeg' || fileType === 'jpg') {
     return 'image';
   } else {
     return 'video';
