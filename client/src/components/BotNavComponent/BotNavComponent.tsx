@@ -4,6 +4,7 @@ import { AccountCircle, Home, Search } from '@material-ui/icons';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { Add as AddIcon } from '@material-ui/icons';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import { User } from '../../interface/Schemas';
@@ -55,6 +56,12 @@ const BotNavComponent: React.FC = () => {
             value="search"
             icon={<Search />}
             // onClick={() => history.push('/login')}
+          />
+          <BottomNavigationAction
+            label="Add"
+            value="add"
+            icon={<AddIcon />}
+            onClick={() => history.push('/createPost')}
           />
           <BottomNavigationAction
             label="Profile"
