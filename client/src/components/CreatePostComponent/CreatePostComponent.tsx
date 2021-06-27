@@ -22,6 +22,7 @@ import { Group } from '@material-ui/icons';
 import { PostTags } from '../../interface/Schemas';
 import axios from 'axios';
 import { gyms } from '../../static/Gyms';
+import { useHistory } from 'react-router';
 import { useSelector } from 'react-redux';
 
 const CreatePostComponent: React.FC = () => {
@@ -36,14 +37,7 @@ const CreatePostComponent: React.FC = () => {
     people: '',
   });
 
-  // const user = useSelector(
-  //   (state: { user: { user: User } }) => state.user.user
-  // );
-  // useEffect(() => {
-  //   if (user) {
-  //     setState(user);
-  //   }
-  // }, [user]);
+  const history = useHistory();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -118,6 +112,7 @@ const CreatePostComponent: React.FC = () => {
         setState(data.data);
         //TODO: return to main page
         setMedia(null);
+        history.push('/home');
       })
       .catch((err) => {
         // TODO: Handle user errors
