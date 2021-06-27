@@ -47,7 +47,6 @@ const TopNavComponent: React.FC = () => {
     (state: { user: { search: [{ username: string; name: string }] } }) =>
       state.user.search
   );
-  console.log(users.map((users) => users.username));
 
   const darkMode = useSelector(
     (state: { user: { status: any; darkMode: boolean } }) => state.user.darkMode

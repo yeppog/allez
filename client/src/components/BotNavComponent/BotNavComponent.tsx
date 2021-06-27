@@ -27,7 +27,6 @@ const BotNavComponent: React.FC = () => {
   const loginStatus = useSelector(
     (state: { user: { loginStatus: string } }) => state.user.loginStatus
   );
-  console.log(loginStatus);
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios

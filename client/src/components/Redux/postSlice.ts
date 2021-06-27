@@ -31,7 +31,6 @@ export const fetchPosts = createAsyncThunk(
       { date: data.date, duration: data.duration },
       { headers: { token: data.token } }
     );
-    console.log(res.data);
     return res.data;
   }
 );
@@ -40,7 +39,6 @@ export const likePost = createAsyncThunk(
   'posts/likePost',
   async (data: { token: string; slug: string }) => {
     const res = await axios.get('/api/posts/like', { headers: data });
-    console.log(res.data);
     return res.data;
   }
 );

@@ -60,7 +60,6 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
   // sets the like button to be checked or not
   useEffect(() => {
     const mediaType = getMediaType(post);
-    console.log(mediaType);
     if (post.likedUsers) {
       if (user.username in post.likedUsers) {
         setState({ ...state, liked: true, mediaType: mediaType });
@@ -71,7 +70,6 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
   }, [post, user]);
 
   const history = useHistory();
-  console.log(state);
 
   const handleLike = () => {
     const token = localStorage.getItem('token');
