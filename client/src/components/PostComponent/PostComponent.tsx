@@ -10,7 +10,10 @@ import {
   Drawer,
   Grid,
   IconButton,
+  Menu,
+  MenuItem,
   Tooltip,
+  Typography,
 } from '@material-ui/core';
 import {
   ChatBubble,
@@ -19,10 +22,12 @@ import {
   Share,
   ThumbUpAlt,
   ThumbUpAltOutlined,
+  Warning,
 } from '@material-ui/icons';
 import { Post, User } from '../../interface/Schemas';
 import React, { useEffect, useState } from 'react';
 
+import DeleteModal from '../DeleteModal/DeleteModal';
 import Image from './../../static/placeholder.png';
 import { likePost } from '../Redux/postSlice';
 import { useDispatch } from 'react-redux';
@@ -52,6 +57,8 @@ function getMediaType(post: Post): 'video' | 'image' {
 
 const PostComponent: React.FC<PostProps> = ({ post, user }) => {
   const dispatch = useDispatch();
+  const [anchor, setAnchor] = useState<null | HTMLElement>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<boolean>(false);
   const [state, setState] = useState<State>({
     liked: false,
     mediaType: null,
@@ -77,9 +84,20 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
       dispatch(likePost({ token: token, slug: post.slug }));
     }
   };
+  const handleDeleteRequest = () => {
+    setDeleteConfirm(true);
+    setAnchor(null);
+  };
 
   return (
     <div className="PostComponent" data-testid="PostComponent">
+      <DeleteModal
+        slug={post.slug}
+        setDeleteConfirm={setDeleteConfirm}
+        deleteConfirm={deleteConfirm}
+        post={post}
+        type="post"
+      />
       <Grid container spacing={1} justify="center" alignItems="center">
         <Grid item xs={10} sm={8} md={6} lg={4}>
           <Card className="cardBody">
@@ -98,11 +116,28 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
                 </Tooltip>
               }
               action={
-                <Tooltip title="Actions">
-                  <IconButton aria-label="">
-                    <MoreVertIcon />
-                  </IconButton>
-                </Tooltip>
+                <div>
+                  <Tooltip title="Actions">
+                    <IconButton
+                      aria-label=""
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                        setAnchor(e.currentTarget)
+                      }
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    anchorEl={anchor}
+                    keepMounted
+                    open={Boolean(anchor)}
+                    onClose={() => setAnchor(null)}
+                  >
+                    <MenuItem onClick={handleDeleteRequest}>
+                      <Warning style={{ paddingRight: '5px' }} /> Delete Post
+                    </MenuItem>
+                  </Menu>
+                </div>
               }
               title={post.username}
               subheader={post.id}
@@ -128,6 +163,7 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
                   {state.liked ? <ThumbUpAlt /> : <ThumbUpAltOutlined />}
                 </IconButton>
               </Tooltip>
+              <Typography>{post.comments.length}</Typography>
               <Tooltip title="Comment">
                 <IconButton onClick={() => history.push(`/post/${post.slug}`)}>
                   <ChatBubble></ChatBubble>
