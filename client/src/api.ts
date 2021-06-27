@@ -42,3 +42,12 @@ export async function likePost(headers: { slug: string; token: string }) {
       .catch((err) => reject(err));
   });
 }
+
+export async function deletePost(body: { token: string; slug: string }) {
+  return new Promise((resolve, reject) => {
+    axios
+      .post('/api/posts/delete', body)
+      .then((data) => resolve(data))
+      .catch((err) => reject(err));
+  });
+}

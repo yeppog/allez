@@ -48,7 +48,19 @@ export const likePost = createAsyncThunk(
 const postSlice = createSlice({
   name: 'posts',
   initialState,
-  reducers: {},
+  reducers: {
+    removePost: (state, action) => {
+      const posts = state.posts;
+      const slug = action.payload.slug;
+      const date = new Date(action.payload.date);
+      const key = `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
+      var arr = [...posts[key]];
+      arr = arr.filter((x) => x.slug != slug);
+      posts[key] = arr;
+      state.posts = posts;
+      state.status = 'succeeded';
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchPosts.pending, (state, action) => {
       state.status = 'pending';
@@ -90,3 +102,4 @@ const postSlice = createSlice({
 });
 
 export default postSlice.reducer;
+export const { removePost } = postSlice.actions;

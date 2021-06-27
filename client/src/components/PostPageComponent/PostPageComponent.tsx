@@ -16,6 +16,9 @@ import {
   Input,
   InputAdornment,
   InputLabel,
+  Menu,
+  MenuItem,
+  Modal,
   Tooltip,
   Typography,
 } from '@material-ui/core';
@@ -26,15 +29,18 @@ import {
   Share,
   ThumbUpAlt,
   ThumbUpAltOutlined,
+  Warning,
 } from '@material-ui/icons';
 import { Post, User } from '../../interface/Schemas';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { fetchPost, likePost } from '../../api';
+import { deletePost, fetchPost, likePost } from '../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
 import CommentComponent from '../CommentComponent/CommentComponent';
+import DeleteModal from '../DeleteModal/DeleteModal';
 import Image from './../../static/placeholder.png';
+import { removePost } from '../Redux/postSlice';
 
 interface ID {
   id: string;
@@ -59,6 +65,8 @@ const PostPageComponent: React.FC = () => {
   const slug = useParams<ID>().id;
   const dispatch = useDispatch();
   const [mappedComponent, setMappedComponent] = useState<ReactNode>();
+  const [anchor, setAnchor] = useState<null | HTMLElement>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<boolean>(false);
   const [state, setState] = useState<State>({
     liked: false,
     mediaType: null,
@@ -71,12 +79,10 @@ const PostPageComponent: React.FC = () => {
 
   // sets the like button to be checked or not
   useEffect(() => {
-    console.log(slug);
     fetchPost({ slug: slug }).then((data) => {
       const temp = data as Post;
       setPost(temp);
 
-      console.log(temp);
       if (temp.comments) {
         setMappedComponent(
           temp.comments.map((comm) => {
@@ -93,11 +99,9 @@ const PostPageComponent: React.FC = () => {
         }
       }
     });
-    // console.log(post.likedUsers);
   }, [user]);
 
   const history = useHistory();
-  // console.log(post);
 
   const handleLike = () => {
     const token = localStorage.getItem('token');
@@ -109,8 +113,32 @@ const PostPageComponent: React.FC = () => {
     }
   };
 
+  const handleDeleteRequest = () => {
+    setDeleteConfirm(true);
+    setAnchor(null);
+  };
+
+  const handleDelete = () => {
+    const token = localStorage.getItem('token');
+    if (token && post) {
+      deletePost({ token: token, slug: slug }).then((data) => {
+        // TODO: UPDATE REDUX STORE
+        removePost({ slug: post.slug, date: post.createdAt });
+        setDeleteConfirm(false);
+        history.push('/home');
+      });
+    }
+  };
+
   return (
+    // TODO: Abstract out into a
     <div className="PostPageComponent" data-testid="PostPageComponent">
+      <DeleteModal
+        slug={slug}
+        setDeleteConfirm={setDeleteConfirm}
+        deleteConfirm={deleteConfirm}
+        post={post}
+      />
       {post && (
         <Grid container spacing={1} justify="center" alignItems="center">
           <Grid item xs={10} sm={8} md={6} lg={4}>
@@ -130,11 +158,28 @@ const PostPageComponent: React.FC = () => {
                   </Tooltip>
                 }
                 action={
-                  <Tooltip title="Actions">
-                    <IconButton aria-label="">
-                      <MoreVertIcon />
-                    </IconButton>
-                  </Tooltip>
+                  <div>
+                    <Tooltip title="Actions">
+                      <IconButton
+                        aria-label=""
+                        onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                          setAnchor(e.currentTarget)
+                        }
+                      >
+                        <MoreVertIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Menu
+                      anchorEl={anchor}
+                      keepMounted
+                      open={Boolean(anchor)}
+                      onClose={() => setAnchor(null)}
+                    >
+                      <MenuItem onClick={handleDeleteRequest}>
+                        <Warning style={{ paddingRight: '5px' }} /> Delete Post
+                      </MenuItem>
+                    </Menu>
+                  </div>
                 }
                 title={post.username}
                 subheader={post.id}
@@ -165,11 +210,11 @@ const PostPageComponent: React.FC = () => {
                     <ChatBubble></ChatBubble>
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Share">
-                  <IconButton disabled>
-                    <Share />
-                  </IconButton>
-                </Tooltip>
+                {/* <Tooltip title="Share"> */}
+                <IconButton disabled>
+                  <Share />
+                </IconButton>
+                {/* </Tooltip> */}
                 <Tooltip title="Beta Info">
                   <IconButton>
                     <Info />

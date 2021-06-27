@@ -33,6 +33,7 @@ export interface Post {
   slug: string;
   tag: object;
   comments: Comment[];
+  createdAt: Date;
 }
 
 export interface Comment {

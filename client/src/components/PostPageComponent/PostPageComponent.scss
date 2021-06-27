@@ -11,3 +11,19 @@
 img {
   user-select: none;
 }
+
+.modal {
+  display: flex;
+  place-items: center;
+  justify-content: center;
+}
+
+.modalCard {
+  padding: 50px;
+}
+
+.modalActions {
+  padding-top: 15px;
+  display: flex;
+  justify-content: center;
+}
