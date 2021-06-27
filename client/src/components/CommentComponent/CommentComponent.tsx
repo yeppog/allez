@@ -25,6 +25,7 @@ const CommentComponent: React.FC<CommentProps> = ({ props }) => {
   const history = useHistory();
   const date = new Date(props.createdAt);
   const diff = Date.now() - date.getTime();
+  // console.log(date);
   return (
     <div className="CommentComponent" data-testid="CommentComponent">
       <Divider />

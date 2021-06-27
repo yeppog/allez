@@ -1,4 +1,4 @@
-import { Post, User } from './interface/Schemas';
+import { Comment, Post, User } from './interface/Schemas';
 
 import axios from 'axios';
 
@@ -39,6 +39,19 @@ export async function likePost(headers: { slug: string; token: string }) {
     axios
       .get('/api/posts/like', { headers: headers })
       .then((data) => resolve(data.data as Post))
+      .catch((err) => reject(err));
+  });
+}
+
+export async function addComment(token: string, slug: string, comment: string) {
+  return new Promise<Comment>((resolve, reject) => {
+    axios
+      .post('/api/posts/addCommentToPost', {
+        token: token,
+        slug: slug,
+        body: comment,
+      })
+      .then((data) => resolve(data.data))
       .catch((err) => reject(err));
   });
 }

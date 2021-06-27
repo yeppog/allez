@@ -27,9 +27,9 @@ import {
   ThumbUpAlt,
   ThumbUpAltOutlined,
 } from '@material-ui/icons';
-import { Post, User } from '../../interface/Schemas';
+import { Comment, Post, User } from '../../interface/Schemas';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { fetchPost, likePost } from '../../api';
+import { addComment, fetchPost, likePost } from '../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
@@ -42,6 +42,7 @@ interface ID {
 interface State {
   liked: boolean;
   mediaType: 'image' | 'video' | null;
+  comment: string;
 }
 
 function getMediaType(post: Post): 'video' | 'image' {
@@ -62,6 +63,7 @@ const PostPageComponent: React.FC = () => {
   const [state, setState] = useState<State>({
     liked: false,
     mediaType: null,
+    comment: '',
   });
   const [post, setPost] = useState<Post>();
 
@@ -76,7 +78,6 @@ const PostPageComponent: React.FC = () => {
       const temp = data as Post;
       setPost(temp);
 
-      console.log(temp);
       if (temp.comments) {
         setMappedComponent(
           temp.comments.map((comm) => {
@@ -106,6 +107,22 @@ const PostPageComponent: React.FC = () => {
         const temp = data as Post;
         setPost(temp);
       });
+    }
+  };
+
+  const handleSubmit = () => {
+    const token = localStorage.getItem('token');
+    if (token && /\S/.test(state.comment)) {
+      addComment(token, slug, state.comment)
+        .then((data) => {
+          console.log(data);
+          setState({
+            ...state,
+            comment: '',
+          });
+          window.location.reload();
+        })
+        .catch((err) => console.log(err));
     }
   };
 
@@ -188,9 +205,13 @@ const PostPageComponent: React.FC = () => {
                     className="password"
                     type="text"
                     id="add-comment"
+                    value={state.comment}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setState({ ...state, comment: event.target.value });
+                    }}
                     endAdornment={
                       <InputAdornment position="end">
-                        <Button>Post</Button>
+                        <Button onClick={handleSubmit}>Post</Button>
                       </InputAdornment>
                     }
                   />
