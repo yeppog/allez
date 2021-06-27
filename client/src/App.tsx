@@ -55,6 +55,15 @@ function App() {
       button: {
         textTransform: 'none',
       },
+      h6: {
+        fontSize: 14,
+      },
+      caption: {
+        fontSize: 13,
+      },
+      subtitle1: {
+        fontSize: 10,
+      },
     },
     overrides: {
       MuiInputBase: {

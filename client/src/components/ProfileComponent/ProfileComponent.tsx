@@ -18,6 +18,7 @@ import { useHistory, useParams } from 'react-router';
 import Image from './../../static/404.png';
 import SettingsIcon from '@material-ui/icons/Settings';
 import axios from 'axios';
+import { formatNumber } from '../../formatNumber';
 
 interface ID {
   id: string;
@@ -88,20 +89,6 @@ const ProfileComponent: React.FC = (props) => {
     following: false,
     error: false,
   });
-
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) {
-      return (num / 100000) % 10 == 0
-        ? (num / 1000000).toFixed().toString() + 'm'
-        : (num / 1000000).toFixed(1).toString() + 'm';
-    } else if (num >= 1000) {
-      return (num / 100) % 10 == 0
-        ? (num / 1000).toFixed().toString() + 'k'
-        : (num / 1000).toFixed(1).toString() + 'k';
-    } else {
-      return num.toString();
-    }
-  };
 
   const handleFollowButton = () => {
     if (state.following) {
