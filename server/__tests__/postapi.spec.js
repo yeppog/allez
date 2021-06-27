@@ -112,7 +112,7 @@ describe("Test delete post", () => {
       .then(async (data) => {
         const token = jwt.sign({ id: data._id }, process.env.JWT_SECRET);
         await request
-          .post("/api/posts/deletePost")
+          .post("/api/posts/delete")
           .send({
             token: token,
             slug: "testpostslug",
@@ -173,7 +173,7 @@ describe("Test delete post", () => {
       .then(async (data) => {
         const token = jwt.sign({ id: data._id }, process.env.JWT_SECRET);
         await request
-          .post("/api/posts/deletePost")
+          .post("/api/posts/delete")
           .send({
             token: token,
             slug: "newslugg",
@@ -194,7 +194,7 @@ describe("Test delete post", () => {
           process.env.JWT_SECRET
         );
         await request
-          .post("/api/posts/deletePost")
+          .post("/api/posts/delete")
           .send({
             token: token,
             slug: "newslug",

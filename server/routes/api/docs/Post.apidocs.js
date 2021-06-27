@@ -15,38 +15,6 @@
  *       "200":
  *         description: "Success"
  *
- * /api/posts/addComment:
- *   post:
- *     description: Adds a comment to a specified post.
- *     tags: [Posts]
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/AddComment'
- *     responses:
- *       "200":
- *         description: "Success"
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/CommentSuccess'
- *       "400":
- *         description: "Bad request"
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/MissingBodyError'
- *       "403":
- *         description: "Unauthorised"
- *         content:
- *           application/json:
- *             schema:
- *               oneOf:
- *                 - $ref: '#/components/schemas/JWTTokenError'
- *                 - $ref: '#/components/schemas/PostFindError'
- *       default:
- *         description: "General error."
  *
  *
  *
@@ -155,7 +123,7 @@
  *          description: "Bad request. Did not have the neccessary fields"
  *
  *
- * /api/posts/deletePost:
+ * /api/posts/delete:
  *    post:
  *      description: Deletes a specific post and removes the related media.
  *      tags: [Posts]
@@ -163,7 +131,7 @@
  *        content:
  *          multipart/form-data:
  *            schema:
- *              - $ref: "#/components/schemas/DeletePost"
+ *              $ref: "#/components/schemas/DeletePost"
  *      responses:
  *        "200":
  *          description: "Success. Returns the user data without the deleted post."
@@ -182,19 +150,23 @@
  *        content:
  *          application/json:
  *            schema:
- *              - $ref: "#/components/schemas/addCommentToComment"
+ *              $ref: "#/components/schemas/AddCommentToComment"
  *
  *      responses:
  *        "200":
- *          description: "Success. Added teh comment to the comment. Returns the updated comment."
+ *          description: "Success. Added the comment to the comment. Returns the updated comment."
  *          content:
  *            application/json:
  *              schema:
- *                - $ref: "#/components/schemas/AddCommentToCommentSuccess"
+ *                $ref: "#/components/schemas/AddCommentToCommentSuccess"
  *        "400":
  *          description: "Bad request. Missing fields."
  *        "403":
  *          description: "Bad JWT Token."
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: "#/components/schemas/JWTTokenError"
  *
  *
  * /api/posts/addCommentToPost:
@@ -202,14 +174,34 @@
  *      description: "Adds a comment to a post."
  *      tags: [Posts]
  *      requestBody:
- *        application/json:
- *          schema:
- *            - $ref: "#/components/schemas/AddCommentToPost"
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/AddCommentToPost'
+ *
  *      responses:
  *        "200":
- *          description: "Success."
+ *          description: "Success"
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/CommentSuccess'
  *        "400":
- *          description: "Bad request. Missing token."
+ *          description: "Bad request"
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/MissingBodyError'
+ *        "403":
+ *          description: "Unauthorised"
+ *          content:
+ *            application/json:
+ *              schema:
+ *                oneOf:
+ *                  - $ref: '#/components/schemas/JWTTokenError'
+ *                  - $ref: '#/components/schemas/PostFindError'
+ *        default:
+ *          description: "General error."
  *
  * /api/posts/fetchFollowPosts:
  *    post:
@@ -309,7 +301,7 @@
  *          file: "The file uploaded"
  *
  *
- *      AddComment:
+ *      AddCommentToPost:
  *        type: object
  *        required:
  *          - token
@@ -326,6 +318,27 @@
  *          token: "e9ri24fh23908f23f"
  *          comment: "This is a comment."
  *          slug: "e49fu23094fn23890fj3290fj"
+ *      AddCommentToComment:
+ *        type: object
+ *        required:
+ *          - token
+ *          - comment
+ *          - body
+ *        properties:
+ *          token:
+ *            type: string
+ *            description: The token of the user
+ *          comment:
+ *            type: string
+ *            description: The comment ID of the comment to add to.
+ *          body:
+ *            description: The content of the comment.
+ *            type: string
+ *        example:
+ *          token: "e9ri24fh23908f23f"
+ *          body: "This is a comment."
+ *          comment: "e4rt234giu3gf908u3bge49fu23094fn23890fj3290fj"
+ *
  *      DeleteComment:
  *        type: object
  *        required:
@@ -428,6 +441,36 @@
  *            description: The description of the error. Unable to find the post from the slug.
  *        example:
  *          message: "Unable to find post"
+ *      AddCommentToCommentSuccess:
+ *        type: object
+ *        properties:
+ *          comments:
+ *            type: array
+ *            description: The comments the post has
+ *          createdAt:
+ *            type: string
+ *            description: The date the post was made
+ *          _id:
+ *            type: string
+ *            description: The post ID.
+ *          user:
+ *            type: string
+ *            description: The object ID of the user who made the post.
+ *          body:
+ *            type: string
+ *            description: The body of the post
+ *          avatarPath:
+ *            type: string
+ *            description: The URL of the user avatar of the user that made the post.
+ *        example:
+ *          comments: ["60d899d9c704025a3c2222d9"]
+ *          createdAt: "2021-06-12T11:47:15.208Z"
+ *          _id: "d082hf823hf23f32f"
+ *          user: "409fh304fn23od32df23"
+ *          username: "username"
+ *          body: "This is the post body"
+ *          avatarPath: "http://test.com/api/avatar/avatar_of_username.png"
+ *          slug: "0t94h034hgf0349hgpostslug"
  *
  *
  *
