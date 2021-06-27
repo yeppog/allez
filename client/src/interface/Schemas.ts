@@ -37,6 +37,7 @@ export interface Post {
 }
 
 export interface Comment {
+  _id: string;
   comments: Comment[];
   body: string;
   edited: boolean;
