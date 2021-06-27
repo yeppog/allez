@@ -471,10 +471,10 @@ async function addCommentToComment(req, res) {
  */
 // TODO: Change this to delete by ID
 async function deleteComment(req, res) {
-  if (!req.body.token || !req.body.slug || !req.body.date) {
+  if (!req.body.token || !req.body.slug || !req.body.id) {
     res.status(400).json({
       message:
-        "Bad request. User token and body slug and comment timestamp must be present.",
+        "Bad request. User token and body slug and comment id must be present.",
     });
   } else {
     post
@@ -486,11 +486,7 @@ async function deleteComment(req, res) {
             .then((user) => {
               var comments = post.comments;
               // filters out the comment by the user and the timestamp of the comment to filter out
-              comments = comments.filter(
-                (item) =>
-                  item.date.toISOString() != req.body.date &&
-                  item.user == user.username
-              );
+              comments = comments.filter((item) => item != req.body.id);
               post.comments = comments;
               post
                 .save()
