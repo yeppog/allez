@@ -1,5 +1,6 @@
 import './TopNavComponent.scss';
 
+import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import {
   Avatar,
   Button,
@@ -15,7 +16,6 @@ import { logoutUser, toggleDarkMode } from './../Redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { AppBar } from '@material-ui/core';
-import { Autocomplete } from '@material-ui/lab';
 import EventEmitter from 'events';
 import IconButton from '@material-ui/core/IconButton';
 import { NavLink } from 'react-router-dom';
@@ -25,6 +25,11 @@ import { useHistory } from 'react-router';
 
 const TopNavComponent: React.FC = () => {
   const dispatch = useDispatch();
+
+  const filterOptions = createFilterOptions({
+    limit: 5,
+    stringify: (option: { username: string; name: string }) => option.username,
+  });
 
   const history = useHistory();
 
@@ -84,12 +89,12 @@ const TopNavComponent: React.FC = () => {
             className="desktopNav"
           >
             <Autocomplete
-              freeSolo
               style={{ width: '70%' }}
-              options={users}
-              value={search}
-              loading={true}
+              options={users.filter((x) => search.length > 1)}
+              filterOptions={filterOptions}
               getOptionLabel={(option) => option.username}
+              clearOnBlur
+              autoHighlight
               renderInput={(params) => (
                 // <Input {...params.inputProps} />
                 <TextField
@@ -104,11 +109,11 @@ const TopNavComponent: React.FC = () => {
                     if (KeyboardEvent.key == 'Enter') {
                       history.push(`/profile/${search}`);
                     }
+                    setSearch('');
                   }}
                 />
               )}
               renderOption={(option) => {
-                console.log(option);
                 return (
                   <Grid
                     container
