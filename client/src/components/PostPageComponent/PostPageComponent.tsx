@@ -31,9 +31,9 @@ import {
   ThumbUpAltOutlined,
   Warning,
 } from '@material-ui/icons';
-import { Post, User } from '../../interface/Schemas';
+import { Comment, Post, User } from '../../interface/Schemas';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { deletePost, fetchPost, likePost } from '../../api';
+import { addComment, deletePost, fetchPost, likePost } from '../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
@@ -48,6 +48,7 @@ interface ID {
 interface State {
   liked: boolean;
   mediaType: 'image' | 'video' | null;
+  comment: string;
 }
 
 function getMediaType(post: Post): 'video' | 'image' {
@@ -70,6 +71,7 @@ const PostPageComponent: React.FC = () => {
   const [state, setState] = useState<State>({
     liked: false,
     mediaType: null,
+    comment: '',
   });
   const [post, setPost] = useState<Post>();
 
@@ -79,27 +81,34 @@ const PostPageComponent: React.FC = () => {
 
   // sets the like button to be checked or not
   useEffect(() => {
-    fetchPost({ slug: slug }).then((data) => {
-      const temp = data as Post;
-      setPost(temp);
-
-      if (temp.comments) {
-        setMappedComponent(
-          temp.comments.map((comm) => {
-            return <CommentComponent props={comm}></CommentComponent>;
-          })
-        );
-      }
-
-      if (temp.likedUsers && user) {
-        if (user.username in temp.likedUsers) {
-          setState({ ...state, liked: true, mediaType: getMediaType(temp) });
-        } else {
-          setState({ ...state, liked: false, mediaType: getMediaType(temp) });
+    if (!post) {
+      fetchPost({ slug: slug }).then((data) => {
+        const temp = data as Post;
+        setPost(temp);
+        if (temp.likedUsers && user) {
+          if (user.username in temp.likedUsers) {
+            setState({ ...state, liked: true, mediaType: getMediaType(temp) });
+          } else {
+            setState({ ...state, liked: false, mediaType: getMediaType(temp) });
+          }
         }
-      }
-    });
-  }, [user]);
+      });
+    } else {
+      setMappedComponent(
+        post.comments.map((comm, index) => {
+          return (
+            <CommentComponent
+              key={index}
+              comment={comm}
+              slug={post.slug}
+              post={post}
+              setPost={setPost}
+            ></CommentComponent>
+          );
+        })
+      );
+    }
+  }, [user, post]);
 
   const history = useHistory();
 
@@ -129,6 +138,22 @@ const PostPageComponent: React.FC = () => {
       });
     }
   };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    if (token && /\S/.test(state.comment)) {
+      addComment({ token: token, slug: slug, body: state.comment })
+        .then((data) => {
+          const oldPost = post as Post;
+          setPost({ ...oldPost, comments: [...oldPost.comments, data] });
+          setState({
+            ...state,
+            comment: '',
+          });
+        })
+        .catch((err) => console.log(err));
+    }
+  };
 
   return (
     // TODO: Abstract out into a
@@ -138,6 +163,7 @@ const PostPageComponent: React.FC = () => {
         setDeleteConfirm={setDeleteConfirm}
         deleteConfirm={deleteConfirm}
         post={post}
+        type="post"
       />
       {post && (
         <Grid container spacing={1} justify="center" alignItems="center">
@@ -227,18 +253,26 @@ const PostPageComponent: React.FC = () => {
               <Divider />
               <CardContent>
                 <FormControl fullWidth>
-                  <InputLabel className="comment">Add Comment</InputLabel>
-                  <Input
-                    fullWidth
-                    className="password"
-                    type="text"
-                    id="add-comment"
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <Button>Post</Button>
-                      </InputAdornment>
-                    }
-                  />
+                  <form onSubmit={handleSubmit}>
+                    <InputLabel className="comment">Add Comment</InputLabel>
+                    <Input
+                      fullWidth
+                      className="password"
+                      type="text"
+                      id="add-comment"
+                      value={state.comment}
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>
+                      ) => {
+                        setState({ ...state, comment: event.target.value });
+                      }}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <Button type="submit">Post</Button>
+                        </InputAdornment>
+                      }
+                    />
+                  </form>
                 </FormControl>
               </CardContent>
             </Card>

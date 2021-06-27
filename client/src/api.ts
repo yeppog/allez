@@ -1,4 +1,4 @@
-import { Post, User } from './interface/Schemas';
+import { Comment, Post, User } from './interface/Schemas';
 
 import axios from 'axios';
 
@@ -45,9 +45,32 @@ export async function likePost(headers: { slug: string; token: string }) {
 
 export async function deletePost(body: { token: string; slug: string }) {
   return new Promise((resolve, reject) => {
+    axios.post('/api/posts/delete', body).then((data) => resolve(data));
+  });
+}
+export async function addComment(req: {
+  token: string;
+  slug: string;
+  body: string;
+}) {
+  return new Promise<Comment>((resolve, reject) => {
     axios
-      .post('/api/posts/delete', body)
-      .then((data) => resolve(data))
+      .post('/api/posts/addCommentToPost', req)
+      .then((data) => resolve(data.data))
+      .catch((err) => reject(err));
+  });
+}
+
+export async function deleteComment(body: {
+  slug: string;
+  token: string;
+  id: string;
+}) {
+  console.log(body);
+  return new Promise<Post>((resolve, reject) => {
+    axios
+      .post('/api/posts/deleteComment', body)
+      .then((data) => resolve(data.data as Post))
       .catch((err) => reject(err));
   });
 }
