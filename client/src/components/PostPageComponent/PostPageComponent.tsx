@@ -2,6 +2,7 @@ import './PostPageComponent.scss';
 
 import {
   Avatar,
+  Button,
   Card,
   CardActions,
   CardContent,
@@ -9,8 +10,12 @@ import {
   CardMedia,
   Divider,
   Drawer,
+  FormControl,
   Grid,
   IconButton,
+  Input,
+  InputAdornment,
+  InputLabel,
   Tooltip,
   Typography,
 } from '@material-ui/core';
@@ -28,6 +33,7 @@ import { fetchPost, likePost } from '../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
+import CommentComponent from '../CommentComponent/CommentComponent';
 import Image from './../../static/placeholder.png';
 
 interface ID {
@@ -73,14 +79,8 @@ const PostPageComponent: React.FC = () => {
       console.log(temp);
       if (temp.comments) {
         setMappedComponent(
-          temp.comments.map((comment) => {
-            return (
-              <Card>
-                <CardContent>{comment.username}</CardContent>
-                <CardContent>{comment.body}</CardContent>
-                <CardContent>{comment.createdAt}</CardContent>
-              </Card>
-            );
+          temp.comments.map((comm) => {
+            return <CommentComponent props={comm}></CommentComponent>;
           })
         );
       }
@@ -179,6 +179,23 @@ const PostPageComponent: React.FC = () => {
               <Divider />
               <CardContent>Comments</CardContent>
               {mappedComponent}
+              <Divider />
+              <CardContent>
+                <FormControl fullWidth>
+                  <InputLabel className="comment">Add Comment</InputLabel>
+                  <Input
+                    fullWidth
+                    className="password"
+                    type="text"
+                    id="add-comment"
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <Button>Post</Button>
+                      </InputAdornment>
+                    }
+                  />
+                </FormControl>
+              </CardContent>
             </Card>
           </Grid>
         </Grid>
