@@ -11,7 +11,7 @@ const ImageSchema = new Schema({
     type: String,
   },
   createdAt: {
-    default: Date.now(),
+    default: Date.now,
     type: Date,
   },
   chunkIDRef: {

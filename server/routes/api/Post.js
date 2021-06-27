@@ -617,7 +617,7 @@ postRouter.get("/getpost", handleGetPost);
 postRouter.post("/deleteComment", deleteComment);
 postRouter.post("/addCommentToPost", addCommentToPost);
 postRouter.post("/addCommentToComment", addCommentToComment);
-postRouter.post("/deletePost", handleDeletePost);
+postRouter.post("/delete", handleDeletePost);
 postRouter.get("/like", handleLike);
 postRouter.post("/createpost", uploadMedia.single("file"), handleCreatePost);
 postRouter.post("/editpost", uploadMedia.single("file"), handleEditPost);

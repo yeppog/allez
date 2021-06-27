@@ -11,7 +11,7 @@ const VideoSchema = new Schema({
     type: String,
   },
   createdAt: {
-    default: Date.now(),
+    default: Date.now,
     type: Date,
   },
   chunkIDRef: {
@@ -23,4 +23,3 @@ const VideoSchema = new Schema({
 const Video = mongoose.model("Video", VideoSchema);
 
 module.exports = Video;
-
