@@ -113,7 +113,7 @@ async function handleCreatePost(req, res, next) {
               const caption = `${user.id}_${req.file.filename}`;
 
               await upload(caption, req.file.filename, req.file.id)
-                .then((data) => (filePath = data))
+                .then((data) => (post.mediaPath = data))
                 .catch((err) =>
                   res
                     .status(500)
@@ -132,7 +132,10 @@ async function handleCreatePost(req, res, next) {
                 req.file.id,
                 options
               )
-                .then((data) => (filePath = data))
+                .then((data) => {
+                  filePath = data;
+                  post.mediaPath = data;
+                })
                 .catch((err) =>
                   res
                     .status(500)
@@ -140,7 +143,6 @@ async function handleCreatePost(req, res, next) {
                 );
             }
           }
-          post.mediaPath = filePath == undefined ? "" : filePath;
 
           await crypto.randomBytes(16, (err, buff) => {
             if (err) {
