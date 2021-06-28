@@ -27,6 +27,7 @@ const ProfileSettingsComponent: React.FC = () => {
     following: [],
     followingCount: 0,
     taggedPost: {},
+    postCount: 0,
   });
   const user = useSelector(
     (state: { user: { user: User } }) => state.user.user
