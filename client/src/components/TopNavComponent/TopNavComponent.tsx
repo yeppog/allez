@@ -156,7 +156,7 @@ const TopNavComponent: React.FC = () => {
           </div>
           <Switch checked={darkMode} color="default" onChange={handleChange} />
           {loginStatus === 'succeeded' && (
-            <div>
+            <div className="navProfile">
               <IconButton
                 onClick={() => history.push(`/profile/${user.username}`)}
               >
