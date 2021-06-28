@@ -161,6 +161,9 @@ const TopNavComponent: React.FC = () => {
               >
                 <Avatar src={user.avatarPath} />
               </IconButton>
+              <Button type="button" onClick={() => history.push('/createpost')}>
+                Create Post
+              </Button>
               <Button type="button" onClick={logoutHandler}>
                 Logout
               </Button>
