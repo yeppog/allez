@@ -175,6 +175,7 @@ async function handleCreatePost(req, res, next) {
                 splitted.forEach((username) => {
                   updateUserTag(post, username, Gym);
                 });
+
                 post.tag.gym = splitted;
               }
               post
@@ -450,7 +451,6 @@ async function addCommentToComment(req, res) {
   } else {
     Comment.findById(new ObjectId(req.body.comment))
       .then((cmt) => {
-        console.log(cmt);
         try {
           const user = jwt.verify(req.body.token, process.env.JWT_SECRET);
           User.findById(new ObjectId(user.id))
@@ -545,7 +545,6 @@ async function handleLike(req, res) {
             .then((user) => {
               const postLikes = { ...post.likedUsers };
               const username = user.username;
-              console.log(post);
               if (username in postLikes) {
                 delete postLikes[username];
                 post.likes = post.likes - 1;

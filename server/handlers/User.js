@@ -13,20 +13,25 @@ const bcrypt = require("bcryptjs");
  */
 async function updateUserTag(post, username, document) {
   return new Promise((resolve, reject) => {
-    document.findOne({ username: username }).then((doc) => {
-      const tags = { ...doc.taggedPost };
-      const date = `${post.createdAt.getFullYear()}${post.createdAt.getMonth()}${post.createdAt.getDate()}`;
-      if (date in tags) {
-        tags[date] = [...tags[date], post.slug];
-      } else {
-        tags[date] = [post.slug];
-      }
-      doc.taggedPost = tags;
-      doc
-        .save()
-        .then((data) => resolve(data))
-        .catch((err) => reject(err));
-    });
+    document
+      .findOne({ username: username })
+      .then((doc) => {
+        if (doc) {
+          const tags = { ...doc.taggedPost };
+          const date = `${post.createdAt.getFullYear()}${post.createdAt.getMonth()}${post.createdAt.getDate()}`;
+          if (date in tags) {
+            tags[date] = [...tags[date], post.slug];
+          } else {
+            tags[date] = [post.slug];
+          }
+          doc.taggedPost = tags;
+          doc
+            .save()
+            .then((data) => resolve(data))
+            .catch((err) => reject(err));
+        }
+      })
+      .catch((err) => reject(err));
   });
 }
 
@@ -133,11 +138,8 @@ async function fetchAllUsers(document) {
 async function fetchPostFromArr(posts) {
   return new Promise(async (resolve, reject) => {
     for (const [key, value] of Object.entries(posts)) {
-      console.log(key);
-      console.log(value);
       if (Array.isArray(value)) {
         const promises = value.map(async (id) => {
-          console.log(id);
           return await Post.findById(new ObjectId(id))
             .then((post) => post)
             .catch((err) => reject(err));
@@ -156,11 +158,8 @@ async function fetchPostFromArr(posts) {
 async function fetchPostFromTagArr(posts) {
   return new Promise(async (resolve, reject) => {
     for (const [key, value] of Object.entries(posts)) {
-      console.log(key);
-      console.log(value);
       if (Array.isArray(value)) {
         const promises = value.map(async (id) => {
-          console.log(id);
           return await Post.findOne({ slug: id })
             .then((post) => post)
             .catch((err) => reject(err));
