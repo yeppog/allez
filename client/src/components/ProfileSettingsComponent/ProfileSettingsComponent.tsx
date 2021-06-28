@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 
 import { User } from '../../interface/Schemas';
 import axios from 'axios';
+import { useHistory } from 'react-router';
 import { useSelector } from 'react-redux';
 
 const ProfileSettingsComponent: React.FC = () => {
@@ -37,7 +38,7 @@ const ProfileSettingsComponent: React.FC = () => {
       setState(user);
     }
   }, [user]);
-
+  const history = useHistory();
   const handleChange =
     (prop: keyof User) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setState({ ...state, [prop]: event.target.value });
@@ -87,8 +88,10 @@ const ProfileSettingsComponent: React.FC = () => {
     axios
       .post('/api/users/updateProfile', formData)
       .then((data) => {
+        console.log('test');
         setState(data.data);
         setAvatar(null);
+        history.goBack();
       })
       .catch((err) => {
         // TODO: Handle user errors

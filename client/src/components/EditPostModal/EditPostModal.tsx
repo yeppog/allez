@@ -109,7 +109,7 @@ const EditPostModal: React.FC<Props> = ({ post, editModal, setEditModal }) => {
   };
 
   return (
-    <div className="EditPostComponent" data-testid="EditPostComponent">
+    <div className="EditPostComponent" data-testid="EditPostModal">
       <Modal
         className="modal"
         open={editModal}
