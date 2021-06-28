@@ -91,8 +91,7 @@ const TopNavComponent: React.FC = () => {
                 options={users.filter((x) => search.length > 1)}
                 filterOptions={filterOptions}
                 getOptionLabel={(option) => option.username}
-                clearOnBlur
-                autoHighlight
+                // autoHighlight
                 renderInput={(params) => (
                   // <Input {...params.inputProps} />
                   <TextField
