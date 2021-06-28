@@ -14,6 +14,8 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URI || '';
 interface UsersState {
   user: User;
   search: { [key: string]: any }[];
+  users: { [key: string]: any }[];
+  gym: { [key: string]: any }[];
   routes: { [key: string]: any }[];
   status: 'idle' | 'pending' | 'succeeded' | 'failed';
   loginStatus: 'idle' | 'succeeded' | 'failed';
@@ -24,6 +26,8 @@ interface UsersState {
 const initialState = {
   user: {} as User,
   search: [],
+  gym: [],
+  users: [],
   routes: [],
   loginStatus: 'idle',
   status: 'idle',
@@ -139,12 +143,14 @@ const userSlice = createSlice({
     builder.addCase(fetchGyms.fulfilled, (state, action) => {
       state.status = 'succeeded';
       state.search = [...state.search, ...action.payload];
+      state.gym = [...state.gym, ...action.payload];
     });
     builder.addCase(fetchGyms.rejected, (state, action) => {
       state.status = 'failed';
     });
     builder.addCase(fetchUsers.fulfilled, (state, action) => {
       state.status = 'succeeded';
+      state.users = [...state.users, ...action.payload];
       state.search = [...state.search, ...action.payload];
     });
     builder.addCase(fetchRoutes.fulfilled, (state, action) => {
