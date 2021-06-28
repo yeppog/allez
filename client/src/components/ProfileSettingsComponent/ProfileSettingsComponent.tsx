@@ -8,11 +8,12 @@ import {
   InputLabel,
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { User } from '../../interface/Schemas';
 import axios from 'axios';
+import { updateUser } from '../Redux/userSlice';
 import { useHistory } from 'react-router';
-import { useSelector } from 'react-redux';
 
 const ProfileSettingsComponent: React.FC = () => {
   const [avatar, setAvatar] = useState<File | null>();
@@ -43,6 +44,7 @@ const ProfileSettingsComponent: React.FC = () => {
     (prop: keyof User) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setState({ ...state, [prop]: event.target.value });
     };
+  const dispatch = useDispatch();
 
   const handleEditPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.files);
@@ -88,9 +90,10 @@ const ProfileSettingsComponent: React.FC = () => {
     axios
       .post('/api/users/updateProfile', formData)
       .then((data) => {
-        console.log('test');
+        console.log(data.data);
         setState(data.data);
         setAvatar(null);
+        dispatch(updateUser(data.data as User));
         history.goBack();
       })
       .catch((err) => {
