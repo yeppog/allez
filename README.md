@@ -1,4 +1,5 @@
 # Allez - Orbital 2021
+
 [![CircleCI](https://circleci.com/gh/yeppog/allez.svg?style=shield&circle-token=0a05dd5ab7ba277eb1270303c3ed9d3d01d085f2)](https://circleci.com/gh/yeppog/allez/tree/master)
 [![codecov](https://codecov.io/gh/yeppog/allez/branch/master/graph/badge.svg?token=XDZE7C6VCM)](https://codecov.io/gh/yeppog/allez)
 
@@ -11,7 +12,6 @@ Imagine you&#39;re stuck on a route while climbing and you are not sure how to p
 There are indeed many climbing Instagram pages online that have climbers post videos of them climbing the route and they may have the beta that you are looking for, but it is messy, unorganised, and often hard to find especially if you don&#39;t follow these pages. To solve this, **Allez** eliminates the hassle of looking through Instagram tirelessly, through building a social media beta-sharing platform solely for the purpose of rock climbing sharing.
 
 ![](static/betamonkeys107.png)
-
 
 ## Aim
 
@@ -57,54 +57,64 @@ Backend: <https://allez-orbital.herokuapp.com/>
 **Features:**
 
 1. **Account Registration and Log in**
-    - Users can register their account with their details and log in to the website
+
+   - Users can register their account with their details and log in to the website
 
 2. **Homepage Feed of following posts**
-  - Feed of posts of climbers or gyms that the user follows which will constantly be updated when someone followed posted a new post    
+
+- Feed of posts of climbers or gyms that the user follows which will constantly be updated when someone followed posted a new post
 
 3. **Posting of Video or Photos**
-    - Users can share videos or photos of them attempting and completing climbing routes
+
+   - Users can share videos or photos of them attempting and completing climbing routes
 
 4. **Post-editing and Deletion**
-    - Users can edit and delete posts that the user have created.
+
+   - Users can edit and delete posts that the user have created.
 
 5. **Profile editing**
-    - Users can edit key information on the user's profile such as their profile picture, bio, username and password
+
+   - Users can edit key information on the user's profile such as their profile picture, bio, username and password
 
 6. **Searching for Users, Gyms, Routes**
-    - Users can find User and Gym pages, and browse routes based on tags
-    - Users can view posts of other users and posts that are tagged to a gym
-
+   - Users can find User and Gym pages, and browse routes based on tags
+   - Users can view posts of other users and posts that are tagged to a gym
 
 **To be completed by Milestone 3:**
 
 **Features**
 
 1. **Machine learning to identify route holds for easier route creation**
-  - Use of machine learning for climbing holds recognisation and segmentation
-  - Use of segemented image for users to select holds that are included in their route
+
+- Use of machine learning for climbing holds recognisation and segmentation
+- Use of segemented image for users to select holds that are included in their route
 
 2. **Route tagging**
-  - Ability for users to browse through route and videos tagged to the routes
 
+- Ability for users to browse through route and videos tagged to the routes
 
 **Optimisation**
 
 1. **Cleaning up of Backend**
-  - Refactoring to Typescript for addition type safety
-  - Error Catching to handle erroneous inputs
-  - Abstracting duplicate functions
+
+- Refactoring to Typescript for addition type safety
+- Error Catching to handle erroneous inputs
+- Abstracting duplicate functions
 
 2. **Optimise file size to be held on server**
-  - Compression of media uploaded to reduce space on server
+
+- Compression of media uploaded to reduce space on server
 
 **Testing**
 
 1. **Frontend Testing**
-  - Unit testing for conditional rendering and error handling
-  - Testing mock inputs and expected outputs
+
+- Unit testing for conditional rendering and error handling
+- Testing mock inputs and expected outputs
+
 2. **Backend Testing**
-  - Addtion of more tests to increase code coverage
+
+- Addtion of more tests to increase code coverage
 
 **Timeline**
 
@@ -112,13 +122,13 @@ Backend: <https://allez-orbital.herokuapp.com/>
 
 ## **Software Engineering Practises**
 
-**Project Management with Notion**
+### Project Management with Notion
 
 Notion is used as it as our one stop location for any information related to the project besides that it also helps us see the work we have currently to do and allocate it to various people to be completed.
 
 ![](static/Notion.png)
 
-**Version Control with Git**
+### Version Control with Git
 
 Git is used as the version control of choice with Github as the hosting site.
 
@@ -128,16 +138,51 @@ In addition to committing our changes to github we also use the github issues pa
 
 ![](static/Github2.png)
 
+### Usage of CI to Test Code
+
+Our project also uses `Jest` together with `CircleCI` to run code on every push to Github to ensure that the code pushed passes unit testing that is written. As of now, only the backend is covered by unit tests. The CI tests can be seen below:
+
+![](static/circleci.jpeg)
+
+The tests are run and the coverage report by Jest is automatically uploaded to `CodeCov`
+
+![](static/circleresults.jpeg)
+
+![](static/codecov.jpeg)
+
+Codecov helps us keep track of the project's test coverage and let's us know when we need to add more tests. Currently the coverage is low and we aim to increase the coverage by Milestone 3.
+
+### Usage of Deployment Tools
+
+We currently use `Heroku` and `Netlify` to host our code, and `Vercel` to deploy per push as Vercel has unlimited deployments. Vercel allows us to test our compiled code every `push` online.
+
+## Design
+
+This section will cover the design of the app in brief detail.
+
+### Backend
+
+The backend is run using `Node.js`, `Express.js` and `MongoDB`. We store schemas for the following objects:
+
+1. User
+2. Gym
+3. Images
+4. Post
+5. Route
+6. User
+7. Video
+
+Each of these schemas have their own document shape that the object will conform to, which allows us to query the data.
+
+For Image and Video uploads, we use `GridFS` with `multer` as a storage engine, to split the files up into chunks on `MongoDB`, then stream it.
+
 ## Class Diagram
 
 ![](static/ObjectDiagram.png)
 
-
 ## Activity Diagram
 
 ![](static/ActivityDiagram.jpg)
-
-
 
 ## Getting Started
 
