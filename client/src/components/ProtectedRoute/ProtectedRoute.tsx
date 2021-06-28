@@ -38,7 +38,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }, [axios, loggedIn]);
   // }
   return (
-    <div>
+    <div data-testid="ProtectedRoute">
       {loggedIn === true && <Route {...routerProps} />}
       {loggedIn === false && <Redirect to="/login" />}
       {loggedIn === null && <div></div>}
