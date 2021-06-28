@@ -29,7 +29,7 @@ We hope to be able to categorise routes and betas efficiently such that users ar
 
 ## Features and Timeline
 
-A **web-based social media site** which provides a place for climbers to share their betas (solutions) to climbing problems for climbers to see and learn.
+We aim to create a **web-based social media site** which provides a place for climbers to share their betas (solutions) to climbing problems for climbers to see and learn.
 
 This acts as a customised and targeted social media platform that climbers can use to quickly search up solutions and share their own personal solutions.
 
@@ -44,61 +44,89 @@ Users will be able look through posts sorted by the routes that they are interes
 Example of how a wall might be segmented to allow users to select their routes.
 Source: Stōkt https://www.getstokt.com/
 
+## Deployment
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/1b060d01-2db2-4025-8133-3eeee2982701/deploy-status)](https://app.netlify.com/sites/allez-orbital/deploys)
 
-To be completed by the mid of June:
+The project can be accessed from the following links
+
+Frontend: <https://allez-orbital.netlify.app/>
+
+Backend: <https://allez-orbital.herokuapp.com/>
 
 **Features:**
 
-1. **Posting of Video or Photos**
-    - Ability to share videos or photos of them attempting and completing climbing routes
+1. **Account Registration and Log in**
+    - Users can register their account with their details and log in to the website
+
 2. **Homepage Feed of following posts**
-    - Feed of posts of climbers or gyms that the user follows which will constantly be updated when someone followed posted a new post
-3. **Post-editing and Deletion**
-    - Ability to edit and delete posts that the user have created.
-4. **Profile editing**
-    - Ability to edit key information on the user's profile such as their profile picture, bio, username and password
-    - Ability to arrange post seen by others users on their profile
-5. **Searching for Users, Gyms, Routes**
-    - Ability to find User and Gym pages, and browse routes based on tags
-    - Ability to view posts of other users and posts that are tagged to a gym
+  - Feed of posts of climbers or gyms that the user follows which will constantly be updated when someone followed posted a new post    
 
-**Documentation:**
+3. **Posting of Video or Photos**
+    - Users can share videos or photos of them attempting and completing climbing routes
 
-1. **API Routes**
-    - Using SwaggerUI and OpenAPI to document API routes
-    - API Documentation to be accessible at root of server domain
-    - API Documentation to include response and request schemas and endpoints
-2. **JS Docs for functions**
-    - Documentation to be included for the implementer to know the purpose of the function, and what parameters each function take
-    - To be done in both client and server respectively
-3. **User Documentation**
-    - Documentation on how to use the system will be included
-4. **Developer Documentation**
-    - API documentation from point (1)
-    - Update class diagrams (to account for new fields and classes)
-    - Add activity diagram
-5. **Readme**
-    - Clarify meanings of climbing related jargon
-    - Update user stories to make the usage of the application clearer
-    - Update timeline to reflect current progress
+4. **Post-editing and Deletion**
+    - Users can edit and delete posts that the user have created.
 
-**Testing:**
+5. **Profile editing**
+    - Users can edit key information on the user's profile such as their profile picture, bio, username and password
 
-1. CircleCI integration with Jest
-    - Automated testing on push to Github to run jest test files
-    - Test both frontend (React) and backend (Node Express Mongo) code
-2. Codecov Integration
-    - Code coverage report to be generated to check for the coverage of test files
-    - Used as a gauge of test effectiveness
-    ****
+6. **Searching for Users, Gyms, Routes**
+    - Users can find User and Gym pages, and browse routes based on tags
+    - Users can view posts of other users and posts that are tagged to a gym
 
-To be completed by the mid of July:
 
-1. Implementation of video uploads (optimisation, compression)
-2. Social network to be implement (user relations, followers, etc)
-3. Frontend main features to be completed (posting, liking, commenting, submission of routes, tags)
-4. Shape detection algorithm to identify route holds for easier route creation.
+**To be completed by Milestone 3:**
+
+**Features**
+
+1. **Machine learning to identify route holds for easier route creation**
+  - Use of machine learning for climbing holds recognisation and segmentation
+  - Use of segemented image for users to select holds that are included in their route
+
+2. **Route tagging**
+  - Ability for users to browse through route and videos tagged to the routes
+
+
+**Optimisation**
+
+1. **Cleaning up of Backend**
+  - Refactoring to Typescript for addition type safety
+  - Error Catching to handle erroneous inputs
+  - Abstracting duplicate functions
+
+2. **Optimise file size to be held on server**
+  - Compression of media uploaded to reduce space on server
+
+**Testing**
+
+1. **Frontend Testing**
+  - Unit testing for conditional rendering and error handling
+  - Testing mock inputs and expected outputs
+2. **Backend Testing**
+  - Addtion of more tests to increase code coverage
+
+**Timeline**
+
+![](static/Timeline.png)
+
+## **Software Engineering Practises**
+
+**Project Management with Notion**
+
+Notion is used as it as our one stop location for any information related to the project besides that it also helps us see the work we have currently to do and allocate it to various people to be completed.
+
+![](static/Notion.png)
+
+**Version Control with Git**
+
+Git is used as the version control of choice with Github as the hosting site.
+
+![](static/Github1.png)
+
+In addition to committing our changes to github we also use the github issues page to keep track of enhancements and bugs that our project has.
+
+![](static/Github2.png)
 
 ## Class Diagram
 
@@ -109,15 +137,7 @@ To be completed by the mid of July:
 
 ![](static/ActivityDiagram.jpg)
 
-## Deployment
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/1b060d01-2db2-4025-8133-3eeee2982701/deploy-status)](https://app.netlify.com/sites/allez-orbital/deploys)
-
-The project can be accessed from the following links
-
-Frontend: <https://allez-orbital.netlify.app/>
-
-Backend: <https://allez-orbital.herokuapp.com/>
 
 ## Getting Started
 
