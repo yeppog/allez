@@ -86,3 +86,43 @@ export async function editPost(
       .catch((err) => reject(err));
   });
 }
+
+export async function fetchUserPost(token: string, username: string) {
+  return new Promise<Post[]>((resolve, reject) => {
+    axios
+      .get('/api/posts/fetchUserPosts', {
+        headers: { token: token, username: username },
+      })
+      .then((data) => {
+        const arr = [];
+        for (const val of Object.values(
+          data.data as { [key: string]: Post[] }
+        )) {
+          arr.push(...val);
+        }
+        arr.reverse();
+        resolve(arr as Post[]);
+      })
+      .catch((err) => reject(err));
+  });
+}
+
+export async function fetchUserTagged(token: string, username: string) {
+  return new Promise<Post[]>((resolve, reject) => {
+    axios
+      .get('/api/posts/fetchUserTagged', {
+        headers: { token: token, username: username },
+      })
+      .then((data) => {
+        const arr = [];
+        for (const val of Object.values(
+          data.data as { [key: string]: Post[] }
+        )) {
+          arr.push(...val);
+        }
+        arr.reverse();
+        resolve(arr as Post[]);
+      })
+      .catch((err) => reject(err));
+  });
+}
