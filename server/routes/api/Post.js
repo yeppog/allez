@@ -13,6 +13,12 @@ const uploadMedia = require("./../../gridfs").uploadMedia;
 const Comment = require("./../../models/Comment");
 const Image = require("./../../models/Images");
 const { addPostTagRelation } = require("../../handlers/Route");
+const {
+  fetchPostFromArr,
+  updateUserTag,
+  fetchPostFromTagArr,
+} = require("./../../handlers/User");
+const { Gym } = require("./../../models/User");
 
 /**
  * Fetches a post of a particular slug.
@@ -152,6 +158,25 @@ async function handleCreatePost(req, res, next) {
             } else {
               post.slug = buff.toString("hex");
               // TODO: Find a better way to manage the tagging
+              // assumes req.body.tag is a string since formdata cannot send arrays
+              if (typeof req.body.tagUser === "string") {
+                const splitted = req.body.tagUser.split(",");
+                splitted.forEach((username) => {
+                  updateUserTag(post, username, User);
+                });
+                post.tag.user = splitted;
+              }
+              if (typeof req.body.tagRoute === "string") {
+                const splitted = req.body.tagRoute.split(",");
+                post.tag.route = splitted;
+              }
+              if (typeof req.body.tagGym === "string") {
+                const splitted = req.body.tagGym.split(",");
+                splitted.forEach((username) => {
+                  updateUserTag(post, username, Gym);
+                });
+                post.tag.gym = splitted;
+              }
               post
                 .save()
                 .then((post) => {
@@ -584,8 +609,6 @@ async function handleFetchFollowPosts(req, res) {
           .catch((err) => console.log("Cant find the user."));
       }
       for (const [key, val] of Object.entries(posts)) {
-        console.log(key);
-        console.log(val);
         const promises = val.map(
           async (x) => await Post.findById(new ObjectId(x)).then((data) => data)
         );
@@ -595,6 +618,44 @@ async function handleFetchFollowPosts(req, res) {
       }
       res.status(200).json(posts);
     });
+  }
+}
+
+async function handleFetchUserPosts(req, res) {
+  if (!req.header("token") || !req.header("username")) {
+    res.status(400).json({ message: "No token" });
+  } else {
+    try {
+      const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
+      User.findOne({ username: req.header("username") })
+        .then((user) => {
+          fetchPostFromArr(user.posts)
+            .then((data) => res.status(200).json(data))
+            .catch((err) => res.status(403).json(err.message));
+        })
+        .catch((err) => res.status(403).json(err.message));
+    } catch (err) {
+      handleJWTError(err);
+    }
+  }
+}
+
+async function handleFetchUserTaggedPosts(req, res) {
+  if (!req.header("token") || !req.header("username")) {
+    res.status(400).json({ message: "No token" });
+  } else {
+    try {
+      const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
+      User.findOne({ username: req.header("username") })
+        .then((user) => {
+          fetchPostFromTagArr(user.taggedPost)
+            .then((data) => res.status(200).json(data))
+            .catch((err) => res.status(403).json(err.message));
+        })
+        .catch((err) => res.status(403).json(err.message));
+    } catch (err) {
+      handleJWTError(err);
+    }
   }
 }
 
@@ -622,4 +683,6 @@ postRouter.get("/like", handleLike);
 postRouter.post("/createpost", uploadMedia.single("file"), handleCreatePost);
 postRouter.post("/editpost", uploadMedia.single("file"), handleEditPost);
 postRouter.post("/fetchFollowPosts", handleFetchFollowPosts);
+postRouter.get("/fetchUserPosts", handleFetchUserPosts);
+postRouter.get("/fetchUserTagged", handleFetchUserTaggedPosts);
 module.exports = { postRouter };

@@ -9,16 +9,25 @@ const bcrypt = require("bcryptjs");
 /**
  * Adds the post slug of a given post to a user's taggedPost array.
  * @param {Post} post Mongoose post document.
- * @param {User} user Mongoose user document to add the tag to.
+ * @param {string} username Username of user
  */
-function updateUserTag(post, user) {
-  const tags = { ...user.taggedPost };
-  const date = `${post.createdAt.getFullYear()}${post.createdAt.getMonth()}${post.createdAt.getDate()}`;
-  if (date in tags) {
-    tags[date] = [...tags[date], post.slug];
-  } else {
-    tags[date] = [post.slug];
-  }
+async function updateUserTag(post, username, document) {
+  return new Promise((resolve, reject) => {
+    document.findOne({ username: username }).then((doc) => {
+      const tags = { ...doc.taggedPost };
+      const date = `${post.createdAt.getFullYear()}${post.createdAt.getMonth()}${post.createdAt.getDate()}`;
+      if (date in tags) {
+        tags[date] = [...tags[date], post.slug];
+      } else {
+        tags[date] = [post.slug];
+      }
+      doc.taggedPost = tags;
+      doc
+        .save()
+        .then((data) => resolve(data))
+        .catch((err) => reject(err));
+    });
+  });
 }
 
 /**
@@ -121,6 +130,52 @@ async function fetchAllUsers(document) {
   });
 }
 
+async function fetchPostFromArr(posts) {
+  return new Promise(async (resolve, reject) => {
+    for (const [key, value] of Object.entries(posts)) {
+      console.log(key);
+      console.log(value);
+      if (Array.isArray(value)) {
+        const promises = value.map(async (id) => {
+          console.log(id);
+          return await Post.findById(new ObjectId(id))
+            .then((post) => post)
+            .catch((err) => reject(err));
+        });
+        await Promise.all(promises)
+          .then((mapped) => {
+            posts[key] = [...mapped];
+          })
+          .catch((err) => reject(err));
+      }
+      resolve(posts);
+    }
+  });
+}
+
+async function fetchPostFromTagArr(posts) {
+  return new Promise(async (resolve, reject) => {
+    for (const [key, value] of Object.entries(posts)) {
+      console.log(key);
+      console.log(value);
+      if (Array.isArray(value)) {
+        const promises = value.map(async (id) => {
+          console.log(id);
+          return await Post.findOne({ slug: id })
+            .then((post) => post)
+            .catch((err) => reject(err));
+        });
+        await Promise.all(promises)
+          .then((mapped) => {
+            posts[key] = [...mapped];
+          })
+          .catch((err) => reject(err));
+      }
+      resolve(posts);
+    }
+  });
+}
+
 function handleCreateError(err, res) {
   if (err.name == "MongoError") {
     if (err) {
@@ -140,4 +195,6 @@ module.exports = {
   createUser: createUser,
   confirmUser: confirmUser,
   fetchAllUsers: fetchAllUsers,
+  fetchPostFromArr: fetchPostFromArr,
+  fetchPostFromTagArr: fetchPostFromTagArr,
 };

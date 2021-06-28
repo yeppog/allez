@@ -64,7 +64,7 @@ const UserSchema = new mongoose.Schema(
     },
     taggedPost: {
       type: {},
-      default: [""],
+      default: {},
     },
     createdAt: {
       type: Date,
