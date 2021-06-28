@@ -128,22 +128,26 @@ const ProfileComponent: React.FC = (props) => {
 
     const token = localStorage.getItem('token');
     if (token) {
-      fetchUserPost(token, username).then((data: Post[]) =>
+      fetchUserPost(token, username).then((data: Post[]) => {
         setPosts(
-          data.map((posts) => (
-            <div>
-              <PostComponent post={posts} user={user as User} />
-            </div>
-          ))
-        )
-      );
+          data
+            .filter((x) => x !== null)
+            .map((posts) => (
+              <div>
+                <PostComponent post={posts} user={user as User} />
+              </div>
+            ))
+        );
+      });
       fetchUserTagged(token, username).then((data: Post[]) =>
         setTaggedPosts(
-          data.map((posts) => (
-            <div>
-              <PostComponent post={posts} user={user as User} />
-            </div>
-          ))
+          data
+            .filter((x) => x !== null)
+            .map((posts) => (
+              <div>
+                <PostComponent post={posts} user={user as User} />
+              </div>
+            ))
         )
       );
     }

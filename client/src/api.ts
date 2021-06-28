@@ -98,7 +98,9 @@ export async function fetchUserPost(token: string, username: string) {
         for (const val of Object.values(
           data.data as { [key: string]: Post[] }
         )) {
-          arr.push(...val);
+          if (val !== null) {
+            arr.push(...val);
+          }
         }
         arr.reverse();
         resolve(arr as Post[]);

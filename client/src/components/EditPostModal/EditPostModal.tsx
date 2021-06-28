@@ -15,17 +15,15 @@ import {
   InputLabel,
   Modal,
   TextField,
-  Typography,
 } from '@material-ui/core';
-import { Comment, Post, PostTags } from '../../interface/Schemas';
+import { Post, PostTags } from '../../interface/Schemas';
 import React, { useState } from 'react';
-import { deleteComment, deletePost, editPost } from '../../api';
-import { editPostAction, removePost } from '../Redux/postSlice';
 
 import { Autocomplete } from '@material-ui/lab';
+import { editPost } from '../../api';
+import { editPostAction } from '../Redux/postSlice';
 import { gyms } from '../../static/Gyms';
 import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router';
 
 interface Props {
   post: Post;
@@ -41,7 +39,6 @@ interface State {
 const EditPostModal: React.FC<Props> = ({ post, editModal, setEditModal }) => {
   const [media, setMedia] = useState<File>();
   const [open, setOpen] = React.useState(false);
-  const [filePreview, setFilePreview] = useState<string | null>();
   const [state, setState] = useState<PostTags>({
     media: post.mediaPath,
     caption: post.body,
