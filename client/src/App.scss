@@ -113,3 +113,13 @@ footer {
 ::-webkit-scrollbar {
   display: none;
 }
+
+.redirectLink {
+  border: none;
+  background-color: transparent;
+  user-select: all;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0 !important;
+  color: #069;
+}

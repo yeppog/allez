@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardMedia,
   Divider,
-  Drawer,
   FormControl,
   Grid,
   IconButton,
@@ -18,9 +17,7 @@ import {
   InputLabel,
   Menu,
   MenuItem,
-  Modal,
   Tooltip,
-  Typography,
 } from '@material-ui/core';
 import {
   ChatBubble,
@@ -31,16 +28,14 @@ import {
   ThumbUpAltOutlined,
   Warning,
 } from '@material-ui/icons';
-import { Comment, Post, User } from '../../interface/Schemas';
+import { Post, User } from '../../interface/Schemas';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { addComment, deletePost, fetchPost, likePost } from '../../api';
-import { useDispatch, useSelector } from 'react-redux';
+import { addComment, fetchPost, likePost } from '../../api';
 import { useHistory, useParams } from 'react-router';
 
 import CommentComponent from '../CommentComponent/CommentComponent';
 import DeleteModal from '../DeleteModal/DeleteModal';
-import Image from './../../static/placeholder.png';
-import { removePost } from '../Redux/postSlice';
+import { useSelector } from 'react-redux';
 
 interface ID {
   id: string;
@@ -64,7 +59,6 @@ function getMediaType(post: Post): 'video' | 'image' {
 
 const PostPageComponent: React.FC = () => {
   const slug = useParams<ID>().id;
-  const dispatch = useDispatch();
   const [mappedComponent, setMappedComponent] = useState<ReactNode>();
   const [anchor, setAnchor] = useState<null | HTMLElement>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<boolean>(false);
@@ -108,7 +102,7 @@ const PostPageComponent: React.FC = () => {
         })
       );
     }
-  }, [user, post]);
+  }, [user, post, slug, state]);
 
   const history = useHistory();
 
@@ -127,17 +121,6 @@ const PostPageComponent: React.FC = () => {
     setAnchor(null);
   };
 
-  const handleDelete = () => {
-    const token = localStorage.getItem('token');
-    if (token && post) {
-      deletePost({ token: token, slug: slug }).then((data) => {
-        // TODO: UPDATE REDUX STORE
-        removePost({ slug: post.slug, date: post.createdAt });
-        setDeleteConfirm(false);
-        history.push('/home');
-      });
-    }
-  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
@@ -177,6 +160,7 @@ const PostPageComponent: React.FC = () => {
                       onClick={() => history.push(`/profile/${post.username}`)}
                     >
                       <img
+                        alt="avatar"
                         src={post.avatarPath}
                         style={{ maxWidth: '40px' }}
                       ></img>

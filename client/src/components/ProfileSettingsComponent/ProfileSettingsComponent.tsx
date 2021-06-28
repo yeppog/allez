@@ -3,17 +3,15 @@ import './ProfileSettingsComponent.scss';
 import {
   Button,
   FormControl,
-  FormHelperText,
   Grid,
   Input,
   InputLabel,
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
-import Image from './../../static/404.png';
 import { User } from '../../interface/Schemas';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const ProfileSettingsComponent: React.FC = () => {
   const [avatar, setAvatar] = useState<File | null>();
@@ -116,6 +114,7 @@ const ProfileSettingsComponent: React.FC = () => {
               {/* TODO: Implement hover cross to "delete" the picture */}
               <div className="pseudoImage">
                 <img
+                  alt="file-preview"
                   src={filePreview != null ? filePreview : state.avatarPath}
                   className="img"
                   onClick={removeAvatar}

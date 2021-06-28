@@ -2,10 +2,10 @@ import './ProtectedRoute.scss';
 
 import React, { useEffect, useState } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 
 import axios from 'axios';
 import { fetchPosts } from '../Redux/postSlice';
+import { useDispatch } from 'react-redux';
 import { verifyUser } from '../Redux/userSlice';
 
 interface ProtectedRouteProps extends RouteProps {
@@ -39,9 +39,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // }
   return (
     <div>
-      {loggedIn == true && <Route {...routerProps} />}
-      {loggedIn == false && <Redirect to="/login" />}
-      {loggedIn == null && <div></div>}
+      {loggedIn === true && <Route {...routerProps} />}
+      {loggedIn === false && <Redirect to="/login" />}
+      {loggedIn === null && <div></div>}
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import { Post, User } from '../../interface/Schemas';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
+import { Post } from '../../interface/Schemas';
 import axios from 'axios';
 
 // sets the default axios baseURL to the environmental variable
@@ -53,7 +53,7 @@ const postSlice = createSlice({
       const date = new Date(action.payload.date);
       const key = `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
       var arr = [...posts[key]];
-      arr = arr.filter((x) => x.slug != slug);
+      arr = arr.filter((x) => x.slug !== slug);
       posts[key] = arr;
       state.posts = posts;
       state.status = 'succeeded';
@@ -78,7 +78,7 @@ const postSlice = createSlice({
       for (const [key, value] of Object.entries(post)) {
         for (let i = 0; i < value.length; i++) {
           for (const [key2, value2] of Object.entries(value[i])) {
-            if (value2 == slug) {
+            if (value2 === slug) {
               const newVal = [...value];
               newVal[i] = action.payload;
               post[key] = newVal;

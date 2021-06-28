@@ -1,9 +1,7 @@
-import { PublicUser, User } from '../../interface/Schemas';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { LoginCredentials } from '../../interface/Credentials';
+import { User } from '../../interface/Schemas';
 import axios from 'axios';
-import { stat } from 'fs';
 
 // sets the default axios baseURL to the environmental variable
 axios.defaults.baseURL = process.env.REACT_APP_API_URI || '';

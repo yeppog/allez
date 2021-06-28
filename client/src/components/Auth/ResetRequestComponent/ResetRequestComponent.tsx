@@ -3,7 +3,6 @@ import './ResetRequestComponent.scss';
 import {
   Button,
   Card,
-  Fade,
   FormControl,
   Grid,
   Input,
@@ -107,12 +106,13 @@ const ResetRequestComponent: React.FC = () => {
                   {/* //TODO: Remove this section once SMTP is working */}
                   <p>
                     Well since SMTP isn't working 🤷, click{' '}
-                    <a
-                      href=""
+                    <button
+                      className="redirectLink"
+                      type="button"
                       onClick={() => history.push(`reset/token=${confirm}`)}
                     >
                       here
-                    </a>{' '}
+                    </button>{' '}
                     to reset your password.
                   </p>
                 </Grid>

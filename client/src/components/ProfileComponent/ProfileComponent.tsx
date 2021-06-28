@@ -1,24 +1,22 @@
 import './ProfileComponent.scss';
 
 import {
-  AppBar,
   Button,
   ButtonBase,
   Grid,
   IconButton,
-  Toolbar,
   Typography,
 } from '@material-ui/core';
 import { PublicUser, User } from '../../interface/Schemas';
 import React, { useEffect, useState } from 'react';
 import { addFollow, removeFollow } from '../../api';
-import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
 import Image from './../../static/404.png';
 import SettingsIcon from '@material-ui/icons/Settings';
 import axios from 'axios';
 import { formatNumber } from '../../formatNumber';
+import { useSelector } from 'react-redux';
 
 interface ID {
   id: string;
@@ -47,9 +45,14 @@ const ProfileComponent: React.FC = (props) => {
     followingCount: 0,
     taggedPost: {},
   });
+  const [state, setState] = useState<State>({
+    myself: false,
+    following: false,
+    error: false,
+  });
   /** Fetch the specified user on load */
   useEffect(() => {
-    if (loggedInUser.username == username) {
+    if (loggedInUser.username === username) {
       setState({ ...state, myself: true, error: false });
       setUser(loggedInUser);
     } else {
@@ -78,17 +81,11 @@ const ProfileComponent: React.FC = (props) => {
           setUser({} as PublicUser);
         });
     }
-  }, [axios, username, loggedInUser, history]);
+  }, [username, loggedInUser, history]);
 
   const handleFetchUser = (prop: keyof PublicUser, data: any) => {
     setState({ ...state, [prop]: data });
   };
-
-  const [state, setState] = useState<State>({
-    myself: false,
-    following: false,
-    error: false,
-  });
 
   const handleFollowButton = () => {
     if (state.following) {
@@ -130,12 +127,13 @@ const ProfileComponent: React.FC = (props) => {
                 <ButtonBase>
                   {/* <img src={state.img} className="img" /> */}
                   <img
+                    alt="avatar"
                     src={user.avatarPath ? user.avatarPath : Image}
                     className="img"
                   />
                 </ButtonBase>
               </Grid>
-              <Grid item alignItems="stretch">
+              <Grid item>
                 <Grid
                   item
                   container

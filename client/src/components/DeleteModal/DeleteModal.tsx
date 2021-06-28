@@ -1,20 +1,13 @@
 import './DeleteModal.scss';
 
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Modal,
-} from '@material-ui/core';
-import { Comment, Post, User } from '../../interface/Schemas';
-import React, { ReactNode, useEffect, useState } from 'react';
-import { deleteComment, deletePost, fetchPost, likePost } from '../../api';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router';
+import { Button, Card, CardActions, Modal } from '@material-ui/core';
+import { Comment, Post } from '../../interface/Schemas';
+import { deleteComment, deletePost } from '../../api';
 
-import Image from './../../static/placeholder.png';
+import React from 'react';
 import { removePost } from '../Redux/postSlice';
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router';
 
 interface Props {
   slug: string;
@@ -52,7 +45,7 @@ const DeleteModal: React.FC<Props> = ({
         setDeleteConfirm(false);
         if (post && setPost) {
           const comments = post.comments;
-          const filtered = comments.filter((cmt) => cmt._id != comment._id);
+          const filtered = comments.filter((cmt) => cmt._id !== comment._id);
           setPost({ ...post, comments: filtered });
         }
       });

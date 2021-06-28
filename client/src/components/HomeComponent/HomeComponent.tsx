@@ -1,14 +1,12 @@
 import './HomeComponent.scss';
 
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-
 import { Post, User } from '../../interface/Schemas';
+
 import PostComponent from '../PostComponent/PostComponent';
-import { fetchPosts } from '../Redux/postSlice';
+import React from 'react';
+import { useSelector } from 'react-redux';
 
 const HomeComponent: React.FC = () => {
-  const dispatch = useDispatch();
   // const [postsArr, setPostsArr] = useState<Post[]>([]);
 
   const user = useSelector((state: { user: { user: User } }) => {
@@ -23,14 +21,13 @@ const HomeComponent: React.FC = () => {
     .flatMap((key) => posts[key])
     .map((post) => {
       return (
-        <PostComponent key={post.id} post={post} user={user}></PostComponent>
+        <PostComponent key={post.slug} post={post} user={user}></PostComponent>
       );
     });
 
   return (
     <div className="HomeComponent" data-testid="HomeComponent">
       {mappedPosts}
-      {/* <PostComponent></PostComponent> */}
     </div>
   );
 };

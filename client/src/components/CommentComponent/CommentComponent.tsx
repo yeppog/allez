@@ -2,9 +2,7 @@ import './CommentComponent.scss';
 
 import {
   Avatar,
-  CardActions,
   CardContent,
-  CardMedia,
   Divider,
   Grid,
   IconButton,
@@ -17,12 +15,9 @@ import {
 import { Comment, Post } from '../../interface/Schemas';
 import { MoreVert as MoreVertIcon, Warning } from '@material-ui/icons';
 import React, { useState } from 'react';
-import { deleteComment, deletePost } from '../../api';
 
 import DeleteModal from '../DeleteModal/DeleteModal';
-import { comment } from 'postcss';
 import { formatTimeToString } from '../../formatNumber';
-import { removePost } from '../Redux/postSlice';
 import { useHistory } from 'react-router';
 
 interface CommentProps {
@@ -46,20 +41,6 @@ const CommentComponent: React.FC<CommentProps> = ({
   const handleDeleteRequest = () => {
     setDeleteConfirm(true);
     setAnchor(null);
-  };
-
-  const handleDelete = () => {
-    const token = localStorage.getItem('token');
-    if (token && comment && slug) {
-      deleteComment({
-        slug: slug,
-        token: token,
-        id: comment._id,
-      }).then(() => {
-        setDeleteConfirm(false);
-        history.push('/home');
-      });
-    }
   };
 
   return (
@@ -86,6 +67,7 @@ const CommentComponent: React.FC<CommentProps> = ({
                   onClick={() => history.push(`/profile/${comment.username}`)}
                 >
                   <img
+                    alt="avatar-profile"
                     src={comment.avatarPath}
                     style={{ maxWidth: '40px' }}
                   ></img>

@@ -130,12 +130,13 @@ const RegisterComponent: React.FC = () => {
               {/* //TODO: Remove this section once SMTP is working */}
               <p>
                 Well since SMTP isn't working 🤷, click{' '}
-                <a
-                  href=""
+                <button
+                  className="redirectLink"
+                  type="button"
                   onClick={() => history.push(`confirm/token=${confirm}`)}
                 >
                   here
-                </a>{' '}
+                </button>{' '}
                 to confirm your account.
               </p>
             </Grid>

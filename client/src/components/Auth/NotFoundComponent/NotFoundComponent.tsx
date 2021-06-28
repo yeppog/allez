@@ -19,9 +19,13 @@ const NotFoundComponent: React.FC = () => {
       <p>
         Perhaps entered the incorrect link? No problem, you'll be redirected
         back to the login page shortly. If not, click{' '}
-        <a href="#" onClick={() => history.push('/login')}>
+        <button
+          className="redirectLink"
+          type="button"
+          onClick={() => history.push('/login')}
+        >
           here
-        </a>{' '}
+        </button>{' '}
         to head back.
       </p>
     </div>

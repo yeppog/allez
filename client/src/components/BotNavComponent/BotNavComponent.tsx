@@ -39,11 +39,11 @@ const BotNavComponent: React.FC = () => {
       .catch((err) => {
         setLoggedIn(false);
       });
-  }, [axios, loggedIn]);
+  }, [loggedIn, dispatch]);
 
   return (
     <div className="BotNavComponent" data-testid="BotNavComponent">
-      {loginStatus == 'succeeded' && (
+      {loginStatus === 'succeeded' && (
         <BottomNavigation value={value} onChange={handleChange} color="primary">
           <BottomNavigationAction
             label="Home"

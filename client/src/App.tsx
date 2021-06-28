@@ -1,16 +1,7 @@
 import './App.scss';
 
-import {
-  BrowserRouter,
-  NavLink,
-  Redirect,
-  Route,
-  Switch,
-  useLocation,
-  withRouter,
-} from 'react-router-dom';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import React, { PropsWithChildren, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import {
   fetchGyms,
@@ -42,7 +33,7 @@ function App() {
     dispatch(fetchGyms());
     dispatch(fetchUsers());
     dispatch(fetchRoutes());
-  }, []);
+  }, [dispatch]);
   const darkMode = useSelector(
     (state: { user: { darkMode: boolean } }) => state.user.darkMode
   );
@@ -77,7 +68,7 @@ function App() {
     },
   });
   console.log(darkMode);
-  const refNode = React.useRef(null);
+  // const refNode = React.useRef(null);
   const routes = [
     { path: '/login', name: 'Login', Component: LoginComponent },
     { path: '/register', name: 'Register', Component: RegisterComponent },

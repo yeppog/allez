@@ -1,4 +1,4 @@
-import { Comment, Post, User } from './interface/Schemas';
+import { Comment, Post } from './interface/Schemas';
 
 import axios from 'axios';
 

@@ -18,12 +18,10 @@ import {
 import React, { useState } from 'react';
 
 import { Autocomplete } from '@material-ui/lab';
-import { Group } from '@material-ui/icons';
 import { PostTags } from '../../interface/Schemas';
 import axios from 'axios';
 import { gyms } from '../../static/Gyms';
 import { useHistory } from 'react-router';
-import { useSelector } from 'react-redux';
 
 const CreatePostComponent: React.FC = () => {
   const [media, setMedia] = useState<File | null>();
@@ -110,7 +108,6 @@ const CreatePostComponent: React.FC = () => {
       .post('/api/posts/createPost', formData, { headers: { token: token } })
       .then((data) => {
         setState(data.data);
-        //TODO: return to main page
         setMedia(null);
         history.push('/home');
       })
@@ -150,6 +147,7 @@ const CreatePostComponent: React.FC = () => {
                     <div className="pseudoImage">
                       <img
                         src={filePreview}
+                        alt="file-preview"
                         className="img"
                         width="350"
                         onClick={removeMedia}
@@ -214,7 +212,7 @@ const CreatePostComponent: React.FC = () => {
                 <Button
                   fullWidth
                   variant="text"
-                  disabled={state.gym == ''}
+                  disabled={state.gym === ''}
                   onClick={handleClickOpen}
                 >
                   Tag Route

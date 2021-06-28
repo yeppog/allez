@@ -7,7 +7,6 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
-  Drawer,
   Grid,
   IconButton,
   Menu,
@@ -28,7 +27,6 @@ import { Post, User } from '../../interface/Schemas';
 import React, { useEffect, useState } from 'react';
 
 import DeleteModal from '../DeleteModal/DeleteModal';
-import Image from './../../static/placeholder.png';
 import { likePost } from '../Redux/postSlice';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
@@ -39,7 +37,6 @@ interface State {
 }
 
 interface PostProps {
-  key: string;
   post: Post;
   user: User;
 }
@@ -169,11 +166,11 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
                   <ChatBubble></ChatBubble>
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Share">
-                <IconButton disabled>
-                  <Share />
-                </IconButton>
-              </Tooltip>
+              {/* <Tooltip title="Share"> */}
+              <IconButton disabled>
+                <Share />
+              </IconButton>
+              {/* </Tooltip> */}
               <Tooltip title="Beta Info">
                 <IconButton>
                   <Info />
