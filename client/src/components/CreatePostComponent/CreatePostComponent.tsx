@@ -21,7 +21,9 @@ import { Autocomplete } from '@material-ui/lab';
 import { PostTags } from '../../interface/Schemas';
 import axios from 'axios';
 import { gyms } from '../../static/Gyms';
+import { join } from 'path';
 import { useHistory } from 'react-router';
+import { useSelector } from 'react-redux';
 
 const CreatePostComponent: React.FC = () => {
   const [media, setMedia] = useState<File | null>();
@@ -32,8 +34,16 @@ const CreatePostComponent: React.FC = () => {
     caption: '',
     gym: '',
     route: '',
-    people: '',
+    people: [],
   });
+
+  const gym = useSelector(
+    (state: { user: { gym: { [key: string]: string }[] } }) => state.user.gym
+  );
+  const users = useSelector(
+    (state: { user: { users: { [key: string]: string }[] } }) =>
+      state.user.users
+  );
 
   const history = useHistory();
 
@@ -51,7 +61,7 @@ const CreatePostComponent: React.FC = () => {
 
   const handleAutoCompleteChange =
     (prop: keyof PostTags) => (event: React.ChangeEvent<{}>, value: any) => {
-      if (value == null) {
+      if (value === null) {
         setState({ ...state, [prop]: '' });
       } else {
         setState({ ...state, [prop]: value });
@@ -102,8 +112,10 @@ const CreatePostComponent: React.FC = () => {
     if (!token) {
       console.log('No token, unable to update');
     }
+    const usertag = state.people;
     formData.append('body', state.caption);
-    formData.append('tag', state.people);
+    formData.append('tagUser', usertag.join());
+    formData.append('tagGym', state.gym);
     axios
       .post('/api/posts/createPost', formData, { headers: { token: token } })
       .then((data) => {
@@ -198,7 +210,7 @@ const CreatePostComponent: React.FC = () => {
                 <FormControl fullWidth>
                   <Autocomplete
                     id="gym"
-                    options={gyms}
+                    options={gym.map((gym) => gym.username)}
                     getOptionLabel={(option) => option}
                     fullWidth
                     onChange={handleAutoCompleteChange('gym')}
@@ -212,7 +224,7 @@ const CreatePostComponent: React.FC = () => {
                 <Button
                   fullWidth
                   variant="text"
-                  disabled={state.gym === ''}
+                  disabled={true}
                   onClick={handleClickOpen}
                 >
                   Tag Route
@@ -262,7 +274,7 @@ const CreatePostComponent: React.FC = () => {
                     fullWidth
                     multiple
                     id="tags-filled"
-                    options={getFriends().map((option) => option.username)}
+                    options={users.map((option) => option.username)}
                     freeSolo
                     onChange={handleAutoCompleteChange('people')}
                     renderTags={(value: string[], getTagProps) =>

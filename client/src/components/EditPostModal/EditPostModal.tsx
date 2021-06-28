@@ -47,7 +47,7 @@ const EditPostModal: React.FC<Props> = ({ post, editModal, setEditModal }) => {
     caption: post.body,
     gym: '',
     route: '',
-    people: '',
+    people: [],
   });
   const dispatch = useDispatch();
 
@@ -88,6 +88,7 @@ const EditPostModal: React.FC<Props> = ({ post, editModal, setEditModal }) => {
     const form = new FormData();
     const token = localStorage.getItem('token');
     form.append('body', state.caption);
+    form.append('user', state.people.join());
     form.append('tag', state.gym);
     if (media) {
       form.append('file', media);
@@ -126,6 +127,7 @@ const EditPostModal: React.FC<Props> = ({ post, editModal, setEditModal }) => {
             <Grid item>
               <form onSubmit={(e) => onSubmit(e)}>
                 <Grid
+                  item
                   container
                   xs={12}
                   spacing={2}
