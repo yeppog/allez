@@ -278,6 +278,8 @@ async function handleEditPost(req, res, next) {
             post.body = req.body.body == undefined ? post.body : req.body.body;
             post.tag = req.body.tag == undefined ? post.tag : req.body.tag;
 
+            post.edited = true;
+
             post
               .save()
               .then((data) => res.status(200).json(data))

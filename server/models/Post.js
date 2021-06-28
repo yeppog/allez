@@ -49,6 +49,10 @@ const PostSchema = new mongoose.Schema({
     default: {},
     type: Object,
   },
+  edited: {
+    default: false,
+    type: Boolean,
+  },
 });
 
 const Post = mongoose.model("PostData", PostSchema);

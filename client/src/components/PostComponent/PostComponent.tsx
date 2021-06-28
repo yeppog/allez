@@ -29,6 +29,7 @@ import React, { useEffect, useState } from 'react';
 
 import DeleteModal from '../DeleteModal/DeleteModal';
 import EditPostModal from '../EditPostModal/EditPostModal';
+import { formatTimeToString } from '../../formatNumber';
 import { likePost } from '../Redux/postSlice';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
@@ -148,7 +149,9 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
                 </div>
               }
               title={post.username}
-              subheader={post.id}
+              subheader={`${formatTimeToString(
+                Date.now() - new Date(post.createdAt).getTime()
+              )}  ${post.edited ? '· Edited' : ''} `}
               style={{ position: 'relative' }}
             />
             <CardMedia

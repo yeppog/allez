@@ -35,6 +35,7 @@ import { useHistory, useParams } from 'react-router';
 
 import CommentComponent from '../CommentComponent/CommentComponent';
 import DeleteModal from '../DeleteModal/DeleteModal';
+import { formatTimeToString } from '../../formatNumber';
 import { useSelector } from 'react-redux';
 
 interface ID {
@@ -192,7 +193,9 @@ const PostPageComponent: React.FC = () => {
                   </div>
                 }
                 title={post.username}
-                subheader={post.id}
+                subheader={`${formatTimeToString(
+                  Date.now() - new Date(post.createdAt).getTime()
+                )}  ${post.edited ? '· Edited' : ''} `}
                 style={{ position: 'relative' }}
               />
               <CardMedia

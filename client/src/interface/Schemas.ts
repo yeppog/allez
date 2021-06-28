@@ -34,6 +34,7 @@ export interface Post {
   tag: object;
   comments: Comment[];
   createdAt: Date;
+  edited: boolean;
 }
 
 export interface Comment {
