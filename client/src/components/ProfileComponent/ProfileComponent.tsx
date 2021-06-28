@@ -1,18 +1,28 @@
 import './ProfileComponent.scss';
 
 import {
+  Box,
   Button,
   ButtonBase,
+  Divider,
   Grid,
   IconButton,
+  Tab,
+  Tabs,
   Typography,
 } from '@material-ui/core';
-import { PublicUser, User } from '../../interface/Schemas';
-import React, { useEffect, useState } from 'react';
-import { addFollow, removeFollow } from '../../api';
+import { Post, PublicUser, User } from '../../interface/Schemas';
+import React, { ReactNode, useEffect, useState } from 'react';
+import {
+  addFollow,
+  fetchUserPost,
+  fetchUserTagged,
+  removeFollow,
+} from '../../api';
 import { useHistory, useParams } from 'react-router';
 
 import Image from './../../static/404.png';
+import PostComponent from '../PostComponent/PostComponent';
 import SettingsIcon from '@material-ui/icons/Settings';
 import axios from 'axios';
 import { formatNumber } from '../../formatNumber';
@@ -28,9 +38,42 @@ interface State {
   error: boolean;
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`scrollable-auto-tabpanel-${index}`}
+      aria-labelledby={`scrollable-auto-tab-${index}`}
+      style={{ minWidth: '100%' }}
+      {...other}
+    >
+      {value === index && <Box p={3}>{children}</Box>}
+    </div>
+  );
+}
+
+function tabProps(index: any) {
+  return {
+    id: `scrollable-auto-tab-${index}`,
+    'aria-controls': `scrollable-auto-tabpanel-${index}`,
+  };
+}
+
 const ProfileComponent: React.FC = (props) => {
   const history = useHistory();
   const username = useParams<ID>().id;
+  const [tab, setTab] = useState(0);
+  const [posts, setPosts] = useState<ReactNode>();
+  const [taggedPosts, setTaggedPosts] = useState<ReactNode>();
   const loggedInUser = useSelector((state: { user: { user: User } }) => {
     return state.user.user;
   });
@@ -44,6 +87,7 @@ const ProfileComponent: React.FC = (props) => {
     following: [],
     followingCount: 0,
     taggedPost: {},
+    postCount: 0,
   });
   const [state, setState] = useState<State>({
     myself: false,
@@ -81,6 +125,28 @@ const ProfileComponent: React.FC = (props) => {
           setUser({} as PublicUser);
         });
     }
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetchUserPost(token, username).then((data: Post[]) =>
+        setPosts(
+          data.map((posts) => (
+            <div>
+              <PostComponent post={posts} user={user as User} />
+            </div>
+          ))
+        )
+      );
+      fetchUserTagged(token, username).then((data: Post[]) =>
+        setTaggedPosts(
+          data.map((posts) => (
+            <div>
+              <PostComponent post={posts} user={user as User} />
+            </div>
+          ))
+        )
+      );
+    }
   }, [username, loggedInUser, history]);
 
   const handleFetchUser = (prop: keyof PublicUser, data: any) => {
@@ -96,7 +162,6 @@ const ProfileComponent: React.FC = (props) => {
       addFollow({ user: loggedInUser.username, target: username });
     }
     setState({ ...state, following: !state.following });
-    //TODO: Implement backend api for following users
   };
 
   return (
@@ -178,12 +243,7 @@ const ProfileComponent: React.FC = (props) => {
                           justify="center"
                         >
                           <Grid item>
-                            <Typography>
-                              0
-                              {/* {state.postNumber
-                              ? formatNumber(state.postNumber)
-                            : 0} */}
-                            </Typography>
+                            <Typography>{user.postCount}</Typography>
                           </Grid>
                           <Grid item>
                             <Typography>&emsp;Posts&emsp;</Typography>
@@ -224,6 +284,40 @@ const ProfileComponent: React.FC = (props) => {
               </Typography>
               <Typography>{user.bio}</Typography>
             </Grid>
+          </Grid>
+
+          <Grid
+            item
+            container
+            direction="column"
+            alignItems="center"
+            justify="center"
+            style={{ minWidth: '100%' }}
+          >
+            <Grid item style={{ justifyContent: 'center', paddingTop: '20px' }}>
+              <Typography>Posts</Typography>
+            </Grid>
+            <Grid
+              item
+              style={{
+                justifyContent: 'center',
+                paddingTop: '20px',
+              }}
+            >
+              <Tabs
+                value={tab}
+                onChange={(e: React.ChangeEvent<{}>, s: number) => setTab(s)}
+              >
+                <Tab label="Posts" {...tabProps(0)} />
+                <Tab label="Tagged Posts" {...tabProps(1)} />
+              </Tabs>
+            </Grid>
+            <TabPanel value={tab} index={0}>
+              {posts}
+            </TabPanel>
+            <TabPanel value={tab} index={1}>
+              {taggedPosts}
+            </TabPanel>
           </Grid>
         </Grid>
       )}
