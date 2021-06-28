@@ -58,6 +58,24 @@ const postSlice = createSlice({
       state.posts = posts;
       state.status = 'succeeded';
     },
+    editPostAction: (state, action) => {
+      console.log(action);
+      const posts = state.posts;
+      const slug = action.payload.slug;
+      const date = new Date(action.payload.date);
+      const key = `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
+      var arr = [...posts[key]];
+      arr = arr.map((x) => {
+        if (x.slug === slug) {
+          return action.payload.post;
+        } else {
+          return x;
+        }
+      });
+      posts[key] = arr;
+      state.posts = posts;
+      state.status = 'succeeded';
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchPosts.pending, (state, action) => {
@@ -100,4 +118,4 @@ const postSlice = createSlice({
 });
 
 export default postSlice.reducer;
-export const { removePost } = postSlice.actions;
+export const { removePost, editPostAction } = postSlice.actions;

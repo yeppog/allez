@@ -16,6 +16,7 @@ import {
 } from '@material-ui/core';
 import {
   ChatBubble,
+  Edit,
   Info,
   MoreVert as MoreVertIcon,
   Share,
@@ -27,6 +28,7 @@ import { Post, User } from '../../interface/Schemas';
 import React, { useEffect, useState } from 'react';
 
 import DeleteModal from '../DeleteModal/DeleteModal';
+import EditPostModal from '../EditPostModal/EditPostModal';
 import { likePost } from '../Redux/postSlice';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
@@ -56,6 +58,7 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
   const dispatch = useDispatch();
   const [anchor, setAnchor] = useState<null | HTMLElement>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<boolean>(false);
+  const [editModal, setEditModal] = useState<boolean>(false);
   const [state, setState] = useState<State>({
     liked: false,
     mediaType: null,
@@ -95,6 +98,11 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
         post={post}
         type="post"
       />
+      <EditPostModal
+        post={post}
+        editModal={editModal}
+        setEditModal={setEditModal}
+      />
       <Grid container spacing={1} justify="center" alignItems="center">
         <Grid item xs={10} sm={8} md={6} lg={4}>
           <Card className="cardBody">
@@ -132,6 +140,9 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
                   >
                     <MenuItem onClick={handleDeleteRequest}>
                       <Warning style={{ paddingRight: '5px' }} /> Delete Post
+                    </MenuItem>
+                    <MenuItem onClick={() => setEditModal(true)}>
+                      <Edit style={{ paddingRight: '5px' }} /> Edit Post
                     </MenuItem>
                   </Menu>
                 </div>

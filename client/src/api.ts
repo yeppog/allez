@@ -74,3 +74,15 @@ export async function deleteComment(body: {
       .catch((err) => reject(err));
   });
 }
+
+export async function editPost(
+  body: FormData,
+  headers: { token: string; slug: string }
+) {
+  return new Promise<Post>((resolve, reject) => {
+    axios
+      .post('/api/posts/editpost', body, { headers: headers })
+      .then((data) => resolve(data.data as Post))
+      .catch((err) => reject(err));
+  });
+}
