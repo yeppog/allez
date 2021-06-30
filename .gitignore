@@ -30,3 +30,7 @@ server/.env
 
 #testing
 server/coverage
+
+#experimental
+server_migration/dist
+server_migration/node_modules
