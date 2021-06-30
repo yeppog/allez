@@ -1,37 +1,60 @@
-import express, { Request, Response } from "express";
-import mongoose, { Document } from "mongoose";
+import { IGymDoc, IUserDoc } from "../models/UserSchema";
+import mongoose, { Document, Model } from "mongoose";
 
 import bcrypt from "bcrypt";
-import { body } from "express-validator";
+import jwt from "jsonwebtoken";
 import winston from "winston";
 
-// const logger = winston.loggers.get("logger");
-
 export class User {
-  static validate = (method: string) => {
-    switch (method) {
-      case "register": {
-        return [
-          body("name", "Name doesn't exist on the body.").exists(),
-          body("username", "Username doesn't exist on the body."),
-          body("email", "Invalid email.").exists().isEmail(),
-          body("password", "Password doesn't exist on the body.").exists(),
-        ];
-      }
-    }
-  };
-
-  static getPasswordHash(password: string): Promise<string> {
+  static async createUser(
+    document: (IUserDoc | IGymDoc) & Document<any, any>
+  ): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       bcrypt.genSalt().then((salt) => {
-        bcrypt.hash(password, salt, (err, hash) => {
+        bcrypt.hash(document.password, salt, (err, hash) => {
           if (err) {
             winston.error("Error generating password hash.");
             reject("Error generating password hash.");
           }
-          resolve(hash);
+          document.password = hash;
+          document
+            .save()
+            .then((doc) => {
+              winston.info(
+                `User ${document.username} successfully registered.`
+              );
+              const token = jwt.sign(hash, process.env.JWT_SECRET);
+              // TODO: send email here
+              resolve(token);
+            })
+            .catch((error) => {
+              reject(error);
+            });
         });
       });
+    });
+  }
+  static async verifyToken(
+    token: string,
+    document: Model<IUserDoc | IGymDoc>
+  ): Promise<IUserDoc | IGymDoc> {
+    return new Promise((resolve, reject) => {
+      try {
+        const payload = jwt.verify(
+          token,
+          process.env.JWT_SECRET
+        ) as jwt.JwtPayload;
+        const id = payload.id;
+        document
+          .findById({ _id: id })
+          .then((user) => resolve(user))
+          .catch((err) => {
+            winston.error(err.message);
+            reject(err);
+          });
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 }

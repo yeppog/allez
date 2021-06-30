@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { body, validationResult } from "express-validator";
+import { body, header, validationResult } from "express-validator";
 
 import winston from "winston";
 
@@ -12,6 +12,9 @@ export const validator = (method: string) => {
         body("email", "Invalid email.").exists().isEmail(),
         body("password", "Password doesn't exist on the body.").exists(),
       ];
+    }
+    case "verify": {
+      return [header("token", "Token doesn't exist on the header.").exists()];
     }
   }
 };

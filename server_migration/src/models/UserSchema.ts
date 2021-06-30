@@ -86,10 +86,11 @@ const GymSchema = new mongoose.Schema({
   },
 });
 
-interface IUserDoc extends User, Document {}
+export interface IUserDoc extends User, Document {}
+export interface IGymDoc extends Gym, Document {}
 
 export const User = mongoose.model<IUserDoc>("UserData", UserSchema);
-export const Gym = mongoose.model("GymData", GymSchema);
+export const Gym = mongoose.model<IGymDoc>("GymData", GymSchema);
 
 export interface User {
   username: string;
