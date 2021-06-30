@@ -7,57 +7,42 @@ Proposed Level of Achievement: Apollo 11
 
 ## Motivation
 
-Imagine you&#39;re stuck on a route while climbing and you&#39;re having a mental breakdown because there&#39;s nobody to show you how to complete the route you want to know what is a method to do so, i.e. the beta but you can&#39;t find the beta online.
+Imagine you&#39;re stuck on a route while climbing and you are not sure how to proceed. Nobody around you knows how to do it either. You want to have someone show you how to do the route i.e show you the beta (guide for the movement sequence to get through the problems) but you can&#39;t find the any videos online.
 
-There are indeed many climbing Instagram pages online that may have the beta that you are looking for, but they are messy, unorganised, and often hard to find especially if you don&#39;t follow these pages. To solve this, **Allez** eliminates the hassle of looking through Instagram tirelessly, through building a social media beta-sharing platform solely for the purpose of rock climbing sharing.
+There are indeed many climbing Instagram pages online that have climbers post videos of them climbing the route and they may have the beta that you are looking for, but it is messy, unorganised, and often hard to find especially if you don&#39;t follow these pages. To solve this, **Allez** eliminates the hassle of looking through Instagram tirelessly, through building a social media beta-sharing platform solely for the purpose of rock climbing sharing.
+
+![](static/betamonkeys107.png)
 
 ## Aim
 
-We hope to be able to categorise routes and betas efficiently such that users are able to search for them quickly. We also hope to allow climbing gyms to have a special account such that they can manage their routes, as well as upload their in-house beta.
+We hope to be able to categorise routes and betas efficiently such that users are able to search for them quickly. We also hope to allow climbing gyms to have a special account such that they can manage their routes, as well as upload the intended beta (solution).
 
 ## User Stories
 
 1. As a climber who is stuck on a route, I would be able to quickly look up the solution of the current route that I am on efficiently.
-2. As a professional climber who knows how to solve this route, I would be able to upload my own beta to the route where others can view.
-3. As an owner of a rock climbing gym, I would be able to publish my route rotations for the week, as well as upload betas of the gym.
+2. As a professional climber who knows how to solve this route, I would be able to upload and share videos of me completing the route to help others.
+3. As an owner of a rock climbing gym, I would be able to publish my route rotations for the week, as well as upload the intended betas for routes so my customers have a guide of how to do the problem.
 4. As a user of any sort, I would be able to share and discuss solutions to these routes on the platform and interact with other users.
 5. As a user of any sort, I want to be able to post my thoughts and feed where others in my network can comment on.
 6. As a user of any sort, I want to be able to follow and receive updates on people/gyms that I am interested in hearing from.
-7. As a user of any sort, I want to be able to upload my own custom routes.
+7. As a user of any sort, I want to be able to easily upload a climbing route to share with people.
 
 ## Features and Timeline
 
-A **web-based social media site** which provides a place for climbers to share their betas (solutions) to climbing problems for climbers to see and learn.
+We aim to create a **web-based social media site** which provides a place for climbers to share their betas (solutions) to climbing problems for climbers to see and learn.
 
 This acts as a customised and targeted social media platform that climbers can use to quickly search up solutions and share their own personal solutions.
 
 Gyms can submit their own routes and there can be community submitted routes as well.
 
-When creating routes, users submit an image of the route which is processed by our backend to allow users to select and label the holds (start, end, footholds, etc). This makes it much easier for a user to submit a route.
+When creating routes, users submit an image of the route which is processed our backend which will be trained by machine learning to allow users to select and label the holds (start, end, footholds, etc). This makes it much easier for a user to submit a route.
 
 Users will be able look through posts sorted by the routes that they are interested in and submit their betas under a route or create their own.
 
-Features to be completed by the mid of June:
+<img src="static/segment.jpeg" alt="drawing" style="width:500px;"/>
 
-1. Account creation (authentication)
-2. Basic front-end design of the site
-3. Simple CRUD features.
-4. Backend design and relations.
-
-Features to be completed by the mid of July:
-
-1. Implementation of video uploads (optimisation, compression)
-2. Social network to be implement (user relations, followers, etc)
-3. Frontend main features to be completed (posting, liking, commenting, submission of routes, tags)
-4. Shape detection algorithm to identify route holds for easier route creation.
-
-## Object Diagram
-
-![](static/ObjectDiagram.png)
-
-## Program Flow
-
-![](static/ProgramFlow.png)
+Example of how a wall might be segmented to allow users to select their routes.
+Source: Stōkt https://www.getstokt.com/
 
 ## Deployment
 
@@ -68,6 +53,136 @@ The project can be accessed from the following links
 Frontend: <https://allez-orbital.netlify.app/>
 
 Backend: <https://allez-orbital.herokuapp.com/>
+
+**Features:**
+
+1. **Account Registration and Log in**
+
+   - Users can register their account with their details and log in to the website
+
+2. **Homepage Feed of following posts**
+
+- Feed of posts of climbers or gyms that the user follows which will constantly be updated when someone followed posted a new post
+
+3. **Posting of Video or Photos**
+
+   - Users can share videos or photos of them attempting and completing climbing routes
+
+4. **Post-editing and Deletion**
+
+   - Users can edit and delete posts that the user have created.
+
+5. **Profile editing**
+
+   - Users can edit key information on the user's profile such as their profile picture, bio, username and password
+
+6. **Searching for Users, Gyms, Routes**
+   - Users can find User and Gym pages, and browse routes based on tags
+   - Users can view posts of other users and posts that are tagged to a gym
+
+**To be completed by Milestone 3:**
+
+**Features**
+
+1. **Machine learning to identify route holds for easier route creation**
+
+- Use of machine learning for climbing holds recognisation and segmentation
+- Use of segemented image for users to select holds that are included in their route
+
+2. **Route tagging**
+
+- Ability for users to browse through route and videos tagged to the routes
+
+**Optimisation**
+
+1. **Cleaning up of Backend**
+
+- Refactoring to Typescript for addition type safety
+- Error Catching to handle erroneous inputs
+- Abstracting duplicate functions
+
+2. **Optimise file size to be held on server**
+
+- Compression of media uploaded to reduce space on server
+
+**Testing**
+
+1. **Frontend Testing**
+
+- Unit testing for conditional rendering and error handling
+- Testing mock inputs and expected outputs
+
+2. **Backend Testing**
+
+- Addtion of more tests to increase code coverage
+
+**Timeline**
+
+![](static/Timeline.png)
+
+## **Software Engineering Practises**
+
+### Project Management with Notion
+
+Notion is used as it as our one stop location for any information related to the project besides that it also helps us see the work we have currently to do and allocate it to various people to be completed.
+
+![](static/Notion.png)
+
+### Version Control with Git
+
+Git is used as the version control of choice with Github as the hosting site.
+
+![](static/Github1.png)
+
+In addition to committing our changes to github we also use the github issues page to keep track of enhancements and bugs that our project has.
+
+![](static/Github2.png)
+
+### Usage of CI to Test Code
+
+Our project also uses `Jest` together with `CircleCI` to run code on every push to Github to ensure that the code pushed passes unit testing that is written. As of now, only the backend is covered by unit tests. The CI tests can be seen below:
+
+![](static/circleci.jpeg)
+
+The tests are run and the coverage report by Jest is automatically uploaded to `CodeCov`
+
+![](static/circleresults.jpeg)
+
+![](static/codecov.jpeg)
+
+Codecov helps us keep track of the project's test coverage and let's us know when we need to add more tests. Currently the coverage is low and we aim to increase the coverage by Milestone 3.
+
+### Usage of Deployment Tools
+
+We currently use `Heroku` and `Netlify` to host our code, and `Vercel` to deploy per push as Vercel has unlimited deployments. Vercel allows us to test our compiled code every `push` online.
+
+## Design
+
+This section will cover the design of the app in brief detail.
+
+### Backend
+
+The backend is run using `Node.js`, `Express.js` and `MongoDB`. We store schemas for the following objects:
+
+1. User
+2. Gym
+3. Images
+4. Post
+5. Route
+6. User
+7. Video
+
+Each of these schemas have their own document shape that the object will conform to, which allows us to query the data.
+
+For Image and Video uploads, we use `GridFS` with `multer` as a storage engine, to split the files up into chunks on `MongoDB`, then stream it.
+
+## Class Diagram
+
+![](static/ObjectDiagram.png)
+
+## Activity Diagram
+
+![](static/ActivityDiagram.jpg)
 
 ## Getting Started
 

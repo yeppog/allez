@@ -1,7 +1,6 @@
-import { PublicUser, User } from '../../interface/Schemas';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { LoginCredentials } from '../../interface/Credentials';
+import { User } from '../../interface/Schemas';
 import axios from 'axios';
 
 // sets the default axios baseURL to the environmental variable
@@ -13,9 +12,11 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URI || '';
  */
 
 interface UsersState {
-  user: User[];
-  users: string;
-  // { [key: string]: User | PublicUser };
+  user: User;
+  search: { [key: string]: any }[];
+  users: { [key: string]: any }[];
+  gym: { [key: string]: any }[];
+  routes: { [key: string]: any }[];
   status: 'idle' | 'pending' | 'succeeded' | 'failed';
   loginStatus: 'idle' | 'succeeded' | 'failed';
   error: string | null | undefined;
@@ -23,8 +24,11 @@ interface UsersState {
 }
 
 const initialState = {
-  user: [],
-  users: '',
+  user: {} as User,
+  search: [],
+  gym: [],
+  users: [],
+  routes: [],
   loginStatus: 'idle',
   status: 'idle',
   error: null,
@@ -46,6 +50,19 @@ export const fetchPublicUser = createAsyncThunk(
     }
   }
 );
+
+export const fetchGyms = createAsyncThunk('user/fetchGyms', async () => {
+  const res = await axios.get('/api/gyms/gyms');
+  return res.data;
+});
+export const fetchUsers = createAsyncThunk('user/fetchUsers', async () => {
+  const res = await axios.get('/api/users/users');
+  return res.data;
+});
+export const fetchRoutes = createAsyncThunk('user/fetchRoutes', async () => {
+  const res = await axios.get('/api/routes/routes');
+  return res.data;
+});
 
 export const checkLoggedInUser = createAsyncThunk(
   'user/checkLoggedInUser',
@@ -85,7 +102,7 @@ const userSlice = createSlice({
     },
     logoutUser: (state) => {
       localStorage.removeItem('token');
-      state.user = [];
+      state.user = {} as User;
       state.status = 'idle';
       state.loginStatus = 'idle';
     },
@@ -98,6 +115,10 @@ const userSlice = createSlice({
       state.loginStatus = 'succeeded';
       state.status = 'succeeded';
     },
+    updateUser: (state, action) => {
+      state.user = action.payload;
+      state.status = 'succeeded';
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(checkLoggedInUser.pending, (state, action) => {
@@ -106,7 +127,7 @@ const userSlice = createSlice({
     builder.addCase(checkLoggedInUser.fulfilled, (state, action) => {
       state.status = 'succeeded';
       state.loginStatus = 'succeeded';
-      state.user = [action.payload];
+      state.user = { ...action.payload };
     });
     builder.addCase(checkLoggedInUser.rejected, (state, action) => {
       state.status = 'failed';
@@ -118,23 +139,27 @@ const userSlice = createSlice({
     });
     builder.addCase(updateUserProfile.fulfilled, (state, action) => {
       state.status = 'succeeded';
-      state.user = [action.payload];
+      state.user = { ...action.payload };
     });
     builder.addCase(updateUserProfile.rejected, (state, action) => {
       state.status = 'failed';
     });
-    builder.addCase(fetchPublicUser.pending, (state, action) => {
-      state.status = 'pending';
+    builder.addCase(fetchGyms.fulfilled, (state, action) => {
+      state.status = 'succeeded';
+      state.search = [...state.search, ...action.payload];
+      state.gym = [...state.gym, ...action.payload];
     });
-    builder.addCase(fetchPublicUser.fulfilled, (state, action) => {
-      // console.log(action.payload);
-      // state.status = 'succeeded';
-      // const hold = { ...state.users };
-      // hold[action.payload.username] = action.payload;
-      state.users = 'a';
-    });
-    builder.addCase(fetchPublicUser.rejected, (state, action) => {
+    builder.addCase(fetchGyms.rejected, (state, action) => {
       state.status = 'failed';
+    });
+    builder.addCase(fetchUsers.fulfilled, (state, action) => {
+      state.status = 'succeeded';
+      state.users = [...state.users, ...action.payload];
+      state.search = [...state.search, ...action.payload];
+    });
+    builder.addCase(fetchRoutes.fulfilled, (state, action) => {
+      state.status = 'succeeded';
+      state.routes = [...state.routes, ...action.payload];
     });
   },
 });
@@ -146,5 +171,5 @@ const HTTPOptions = {
 export default userSlice.reducer;
 export const getUser = () => (state: UsersState) => state.user;
 export const getStatus = (state: UsersState) => state.status;
-export const { loginUser, logoutUser, toggleDarkMode, verifyUser } =
+export const { loginUser, logoutUser, toggleDarkMode, verifyUser, updateUser } =
   userSlice.actions;

@@ -38,7 +38,7 @@ async function handleVideoUpload(caption, filename, chunkIDRef) {
           await video
             .save()
             .then((data) => {
-              resolve(`${process.env.domain}/api/videos/${data.filename}`);
+              resolve(`${process.env.DOMAIN}/api/videos/${data.filename}`);
             })
             .catch((err) => {
               reject(err);
@@ -47,7 +47,7 @@ async function handleVideoUpload(caption, filename, chunkIDRef) {
           await newVideo
             .save()
             .then((data) => {
-              resolve(`${process.env.domain}/api/videos/${data.filename}`);
+              resolve(`${process.env.DOMAIN}/api/videos/${data.filename}`);
             })
             .catch((err) => {
               reject(err);
@@ -114,7 +114,7 @@ videoRouter.route("/upload").post(upload.single("file"), (req, res, next) => {
       .save()
       .then((video) => {
         res.status(200).json({
-          message: `${process.env.domain}/api/videos/${video.filename}`,
+          message: `${process.env.DOMAIN}/api/videos/${video.filename}`,
         });
       })
       .catch((err) => res.status(500).json(err));

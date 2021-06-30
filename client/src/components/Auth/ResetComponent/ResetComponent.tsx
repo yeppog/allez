@@ -94,9 +94,13 @@ const ResetComponent: React.FC = () => {
                 <p>You will be redirected to the login page shortly</p>
                 <p>
                   If you're somehow not redirected, click{' '}
-                  <a href="" onClick={() => history.push('/login')}>
+                  <button
+                    type="button"
+                    className="redirectLink"
+                    onClick={() => history.push('/login')}
+                  >
                     here.
-                  </a>
+                  </button>
                 </p>
               </div>
             )}
@@ -178,9 +182,13 @@ const ResetComponent: React.FC = () => {
                 </p>
                 <p>
                   Find your way back! Click{' '}
-                  <a href="" onClick={() => history.push('/login')}>
+                  <button
+                    className="redirectLink"
+                    type="button"
+                    onClick={() => history.push('/login')}
+                  >
                     here.
-                  </a>
+                  </button>
                 </p>
               </div>
             )}

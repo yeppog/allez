@@ -1,17 +1,14 @@
 import './App.scss';
 
-import {
-  BrowserRouter,
-  NavLink,
-  Redirect,
-  Route,
-  Switch,
-  useLocation,
-  withRouter,
-} from 'react-router-dom';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import React, { PropsWithChildren } from 'react';
+import React, { useEffect } from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import {
+  fetchGyms,
+  fetchRoutes,
+  fetchUsers,
+} from './components/Redux/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 import BotNavComponent from './components/BotNavComponent/BotNavComponent';
 import ConfirmComponent from './components/Auth/ConfirmComponent/ConfirmComponent';
@@ -20,6 +17,7 @@ import { CssBaseline } from '@material-ui/core';
 import HomeComponent from './components/HomeComponent/HomeComponent';
 import LoginComponent from './components/Auth/LoginComponent/LoginComponent';
 import NotFoundComponent from './components/Auth/NotFoundComponent/NotFoundComponent';
+import PostPageComponent from './components/PostPageComponent/PostPageComponent';
 import ProfileComponent from './components/ProfileComponent/ProfileComponent';
 import ProfileSettingsComponent from './components/ProfileSettingsComponent/ProfileSettingsComponent';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
@@ -28,9 +26,14 @@ import ResetComponent from './components/Auth/ResetComponent/ResetComponent';
 import ResetRequestComponent from './components/Auth/ResetRequestComponent/ResetRequestComponent';
 import TopNavComponent from './components/TopNavComponent/TopNavComponent';
 import { blueGrey } from '@material-ui/core/colors';
-import { useSelector } from 'react-redux';
 
 function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchGyms());
+    dispatch(fetchUsers());
+    dispatch(fetchRoutes());
+  }, [dispatch]);
   const darkMode = useSelector(
     (state: { user: { darkMode: boolean } }) => state.user.darkMode
   );
@@ -42,6 +45,15 @@ function App() {
     typography: {
       button: {
         textTransform: 'none',
+      },
+      h6: {
+        fontSize: 14,
+      },
+      caption: {
+        fontSize: 13,
+      },
+      subtitle1: {
+        fontSize: 10,
       },
     },
     overrides: {
@@ -56,7 +68,7 @@ function App() {
     },
   });
   console.log(darkMode);
-  const refNode = React.useRef(null);
+  // const refNode = React.useRef(null);
   const routes = [
     { path: '/login', name: 'Login', Component: LoginComponent },
     { path: '/register', name: 'Register', Component: RegisterComponent },
@@ -169,6 +181,7 @@ function App() {
             />
           </Route>
           <Route path="/confirm/token=:token" component={ConfirmComponent} />
+          <Route path="/post/:id" component={PostPageComponent} />
           {routes.map((route: { path: string; Component: React.FC }) => (
             <Route key={route.path} exact path={route.path}>
               <route.Component />

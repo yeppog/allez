@@ -2,42 +2,82 @@ import './CreatePostComponent.scss';
 
 import {
   Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   Grid,
   Input,
   InputLabel,
+  TextField,
   Typography,
 } from '@material-ui/core';
 import React, { useState } from 'react';
 
-import { Group } from '@material-ui/icons';
+import { Autocomplete } from '@material-ui/lab';
 import { PostTags } from '../../interface/Schemas';
+import axios from 'axios';
+import { gyms } from '../../static/Gyms';
+import { join } from 'path';
+import { useHistory } from 'react-router';
 import { useSelector } from 'react-redux';
 
-const CreatePostComponent = () => {
+const CreatePostComponent: React.FC = () => {
   const [media, setMedia] = useState<File | null>();
+  const [open, setOpen] = React.useState(false);
   const [filePreview, setFilePreview] = useState<string | null>();
   const [state, setState] = useState<PostTags>({
     media: '',
     caption: '',
     gym: '',
     route: '',
-    people: '',
+    people: [],
   });
 
-  // const user = useSelector(
-  //   (state: { user: { user: User } }) => state.user.user
-  // );
-  // useEffect(() => {
-  //   if (user) {
-  //     setState(user);
-  //   }
-  // }, [user]);
+  const gym = useSelector(
+    (state: { user: { gym: { [key: string]: string }[] } }) => state.user.gym
+  );
+  const users = useSelector(
+    (state: { user: { users: { [key: string]: string }[] } }) =>
+      state.user.users
+  );
+
+  const history = useHistory();
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setState({ ...state, route: '' });
+  };
+  const handleConfirm = () => {
+    setOpen(false);
+  };
+
+  const handleAutoCompleteChange =
+    (prop: keyof PostTags) => (event: React.ChangeEvent<{}>, value: any) => {
+      if (value === null) {
+        setState({ ...state, [prop]: '' });
+      } else {
+        setState({ ...state, [prop]: value });
+      }
+    };
 
   const handleChange =
     (prop: keyof PostTags) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setState({ ...state, [prop]: event.target.value });
     };
+
+  const getFriends = () => {
+    // TODO: Get Friends
+    const friends = [{ username: 'nzixuan' }, { username: 'lenathonaj' }];
+    return friends;
+  };
 
   const handleEditMedia = (e: React.ChangeEvent<HTMLInputElement>) => {
     // console.log(e.target.files);
@@ -61,9 +101,33 @@ const CreatePostComponent = () => {
   };
 
   const onSubmit = (e: any): void => {
+    //TODO: Handle invalid input
     // preventDefault prevents the page from refreshing when the form is submitted
     e.preventDefault();
-    //TODO: API Stuuf
+    const formData = new FormData();
+    const token = localStorage.getItem('token') as string;
+    if (media) {
+      formData.append('file', media, media.name);
+    }
+    if (!token) {
+      console.log('No token, unable to update');
+    }
+    const usertag = state.people;
+    formData.append('body', state.caption);
+    formData.append('tagUser', usertag.join());
+    formData.append('tagGym', state.gym);
+    axios
+      .post('/api/posts/createPost', formData, { headers: { token: token } })
+      .then((data) => {
+        setState(data.data);
+        setMedia(null);
+        history.push('/home');
+      })
+      .catch((err) => {
+        // TODO: Handle user errors
+        console.log(token);
+        console.log(err);
+      });
   };
 
   return (
@@ -95,6 +159,7 @@ const CreatePostComponent = () => {
                     <div className="pseudoImage">
                       <img
                         src={filePreview}
+                        alt="file-preview"
                         className="img"
                         width="350"
                         onClick={removeMedia}
@@ -143,37 +208,94 @@ const CreatePostComponent = () => {
 
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <InputLabel>Tag Gym</InputLabel>
-                  <Input
+                  <Autocomplete
+                    id="gym"
+                    options={gym.map((gym) => gym.username)}
+                    getOptionLabel={(option) => option}
                     fullWidth
-                    value={state.gym}
-                    onChange={handleChange('gym')}
+                    onChange={handleAutoCompleteChange('gym')}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Gym" variant="standard" />
+                    )}
                   />
                 </FormControl>
               </Grid>
-
               <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Tag Route</InputLabel>
-                  <Input
+                <Button
+                  fullWidth
+                  variant="text"
+                  disabled={true}
+                  onClick={handleClickOpen}
+                >
+                  Tag Route
+                </Button>
+                <Dialog
+                  open={open}
+                  onClose={handleClose}
+                  aria-labelledby="form-dialog-title"
+                >
+                  <DialogTitle id="form-dialog-title">Tag Route</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>Tag your routes here</DialogContentText>
+                    <TextField
+                      margin="dense"
+                      id="grade"
+                      label="Route Grade"
+                      type="email"
+                      fullWidth
+                    />
+                    <TextField
+                      margin="dense"
+                      id="colour"
+                      label="Route Colour"
+                      type="email"
+                      fullWidth
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                      Cancel
+                    </Button>
+                    <Button onClick={handleConfirm} color="primary">
+                      Confirm
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
+                {/* <Input
                     fullWidth
                     value={state.route}
                     onChange={handleChange('route')}
-                  />
-                </FormControl>
+                  /> */}
               </Grid>
-
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <InputLabel>Tag People</InputLabel>
-                  <Input
-                    value={state.people}
-                    onChange={handleChange('people')}
+                  <Autocomplete
                     fullWidth
+                    multiple
+                    id="tags-filled"
+                    options={users.map((option) => option.username)}
+                    freeSolo
+                    onChange={handleAutoCompleteChange('people')}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => (
+                        <Chip
+                          variant="outlined"
+                          label={option}
+                          {...getTagProps({ index })}
+                        />
+                      ))
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="standard"
+                        label="Tag Friends"
+                      />
+                    )}
                   />
                 </FormControl>
               </Grid>
-
               <Grid item xs={12}>
                 <Button variant="text" color="primary" type="submit" fullWidth>
                   Post

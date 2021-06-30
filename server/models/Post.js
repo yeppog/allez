@@ -15,11 +15,11 @@ const PostSchema = new mongoose.Schema({
   },
   body: {
     type: String,
-    required: true,
+    default: "",
   },
   avatarPath: {
     type: String,
-    required: true,
+    default: "",
   },
   mediaPath: {
     type: String,
@@ -42,12 +42,16 @@ const PostSchema = new mongoose.Schema({
     required: true,
   },
   createdAt: {
-    default: Date.now(),
+    default: Date.now,
     type: Date,
   },
   tag: {
     default: {},
     type: Object,
+  },
+  edited: {
+    default: false,
+    type: Boolean,
   },
 });
 

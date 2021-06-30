@@ -1,0 +1,30 @@
+.PostPageComponent {
+  display: flex;
+  flex-direction: column;
+  min-width: 100vw;
+  min-height: 100vh;
+  align-items: center;
+  // justify-content: center;
+  margin-top: 120px;
+  margin-bottom: 100px;
+}
+
+img {
+  user-select: none;
+}
+
+.modal {
+  display: flex;
+  place-items: center;
+  justify-content: center;
+}
+
+.modalCard {
+  padding: 50px;
+}
+
+.modalActions {
+  padding-top: 15px;
+  display: flex;
+  justify-content: center;
+}

@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const User = require("../models/User").User;
 const Post = require("../models/Post");
 const app = require("../index");
 const mongoose = require("mongoose");
@@ -42,7 +42,7 @@ describe("Test get post", () => {
       mediaPath: "media",
       likes: 15,
       likedUsers: ["test", "test2"],
-      comments: [{ date: "123123", body: "yeet", user: "test3" }],
+      comments: ["60d381a2874cfb0640249c52"],
       slug: "3490283fn3fndsjkfbdnsf7f23",
     });
     await post
@@ -80,7 +80,7 @@ describe("Test delete post", () => {
       mediaPath: "media",
       likes: 15,
       likedUsers: ["test", "test2"],
-      comments: [{ date: "123123", body: "yeet", user: "test3" }],
+      comments: ["60d381a2874cfb0640249c52"],
       slug: "testpostslug",
       createdAt: currentDate,
     });
@@ -112,20 +112,22 @@ describe("Test delete post", () => {
       .then(async (data) => {
         const token = jwt.sign({ id: data._id }, process.env.JWT_SECRET);
         await request
-          .post("/api/posts/deletePost")
+          .post("/api/posts/delete")
           .send({
             token: token,
             slug: "testpostslug",
           })
           .then(async (data) => {
             expect(data.status).toBe(200);
-            expect(data.body.posts).toBeUndefined();
+            expect(data.body.posts).toStrictEqual({});
             expect(data).toBeDefined();
             await User.findOne({ username: "test" })
               .then((data) => {
                 expect(data.posts).toStrictEqual({});
               })
-              .catch((err) => expect(err).toBeUndefined());
+              .catch((err) => {
+                expect(err).toBeUndefined();
+              });
           });
       })
       .catch((err) => expect(err).toBeUndefined());
@@ -140,7 +142,7 @@ describe("Test delete post", () => {
       mediaPath: "media",
       likes: 15,
       likedUsers: ["test", "test2"],
-      comments: [{ date: "123123", body: "yeet", user: "test3" }],
+      comments: ["60d381a2874cfb0640249c52"],
       slug: "newslug",
       createdAt: currentDate,
     });
@@ -171,7 +173,7 @@ describe("Test delete post", () => {
       .then(async (data) => {
         const token = jwt.sign({ id: data._id }, process.env.JWT_SECRET);
         await request
-          .post("/api/posts/deletePost")
+          .post("/api/posts/delete")
           .send({
             token: token,
             slug: "newslugg",
@@ -192,7 +194,7 @@ describe("Test delete post", () => {
           process.env.JWT_SECRET
         );
         await request
-          .post("/api/posts/deletePost")
+          .post("/api/posts/delete")
           .send({
             token: token,
             slug: "newslug",

@@ -12,6 +12,7 @@ export interface PublicUser {
   following: string[];
   followingCount: number;
   taggedPost: object;
+  postCount: number;
 }
 
 export interface PostTags {
@@ -19,16 +20,30 @@ export interface PostTags {
   caption: string;
   gym: string;
   route: string;
-  people: string;
+  people: [];
 }
 
 export interface Post {
   mediaPath: string;
   likes: number;
+  likedUsers: string[];
   id: string;
   username: string;
   body: string;
   avatarPath: string;
   slug: string;
   tag: object;
+  comments: Comment[];
+  createdAt: Date;
+  edited: boolean;
+}
+
+export interface Comment {
+  _id: string;
+  comments: Comment[];
+  body: string;
+  edited: boolean;
+  username: string;
+  avatarPath: string;
+  createdAt: Date;
 }

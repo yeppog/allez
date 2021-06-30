@@ -66,26 +66,30 @@ const ConfirmComponent: React.FC = () => {
             </p>
             <p>
               Find your way back! Click{' '}
-              <a
-                className="anchorLink"
-                role="button"
+              <button
+                className="redirectLink"
+                type="button"
                 onClick={() => history.push('/login')}
               >
-                here.
-              </a>
+                here
+              </button>
             </p>
           </div>
         )}
-        {state == 'success' && (
+        {state === 'success' && (
           <div className="messageContent">
             <h3>🎉 Hooray! 🎉</h3>
             <h4>Your account has been activated</h4>
             <p>You will be redirected to the login page shortly</p>
             <p>
               If you're somehow not redirected, click{' '}
-              <a href="" onClick={() => history.push('/login')}>
+              <button
+                className="redirectLink"
+                onClick={() => history.push('/login')}
+                type="button"
+              >
                 here.
-              </a>
+              </button>
             </p>
           </div>
         )}

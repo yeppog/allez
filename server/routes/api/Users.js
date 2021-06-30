@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const detect = require("./routedetect/RouteDetection");
 const Post = require("./../../models/Post");
+const { handleConfirmError } = require("../../handlers/Error");
 
 /** Used to query by ObjectId */
 const ObjectId = require("mongodb").ObjectID;
@@ -27,13 +28,19 @@ const transporter = nodemailer.createTransport({
 // Validate inputs
 
 // User model
-const User = require("../../models/User");
+const User = require("../../models/User").User;
 const Image = require("../../models/Images");
 
 // GridFS Uploads
 const uploadAvatar = require("./../../gridfs").uploadAvatar;
 const uploadMedia = require("./../../gridfs").uploadMedia;
 const Video = require("../../models/Video");
+const {
+  createUser,
+  handleCreateError,
+  confirmUser,
+  fetchAllUsers,
+} = require("../../handlers/User");
 
 /**
  * Handles the POST request of creating a new account.
@@ -52,57 +59,9 @@ async function handleRegister(req, res) {
     password: req.body.password,
     activated: false,
   });
-  // await User.syncIndexes()
-  // .then(() => {
-  bcrypt.genSalt().then((salt) => {
-    bcrypt.hash(newUser.password, salt, (err, hash) => {
-      if (err) {
-        return res.status(400).json(err);
-      }
-      newUser.password = hash;
-      let id;
-      newUser
-        .save()
-        .then(async (user) => {
-          const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
-          // sends token to the registered email for confirmation;
-          // await transporter.sendMail(
-          //   {
-          //     from: '"Allez" <reset@allez.com>',
-          //     to: `${newUser.email}`,
-          //     subject: "Please confirm your account",
-          //     text: `Click here to confirm your account.`,
-          //     html: `Click <a href = "${process.env.DOMAIN}/confirm/token=${token}">here</a> to confirm your account.`,
-          //   },
-          //   (err, info) => {
-          //     if (err) {
-          //       return res.status(400).json({ message: err });
-          //     }
-          //     return res.status(200).json({ message: info });
-          //   }
-          // );
-          return res.status(200).json({ token: token });
-        })
-        .catch((err) => {
-          // console.log(err);
-          if (err.name == "MongoError") {
-            if (err) {
-              return res
-                .status(403)
-                .json({ message: "Email is already taken" });
-            } else if (err.keyValue.email) {
-              return res
-                .status(403)
-                .json({ message: "Username is already taken" });
-            }
-            return res.status(500).json(err);
-          }
-          return res.status(500).json(err);
-        });
-    });
-  });
-  // })
-  // .catch((err) => res.json(err));
+  createUser(newUser)
+    .then((data) => res.status(200).json(data))
+    .catch((err) => handleCreateError(err, res));
 }
 
 /**
@@ -318,36 +277,12 @@ async function handleReset(req, res) {
  */
 
 async function handleConfirm(req, res) {
-  if (!req.headers) {
-    return res.status(400).json({ message: "Missing header" });
+  if (!req.header("token")) {
+    return res.status(400).json({ message: "Missing token" });
   } else {
-    if (!req.headers.token) {
-      return res.status(400).json({ message: "Missing token" });
-    } else {
-      try {
-        jwt.verify(req.headers.token, process.env.JWT_SECRET);
-        const id = jwt.decode(req.headers.token, process.env.JWT_SECRET).id;
-        const user = await User.findOne(new ObjectId(id));
-        if (user.activated) {
-          return res.status(403).json({ message: "Account already activated" });
-        }
-        await User.findByIdAndUpdate(
-          new ObjectId(id),
-          { activated: true },
-          { useFindAndModify: false }
-        );
-        return res
-          .status(200)
-          .json({ message: "Account successfully activated" });
-      } catch (err) {
-        if (err instanceof jwt.JsonWebTokenError) {
-          return res
-            .status(403)
-            .json({ message: "Invalid or expired token. Unauthorised" });
-        }
-        return res.status(400).json({ message: err });
-      }
-    }
+    confirmUser(User, req.header("token"))
+      .then((data) => res.status(200).json({ message: data }))
+      .catch((err) => handleConfirmError(res, err));
   }
 }
 
@@ -389,7 +324,12 @@ async function handleUpdateProfile(req, res, next) {
       const caption = `${user.id}_avatar`;
       const upload = require("./Image").uploadImage;
       let imageURL;
-      await upload(caption, req.file.filename, chunkIDRef, "/api/users/avatar")
+      await upload(
+        caption,
+        req.file.filename,
+        req.file.id,
+        "/api/images/avatar/"
+      )
         .then((data) => (imageURL = data))
         .catch((err) => res.status(403).json(err));
 
@@ -407,16 +347,7 @@ async function handleUpdateProfile(req, res, next) {
     user
       .save()
       .then((data) => {
-        return res.status(200).json({
-          username: data.username,
-          email: data.email,
-          avatar: data.avatarPath,
-          name: data.name,
-          bio: data.bio,
-          posts: data.posts,
-          followers: data.followers,
-          followCount: data.followCount,
-        });
+        return res.status(200).json(data);
       })
       .catch((err) => {
         return res.status(400).json(err);
@@ -580,6 +511,12 @@ async function removeFollowRelation(req, res) {
   }
 }
 
+async function handleFetchAll(req, res) {
+  fetchAllUsers(User)
+    .then((data) => res.status(200).json(data))
+    .catch((err) => res.status(404).json(err.message));
+}
+
 function handleJWTError(res, err) {
   if (err instanceof jwt.TokenExpiredError) {
     res.status(403).json({ message: "Token has expired" });
@@ -622,5 +559,7 @@ router.post("/handleFollow", handleFollow);
 router.get("/addFollow", addFollowRelation);
 
 router.get("/removeFollow", removeFollowRelation);
+
+router.get("/users", handleFetchAll);
 
 module.exports = router;

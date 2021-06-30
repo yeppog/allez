@@ -53,6 +53,7 @@ app.use(
       "username",
       "target",
       "user",
+      "slug",
     ],
     exposedHeaders: ["sessionId"],
     origin: "*",
@@ -75,6 +76,14 @@ app.use("/api/videos", videos.router);
 /** Import Post API */
 const post = require("./routes/api/Post");
 app.use("/api/posts/", post.postRouter);
+
+/** Import Gym API */
+const gyms = require("./routes/api/Gyms");
+app.use("/api/gyms", gyms);
+
+/** Import Route API */
+const routes = require("./routes/api/Routes");
+app.use("/api/routes", routes);
 
 /**
  * Route for User API

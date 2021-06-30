@@ -5,7 +5,7 @@ const post = require("./../../models/Post");
 const crypto = require("crypto");
 const ObjectId = require("mongodb").ObjectID;
 const jwt = require("jsonwebtoken");
-const User = require("./../../models/User");
+const User = require("./../../models/User").User;
 const { use } = require("./Users");
 const { read } = require("fs");
 const Post = require("./../../models/Post");
@@ -13,6 +13,12 @@ const uploadMedia = require("./../../gridfs").uploadMedia;
 const Comment = require("./../../models/Comment");
 const Image = require("./../../models/Images");
 const { addPostTagRelation } = require("../../handlers/Route");
+const {
+  fetchPostFromArr,
+  updateUserTag,
+  fetchPostFromTagArr,
+} = require("./../../handlers/User");
+const { Gym } = require("./../../models/User");
 
 /**
  * Fetches a post of a particular slug.
@@ -20,13 +26,44 @@ const { addPostTagRelation } = require("../../handlers/Route");
  * @param {Response} res The HTTP response to output to.
  */
 
+async function recursiveGetComment(arr) {
+  return new Promise((resolve, reject) => {
+    if (arr.length <= 0 || !Array.isArray(arr)) {
+      resolve([]);
+    }
+    const promises = arr.map(
+      async (id) =>
+        await Comment.findById(new ObjectId(id)).then((data) => data)
+    );
+
+    Promise.all(promises).then(async (comments) => {
+      arr = comments;
+
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i]) {
+          if (arr[i].comments.length > 0) {
+            arr[i].comments = await recursiveGetComment(arr[i].comments);
+          }
+        }
+      }
+      Promise.all(arr).then((newComments) => {
+        resolve(newComments);
+      });
+    });
+  });
+}
+
 async function handleGetPost(req, res) {
   if (!req.header("slug")) {
     res.status(400).json({ message: "Post not specified" });
   } else {
     post
       .findOne({ slug: req.header("slug") })
-      .then((data) => {
+      .then(async (data) => {
+        await recursiveGetComment(data.comments).then(async (comments) => {
+          data.comments = comments;
+        });
+
         if (data == null) {
           res.status(403).json({ message: "Post not found." });
         } else {
@@ -34,7 +71,7 @@ async function handleGetPost(req, res) {
         }
       })
       .catch((err) => {
-        rdtaes.status(403).json(err);
+        res.status(403).json(err);
       });
   }
 }
@@ -82,7 +119,7 @@ async function handleCreatePost(req, res, next) {
               const caption = `${user.id}_${req.file.filename}`;
 
               await upload(caption, req.file.filename, req.file.id)
-                .then((data) => (filePath = data))
+                .then((data) => (post.mediaPath = data))
                 .catch((err) =>
                   res
                     .status(500)
@@ -101,7 +138,10 @@ async function handleCreatePost(req, res, next) {
                 req.file.id,
                 options
               )
-                .then((data) => (filePath = data))
+                .then((data) => {
+                  filePath = data;
+                  post.mediaPath = data;
+                })
                 .catch((err) =>
                   res
                     .status(500)
@@ -109,7 +149,6 @@ async function handleCreatePost(req, res, next) {
                 );
             }
           }
-          post.mediaPath = filePath == undefined ? "" : filePath;
 
           await crypto.randomBytes(16, (err, buff) => {
             if (err) {
@@ -119,6 +158,26 @@ async function handleCreatePost(req, res, next) {
             } else {
               post.slug = buff.toString("hex");
               // TODO: Find a better way to manage the tagging
+              // assumes req.body.tag is a string since formdata cannot send arrays
+              if (typeof req.body.tagUser === "string") {
+                const splitted = req.body.tagUser.split(",");
+                splitted.forEach((username) => {
+                  updateUserTag(post, username, User);
+                });
+                post.tag.user = splitted;
+              }
+              if (typeof req.body.tagRoute === "string") {
+                const splitted = req.body.tagRoute.split(",");
+                post.tag.route = splitted;
+              }
+              if (typeof req.body.tagGym === "string") {
+                const splitted = req.body.tagGym.split(",");
+                splitted.forEach((username) => {
+                  updateUserTag(post, username, Gym);
+                });
+
+                post.tag.gym = splitted;
+              }
               post
                 .save()
                 .then((post) => {
@@ -244,6 +303,8 @@ async function handleEditPost(req, res, next) {
             post.mediaPath = filePath == undefined ? post.mediaPath : filePath;
             post.body = req.body.body == undefined ? post.body : req.body.body;
             post.tag = req.body.tag == undefined ? post.tag : req.body.tag;
+
+            post.edited = true;
 
             post
               .save()
@@ -390,7 +451,6 @@ async function addCommentToComment(req, res) {
   } else {
     Comment.findById(new ObjectId(req.body.comment))
       .then((cmt) => {
-        console.log(cmt);
         try {
           const user = jwt.verify(req.body.token, process.env.JWT_SECRET);
           User.findById(new ObjectId(user.id))
@@ -440,10 +500,10 @@ async function addCommentToComment(req, res) {
  */
 // TODO: Change this to delete by ID
 async function deleteComment(req, res) {
-  if (!req.body.token || !req.body.slug || !req.body.date) {
+  if (!req.body.token || !req.body.slug || !req.body.id) {
     res.status(400).json({
       message:
-        "Bad request. User token and body slug and comment timestamp must be present.",
+        "Bad request. User token and body slug and comment id must be present.",
     });
   } else {
     post
@@ -455,11 +515,7 @@ async function deleteComment(req, res) {
             .then((user) => {
               var comments = post.comments;
               // filters out the comment by the user and the timestamp of the comment to filter out
-              comments = comments.filter(
-                (item) =>
-                  item.date.toISOString() != req.body.date &&
-                  item.user == user.username
-              );
+              comments = comments.filter((item) => item != req.body.id);
               post.comments = comments;
               post
                 .save()
@@ -491,10 +547,10 @@ async function handleLike(req, res) {
               const username = user.username;
               if (username in postLikes) {
                 delete postLikes[username];
-                postLikes.like = postLikes.like - 1;
+                post.likes = post.likes - 1;
               } else {
                 postLikes[username] = new Date();
-                postLikes.like = postLikes.like + 1;
+                post.likes = post.likes + 1;
               }
               post.likedUsers = postLikes;
               post
@@ -521,18 +577,18 @@ async function handleFetchFollowPosts(req, res) {
     User.findById(new ObjectId(id)).then(async (user) => {
       // create the date object
       const dates = [];
-      const posts = {};
+      const posts = user.posts;
       var date = new Date(req.body.date);
       for (i = 0; i < req.body.duration; i++) {
         const formatted = `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
         dates.push(parseInt(formatted));
         date.setDate(date.getDate() - 1);
-        posts[parseInt(formatted)] = [];
+        const newDate = parseInt(formatted);
+        if (!(newDate in posts)) {
+          posts[newDate] = [];
+        }
       }
-      console.log(dates);
-      console.log(posts);
       for (i = 0; i < user.following.length; i++) {
-        // console.log(user.following[i]);
         const username = user.following[i];
         await User.findOne({ username: username })
           .then((data) => {
@@ -564,6 +620,44 @@ async function handleFetchFollowPosts(req, res) {
   }
 }
 
+async function handleFetchUserPosts(req, res) {
+  if (!req.header("token") || !req.header("username")) {
+    res.status(400).json({ message: "No token" });
+  } else {
+    try {
+      const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
+      User.findOne({ username: req.header("username") })
+        .then((user) => {
+          fetchPostFromArr(user.posts)
+            .then((data) => res.status(200).json(data))
+            .catch((err) => res.status(403).json(err.message));
+        })
+        .catch((err) => res.status(403).json(err.message));
+    } catch (err) {
+      handleJWTError(err);
+    }
+  }
+}
+
+async function handleFetchUserTaggedPosts(req, res) {
+  if (!req.header("token") || !req.header("username")) {
+    res.status(400).json({ message: "No token" });
+  } else {
+    try {
+      const id = jwt.verify(req.header("token"), process.env.JWT_SECRET).id;
+      User.findOne({ username: req.header("username") })
+        .then((user) => {
+          fetchPostFromTagArr(user.taggedPost)
+            .then((data) => res.status(200).json(data))
+            .catch((err) => res.status(403).json(err.message));
+        })
+        .catch((err) => res.status(403).json(err.message));
+    } catch (err) {
+      handleJWTError(err);
+    }
+  }
+}
+
 /**
  * Selectively handles the JWT errors. Else, throw the error back out to be catched by the async pipeline.
  * @param {Response} res The HTTP response to output the response to.
@@ -583,9 +677,11 @@ postRouter.get("/getpost", handleGetPost);
 postRouter.post("/deleteComment", deleteComment);
 postRouter.post("/addCommentToPost", addCommentToPost);
 postRouter.post("/addCommentToComment", addCommentToComment);
-postRouter.post("/deletePost", handleDeletePost);
+postRouter.post("/delete", handleDeletePost);
 postRouter.get("/like", handleLike);
 postRouter.post("/createpost", uploadMedia.single("file"), handleCreatePost);
 postRouter.post("/editpost", uploadMedia.single("file"), handleEditPost);
 postRouter.post("/fetchFollowPosts", handleFetchFollowPosts);
+postRouter.get("/fetchUserPosts", handleFetchUserPosts);
+postRouter.get("/fetchUserTagged", handleFetchUserTaggedPosts);
 module.exports = { postRouter };

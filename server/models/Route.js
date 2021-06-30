@@ -11,7 +11,7 @@ const RouteSchema = new Schema({
     default: {},
   },
   grade: {
-    type: Number,
+    type: String,
     required: true,
   },
   color: {
@@ -19,8 +19,16 @@ const RouteSchema = new Schema({
     required: true,
   },
   tags: {
+    type: [],
+    default: [],
+  },
+  name: {
     type: String,
     required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

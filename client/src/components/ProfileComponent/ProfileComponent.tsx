@@ -1,42 +1,79 @@
 import './ProfileComponent.scss';
 
 import {
+  Box,
   Button,
   ButtonBase,
+  Divider,
   Grid,
   IconButton,
+  Tab,
+  Tabs,
   Typography,
 } from '@material-ui/core';
-import { PublicUser, User } from '../../interface/Schemas';
-import React, { useEffect, useState } from 'react';
-import { addFollow, removeFollow } from '../../api';
-import { useDispatch, useSelector } from 'react-redux';
+import { Post, PublicUser, User } from '../../interface/Schemas';
+import React, { ReactNode, useEffect, useState } from 'react';
+import {
+  addFollow,
+  fetchUserPost,
+  fetchUserTagged,
+  removeFollow,
+} from '../../api';
 import { useHistory, useParams } from 'react-router';
 
 import Image from './../../static/404.png';
+import PostComponent from '../PostComponent/PostComponent';
 import SettingsIcon from '@material-ui/icons/Settings';
 import axios from 'axios';
+import { formatNumber } from '../../formatNumber';
+import { useSelector } from 'react-redux';
 
 interface ID {
   id: string;
 }
 
 interface State {
-  id: string;
-  name: string;
-  bio: string;
-  img: ImageBitmap;
-  avatarPath: string;
-  postNumber: string;
-  //TODO:
+  myself: boolean;
+  following: boolean;
+  error: boolean;
+}
 
-  postState: string;
-  message: string;
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`scrollable-auto-tabpanel-${index}`}
+      aria-labelledby={`scrollable-auto-tab-${index}`}
+      style={{ minWidth: '100%' }}
+      {...other}
+    >
+      {value === index && <Box p={3}>{children}</Box>}
+    </div>
+  );
+}
+
+function tabProps(index: any) {
+  return {
+    id: `scrollable-auto-tab-${index}`,
+    'aria-controls': `scrollable-auto-tabpanel-${index}`,
+  };
 }
 
 const ProfileComponent: React.FC = (props) => {
   const history = useHistory();
   const username = useParams<ID>().id;
+  const [tab, setTab] = useState(0);
+  const [posts, setPosts] = useState<ReactNode>();
+  const [taggedPosts, setTaggedPosts] = useState<ReactNode>();
   const loggedInUser = useSelector((state: { user: { user: User } }) => {
     return state.user.user;
   });
@@ -50,13 +87,17 @@ const ProfileComponent: React.FC = (props) => {
     following: [],
     followingCount: 0,
     taggedPost: {},
+    postCount: 0,
+  });
+  const [state, setState] = useState<State>({
+    myself: false,
+    following: false,
+    error: false,
   });
   /** Fetch the specified user on load */
   useEffect(() => {
-    console.log('test');
-    if (loggedInUser.username == username) {
-      console.log('wat');
-      setState({ ...state, myself: true });
+    if (loggedInUser.username === username) {
+      setState({ ...state, myself: true, error: false });
       setUser(loggedInUser);
     } else {
       setState({ ...state, myself: false });
@@ -69,40 +110,51 @@ const ProfileComponent: React.FC = (props) => {
           if (loggedInUser.following) {
             if (loggedInUser.following.includes(username)) {
               // myself is set to false as the async setstate may call the previous ...state value where myself was true
-              setState({ ...state, following: true, myself: false });
+
+              setState({
+                ...state,
+                following: true,
+                myself: false,
+                error: false,
+              });
             }
           }
+        })
+        .catch((err) => {
+          setState({ ...state, error: true });
+          setUser({} as PublicUser);
         });
     }
-  }, [axios, username, loggedInUser, history]);
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetchUserPost(token, username).then((data: Post[]) => {
+        setPosts(
+          data
+            .filter((x) => x !== null)
+            .map((posts) => (
+              <div>
+                <PostComponent post={posts} user={user as User} />
+              </div>
+            ))
+        );
+      });
+      fetchUserTagged(token, username).then((data: Post[]) =>
+        setTaggedPosts(
+          data
+            .filter((x) => x !== null)
+            .map((posts) => (
+              <div>
+                <PostComponent post={posts} user={user as User} />
+              </div>
+            ))
+        )
+      );
+    }
+  }, [username, loggedInUser, history]);
 
   const handleFetchUser = (prop: keyof PublicUser, data: any) => {
     setState({ ...state, [prop]: data });
-  };
-
-  const [state, setState] = useState({
-    // to migrate to user in the future
-    postNumber: 0,
-    followNumber: 0,
-    myself: false,
-    following: false,
-
-    postState: '',
-    message: '',
-  });
-
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) {
-      return (num / 100000) % 10 == 0
-        ? (num / 1000000).toFixed().toString() + 'm'
-        : (num / 1000000).toFixed(1).toString() + 'm';
-    } else if (num >= 1000) {
-      return (num / 100) % 10 == 0
-        ? (num / 1000).toFixed().toString() + 'k'
-        : (num / 1000).toFixed(1).toString() + 'k';
-    } else {
-      return num.toString();
-    }
   };
 
   const handleFollowButton = () => {
@@ -114,110 +166,114 @@ const ProfileComponent: React.FC = (props) => {
       addFollow({ user: loggedInUser.username, target: username });
     }
     setState({ ...state, following: !state.following });
-    //TODO: Implement backend api for following users
   };
 
   return (
     <div className="ProfileComponent" data-testid="ProfileComponent">
-      {/*  direction="row" */}
-      <Grid container direction="row" alignItems="center" justify="center">
-        <Grid
-          item
-          xs={12}
-          sm={8}
-          md={6}
-          lg={4}
-          container
-          direction="column"
-          alignItems="center"
-          justify="center"
-          spacing={2}
-        >
-          <Grid item container direction="row" alignItems="stretch">
-            <Grid item>
-              <ButtonBase>
-                {/* <img src={state.img} className="img" /> */}
-                <img
-                  src={user.avatarPath ? user.avatarPath : Image}
-                  className="img"
-                />
-              </ButtonBase>
-            </Grid>
-            <Grid item alignItems="stretch">
-              <Grid
-                item
-                container
-                direction="column"
-                alignItems="stretch"
-                spacing={4}
-              >
-                <Grid item container alignItems="center" spacing={4}>
-                  <Grid item>
-                    <Typography variant="h5" style={{ fontWeight: 600 }}>
-                      {user.username}
-                    </Typography>
-                  </Grid>
-                  {state.myself ? (
-                    <IconButton
-                      aria-label="settings"
-                      onClick={() => {
-                        history.push('/editProfile');
-                      }}
-                    >
-                      <SettingsIcon />
-                    </IconButton>
-                  ) : (
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="primary"
-                      onClick={handleFollowButton}
-                    >
-                      {state.following ? 'Following' : 'Follow'}
-                    </Button>
-                  )}
-                </Grid>
-                <Grid item>
-                  <Grid container direction="row" spacing={1}>
+      {state.error ? (
+        <div>
+          <Typography variant="h3" style={{ textAlign: 'center' }}>
+            {' '}
+            Profile not found.
+          </Typography>
+        </div>
+      ) : (
+        <Grid container direction="row" alignItems="center" justify="center">
+          <Grid
+            item
+            xs={12}
+            sm={8}
+            md={6}
+            lg={4}
+            container
+            direction="column"
+            alignItems="center"
+            justify="center"
+            spacing={2}
+          >
+            <Grid item container direction="row" alignItems="stretch">
+              <Grid item>
+                <ButtonBase>
+                  {/* <img src={state.img} className="img" /> */}
+                  <img
+                    alt="avatar"
+                    src={user.avatarPath ? user.avatarPath : Image}
+                    className="img"
+                  />
+                </ButtonBase>
+              </Grid>
+              <Grid item>
+                <Grid
+                  item
+                  container
+                  direction="column"
+                  alignItems="stretch"
+                  spacing={4}
+                >
+                  <Grid item container alignItems="center" spacing={4}>
                     <Grid item>
-                      <Grid
-                        container
-                        direction="column"
-                        spacing={1}
-                        alignItems="center"
-                        justify="center"
+                      <Typography variant="h5" style={{ fontWeight: 600 }}>
+                        {user.username}
+                      </Typography>
+                    </Grid>
+                    {state.myself ? (
+                      <IconButton
+                        aria-label="settings"
+                        onClick={() => {
+                          history.push('/editProfile');
+                        }}
                       >
-                        <Grid item>
-                          <Typography>
-                            {state.postNumber
-                              ? formatNumber(state.postNumber)
-                              : 0}
-                          </Typography>
-                        </Grid>
-                        <Grid item>
-                          <Typography>&emsp;Posts&emsp;</Typography>
+                        <SettingsIcon />
+                      </IconButton>
+                    ) : (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="primary"
+                        onClick={handleFollowButton}
+                      >
+                        {state.following ? 'Following' : 'Follow'}
+                      </Button>
+                    )}
+                  </Grid>
+                  <Grid item>
+                    <Grid container direction="row" spacing={1}>
+                      <Grid item>
+                        <Grid
+                          container
+                          direction="column"
+                          spacing={1}
+                          alignItems="center"
+                          justify="center"
+                        >
+                          <Grid item>
+                            <Typography>{user.postCount}</Typography>
+                          </Grid>
+                          <Grid item>
+                            <Typography>&emsp;Posts&emsp;</Typography>
+                          </Grid>
                         </Grid>
                       </Grid>
-                    </Grid>
-                    <Grid item></Grid>
-                    <Grid item></Grid>
-                    <Grid item>
-                      <Grid
-                        container
-                        direction="column"
-                        spacing={1}
-                        alignItems="center"
-                        justify="center"
-                      >
-                        <Grid item>
-                          <Typography>
-                            {user.followCount
-                              ? formatNumber(user.followCount)
-                              : 0}
-                          </Typography>
-                        </Grid>
-                        <Grid item>
-                          <Typography>&ensp;Followers&ensp;</Typography>
+                      <Grid item></Grid>
+                      <Grid item></Grid>
+                      <Grid item>
+                        <Grid
+                          container
+                          direction="column"
+                          spacing={1}
+                          alignItems="center"
+                          justify="center"
+                        >
+                          <Grid item>
+                            <Typography>
+                              {user.followCount
+                                ? formatNumber(user.followCount)
+                                : 0}
+                            </Typography>
+                          </Grid>
+                          <Grid item>
+                            <Typography>&ensp;Followers&ensp;</Typography>
+                          </Grid>
                         </Grid>
                       </Grid>
                     </Grid>
@@ -225,16 +281,50 @@ const ProfileComponent: React.FC = (props) => {
                 </Grid>
               </Grid>
             </Grid>
+            <Grid item>
+              {/* TODO: Needs to align left since this text can overflow */}
+              <Typography>
+                <strong>{user.name}</strong>
+              </Typography>
+              <Typography>{user.bio}</Typography>
+            </Grid>
           </Grid>
-          <Grid item>
-            {/* TODO: Needs to align left since this text can overflow */}
-            <Typography>
-              <strong>{user.name}</strong>
-            </Typography>
-            <Typography>{user.bio}</Typography>
+
+          <Grid
+            item
+            container
+            direction="column"
+            alignItems="center"
+            justify="center"
+            style={{ minWidth: '100%' }}
+          >
+            <Grid item style={{ justifyContent: 'center', paddingTop: '20px' }}>
+              <Typography>Posts</Typography>
+            </Grid>
+            <Grid
+              item
+              style={{
+                justifyContent: 'center',
+                paddingTop: '20px',
+              }}
+            >
+              <Tabs
+                value={tab}
+                onChange={(e: React.ChangeEvent<{}>, s: number) => setTab(s)}
+              >
+                <Tab label="Posts" {...tabProps(0)} />
+                <Tab label="Tagged Posts" {...tabProps(1)} />
+              </Tabs>
+            </Grid>
+            <TabPanel value={tab} index={0}>
+              {posts}
+            </TabPanel>
+            <TabPanel value={tab} index={1}>
+              {taggedPosts}
+            </TabPanel>
           </Grid>
         </Grid>
-      </Grid>
+      )}
     </div>
   );
 };
