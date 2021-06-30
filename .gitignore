@@ -26,6 +26,10 @@ server/node_modules
 
 server/.env
 
+server_migration/.env
+
+*/.env
+
 
 
 #testing
