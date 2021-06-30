@@ -26,7 +26,7 @@ server/node_modules
 
 server/.env
 
-server_migration/.env
+server_migration/src/.env
 
 */.env
 
