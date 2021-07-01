@@ -115,6 +115,10 @@ const userSlice = createSlice({
       state.loginStatus = 'succeeded';
       state.status = 'succeeded';
     },
+    updateUser: (state, action) => {
+      state.user = action.payload;
+      state.status = 'succeeded';
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(checkLoggedInUser.pending, (state, action) => {
@@ -167,5 +171,5 @@ const HTTPOptions = {
 export default userSlice.reducer;
 export const getUser = () => (state: UsersState) => state.user;
 export const getStatus = (state: UsersState) => state.status;
-export const { loginUser, logoutUser, toggleDarkMode, verifyUser } =
+export const { loginUser, logoutUser, toggleDarkMode, verifyUser, updateUser } =
   userSlice.actions;

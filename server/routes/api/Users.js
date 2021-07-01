@@ -347,16 +347,7 @@ async function handleUpdateProfile(req, res, next) {
     user
       .save()
       .then((data) => {
-        return res.status(200).json({
-          username: data.username,
-          email: data.email,
-          avatar: data.avatarPath,
-          name: data.name,
-          bio: data.bio,
-          posts: data.posts,
-          followers: data.followers,
-          followCount: data.followCount,
-        });
+        return res.status(200).json(data);
       })
       .catch((err) => {
         return res.status(400).json(err);
