@@ -1,8 +1,11 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import { google } from "googleapis";
 import mongoose from "mongoose";
+import nodemailer from "nodemailer";
 import { userRouter } from "./routes/user";
+import winston from "winston";
 
 // Load process.env file
 dotenv.config();
@@ -18,4 +21,35 @@ app.get("/", (req, res) => {
 app.use(express.json());
 app.use("/api/users", userRouter);
 
+// Nodemailer for google SMTP
+
+const oauth2Client = new google.auth.OAuth2(
+  process.env.clientID,
+  process.env.clientSecret,
+  "https://developers.google.com/oauthplayground"
+);
+oauth2Client.setCredentials({
+  refresh_token: process.env.refreshToken,
+});
+
+let accessToken;
+oauth2Client
+  .getAccessToken()
+  .then((data) => (accessToken = data.token))
+  .catch((err) => winston.error(err));
+
+export const transport = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    type: "OAuth2",
+    user: "allez.orbital@gmail.com",
+    clientId: process.env.clientID,
+    clientSecret: process.env.clientSecret,
+    refreshToken: process.env.refreshToken,
+    accessToken,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
 export default app;

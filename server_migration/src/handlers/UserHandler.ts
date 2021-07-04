@@ -3,6 +3,8 @@ import mongoose, { Document, Model } from "mongoose";
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
+import { transport } from "../index";
 import winston from "winston";
 
 export class User {
@@ -19,12 +21,33 @@ export class User {
           document.password = hash;
           document
             .save()
-            .then((doc) => {
+            .then(async (doc) => {
               winston.info(
                 `User ${document.username} successfully registered.`
               );
               const token = jwt.sign({ id: doc.id }, process.env.JWT_SECRET);
-              // TODO: send email here
+              await transport.sendMail(
+                {
+                  from: '"Allez" <allez.orbital@gmail.com>',
+                  to: `${doc.email}`,
+                  subject: "Welcome to Allez. Confirm your account now!",
+                  text: `Click here to confirm your account.`,
+                  html: `Click <a href = "${process.env.DOMAIN}/recover/token=${token}">here</a> to confirm your account.`,
+                },
+                (error: any, info: any) => {
+                  if (error) {
+                    winston.error(error);
+                  }
+                  if (info) {
+                    winston.info(
+                      `Email sent to ${doc.email}. Contents: ${JSON.stringify(
+                        info
+                      )}`
+                    );
+                  }
+                  reject(error);
+                }
+              );
               resolve(token);
             })
             .catch((error) => {
