@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { validate, validator } from "../validator";
+import { passwordMatch, validate, validator } from "../validator";
 
 import { Errors } from "../handlers/Errors";
 import { User } from "../models/UserSchema";
@@ -67,6 +67,34 @@ class Login {
         }
       });
   }
+  static async handleReset(req: Request, res: Response) {
+    const email = req.header("email");
+    UserMethods.resetReq(User, email)
+      .then((data) => {
+        res.status(200).json(data);
+      })
+      .catch((err) => {
+        try {
+          Errors.handleJWTError(err, res);
+        } catch (err) {
+          res.status(500).json(err.message);
+        }
+      });
+  }
+
+  static async handleResetEnd(req: Request, res: Response) {
+    const token = req.header("token");
+    const { password, password_confirm } = req.body;
+    UserMethods.reset(User, token, password)
+      .then((data) => res.status(200).json(data))
+      .catch((err) => {
+        try {
+          Errors.handleJWTError(err, res);
+        } catch (err) {
+          res.status(500).json(err.message);
+        }
+      });
+  }
 }
 
 userRouter.post(
@@ -78,3 +106,12 @@ userRouter.post(
 userRouter.get("/verify", validator("verify"), validate, Login.handleVerify);
 userRouter.post("/login", validator("login"), validate, Login.handleLogin);
 userRouter.get("/confirm", validator("confirm"), validate, Login.handleConfirm);
+userRouter.get("/reset", validator("reset"), validate, Login.handleReset);
+userRouter.post(
+  "/reset/end",
+  passwordMatch,
+  validator("token"),
+  validator("resetEnd"),
+  validate,
+  Login.handleResetEnd
+);

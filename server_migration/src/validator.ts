@@ -5,6 +5,9 @@ import winston from "winston";
 
 export const validator = (method: string) => {
   switch (method) {
+    case "token": {
+      return [header("token", "Token doesn't exist on the header.").exists()];
+    }
     case "register": {
       return [
         body("name", "Name doesn't exist on the body.").exists(),
@@ -28,6 +31,18 @@ export const validator = (method: string) => {
     case "confirm": {
       return [header("token", "Token doesn't exist on the header.").exists()];
     }
+    case "reset": {
+      return [header("email", "Email doesn't exist on the header.").exists()];
+    }
+    case "resetEnd": {
+      return [
+        body("password", "Password doesn't exist on the body.").exists(),
+        body(
+          "password_confirm",
+          "Password confirm doesn't exist on the body."
+        ).exists(),
+      ];
+    }
   }
 };
 
@@ -46,3 +61,11 @@ export const validate = (req: Request, res: Response, next: () => any) => {
     errors: extractedErrors,
   });
 };
+export const passwordMatch = body("password_confirm").custom(
+  (value, { req }) => {
+    if (value !== req.body.password) {
+      throw new Error("Passwords does not match");
+    }
+    return true;
+  }
+);

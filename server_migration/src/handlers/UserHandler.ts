@@ -117,4 +117,71 @@ export class User {
       }
     });
   }
+  static async resetReq(
+    document: Model<IUserDoc | IGymDoc>,
+    email: string
+  ): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      document
+        .findOne({ email })
+        .then((data) => {
+          if (data) {
+            const resetToken = jwt.sign(
+              { id: data.id },
+              `password_reset-${process.env.JWT_SECRET}`
+            );
+            winston.info(
+              `User ${email} password reset request successfully sent to email.`
+            );
+            resolve(resetToken);
+          } else {
+            winston.info(`User ${email} is not found. Faking 200 response.`);
+            resolve("bad token");
+          }
+        })
+        .catch((err) => reject(err));
+    });
+  }
+
+  static async reset(
+    document: Model<IUserDoc | IGymDoc>,
+    token: string,
+    password: string
+  ): Promise<IUserDoc | IGymDoc> {
+    return new Promise((resolve, reject) => {
+      const payload = jwt.verify(
+        token,
+        `password_reset-${process.env.JWT_SECRET}`
+      ) as jwt.JwtPayload;
+      const id = payload.id;
+      document
+        .findById({ _id: id })
+        .then((user) => {
+          bcrypt
+            .genSalt()
+            .then((salt) => {
+              bcrypt.hash(password, salt, (err, hash) => {
+                if (err) {
+                  winston.error("Error generating password hash.");
+                  reject("Error generating password hash.");
+                }
+                user.password = hash;
+                user
+                  .save()
+                  .then((doc) => {
+                    winston.info(
+                      `User ${user.username} password successfully reset.`
+                    );
+                    resolve(user);
+                  })
+                  .catch((error) => {
+                    reject(error);
+                  });
+              });
+            })
+            .catch((err) => reject(err));
+        })
+        .catch((err) => reject(err));
+    });
+  }
 }
