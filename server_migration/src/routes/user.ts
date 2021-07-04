@@ -48,9 +48,22 @@ class Login {
       })
       .catch((err) => {
         if (err === "Account not activated") {
-          res.status(403).json(err.message);
+          res.status(403).json(err);
         } else {
           res.status(401).json(err.message);
+        }
+      });
+  }
+
+  static async handleConfirm(req: Request, res: Response) {
+    const token = req.header("token");
+    UserMethods.confirm(User, token)
+      .then((data) => res.status(200).json(data))
+      .catch((err) => {
+        try {
+          Errors.handleJWTError(err, res);
+        } catch (err) {
+          res.status(500).json(err.message);
         }
       });
   }
@@ -64,3 +77,4 @@ userRouter.post(
 );
 userRouter.get("/verify", validator("verify"), validate, Login.handleVerify);
 userRouter.post("/login", validator("login"), validate, Login.handleLogin);
+userRouter.get("/confirm", validator("confirm"), validate, Login.handleConfirm);

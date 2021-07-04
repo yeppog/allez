@@ -25,6 +25,9 @@ export const validator = (method: string) => {
         body("password", "password doesn't exist on the body.").exists(),
       ];
     }
+    case "confirm": {
+      return [header("token", "Token doesn't exist on the header.").exists()];
+    }
   }
 };
 

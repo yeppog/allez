@@ -23,7 +23,7 @@ export class User {
               winston.info(
                 `User ${document.username} successfully registered.`
               );
-              const token = jwt.sign(hash, process.env.JWT_SECRET);
+              const token = jwt.sign({ id: doc.id }, process.env.JWT_SECRET);
               // TODO: send email here
               resolve(token);
             })
@@ -47,7 +47,12 @@ export class User {
         const id = payload.id;
         document
           .findById({ _id: id })
-          .then((user) => resolve(user))
+          .then((user) => {
+            if (!user.activated) {
+              reject("Account not activated");
+            }
+            resolve(user);
+          })
           .catch((err) => {
             winston.error(err.message);
             reject(err);
@@ -86,6 +91,30 @@ export class User {
           }
         })
         .catch((err) => reject(err));
+    });
+  }
+
+  static async confirm(
+    document: Model<IUserDoc | IGymDoc>,
+    token: string
+  ): Promise<IUserDoc | IGymDoc> {
+    return new Promise<IUserDoc | IGymDoc>((resolve, reject) => {
+      try {
+        const payload = jwt.verify(
+          token,
+          process.env.JWT_SECRET
+        ) as jwt.JwtPayload;
+        const id = payload.id;
+        document.findById({ _id: id }).then((user) => {
+          user.activated = true;
+          user
+            .save()
+            .then((data) => resolve(data))
+            .catch((err) => reject(err));
+        });
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 }
