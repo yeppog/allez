@@ -16,6 +16,15 @@ export const validator = (method: string) => {
     case "verify": {
       return [header("token", "Token doesn't exist on the header.").exists()];
     }
+    case "login": {
+      return [
+        body(
+          ["username", "email"],
+          "Email or username doesn't exist on the body."
+        ).if((value: string[]) => value[0] || value[1]),
+        body("password", "password doesn't exist on the body.").exists(),
+      ];
+    }
   }
 };
 

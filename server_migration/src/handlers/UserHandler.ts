@@ -57,4 +57,35 @@ export class User {
       }
     });
   }
+
+  static async login(
+    document: Model<IUserDoc | IGymDoc>,
+    password: string,
+    email?: string,
+    username?: string
+  ): Promise<{ token: string; user: IUserDoc | IGymDoc }> {
+    return new Promise((resolve, reject) => {
+      let query;
+      if (email) {
+        query = { email };
+      } else {
+        query = { username };
+      }
+      document
+        .findOne(query)
+        .then((doc) => {
+          if (!doc.activated) {
+            reject("Account not activated");
+          }
+          const check = bcrypt.compare(doc.password, password);
+          if (check) {
+            const token = jwt.sign({ id: doc._id }, process.env.JWT_SECRET);
+            resolve({ token, user: doc });
+          } else {
+            reject("Password incorrect.");
+          }
+        })
+        .catch((err) => reject(err));
+    });
+  }
 }

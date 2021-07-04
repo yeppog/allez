@@ -8,36 +8,59 @@ import winston from "winston";
 
 export const userRouter = express.Router();
 
-async function handleRegister(req: Request, res: Response) {
-  const { name, username, email, password } = req.body;
+class Login {
+  static async handleRegister(req: Request, res: Response) {
+    const { name, username, email, password } = req.body;
 
-  const newUser = new User({
-    name,
-    username,
-    email,
-    password,
-  });
-  UserMethods.createUser(newUser)
-    .then((token) => res.status(200).json(token))
-    .catch((err) => {
-      winston.error(err.message);
-      res.status(401).json(err.message);
+    const newUser = new User({
+      name,
+      username,
+      email,
+      password,
     });
+    UserMethods.createUser(newUser)
+      .then((token) => res.status(200).json(token))
+      .catch((err) => {
+        winston.error(err.message);
+        res.status(401).json(err.message);
+      });
+  }
+
+  static async handleVerify(req: Request, res: Response) {
+    const token = req.header("token");
+    console.log(token);
+    UserMethods.verifyToken(token, User)
+      .then((data) => res.status(200).json(data))
+      .catch((err) => {
+        try {
+          Errors.handleJWTError(err, res);
+        } catch (err) {
+          res.status(500).json(err.message);
+        }
+      });
+  }
+
+  static async handleLogin(req: Request, res: Response) {
+    const { username, email, password } = req.body;
+    UserMethods.login(User, password, email, username)
+      .then((data) => {
+        res.status(200).json(data);
+      })
+      .catch((err) => {
+        if (err === "Account not activated") {
+          res.status(403).json(err.message);
+        } else {
+          res.status(401).json(err.message);
+        }
+      });
+  }
 }
 
-async function handleVerify(req: Request, res: Response) {
-  const token = req.header("token");
-  console.log(token);
-  UserMethods.verifyToken(token, User)
-    .then((data) => res.status(200).json(data))
-    .catch((err) => {
-      try {
-        Errors.handleJWTError(err, res);
-      } catch (err) {
-        res.status(500).json(err.message);
-      }
-    });
-}
-
-userRouter.post("/register", validator("register"), validate, handleRegister);
-userRouter.get("/verify", validator("verify"), validate, handleVerify);
+userRouter.post(
+  "/register",
+  validator("register"),
+  validate,
+  Login.handleRegister
+);
+userRouter.get("/verify", validator("verify"), validate, Login.handleVerify);
+userRouter.post("/login", validator("login"), validate, Login.handleLogin);

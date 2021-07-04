@@ -22,6 +22,7 @@ const UserSchema = new mongoose.Schema(
     },
     activated: {
       type: Boolean,
+      default: false,
     },
     name: {
       type: String,
