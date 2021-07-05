@@ -1,12 +1,13 @@
 import { GridFsStorage } from "multer-gridfs-storage";
 import crypto from "crypto";
+import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
 import multer from "multer";
 import path from "path";
 import winston from "winston";
 
-const logger = winston.loggers.get("logger");
+dotenv.config();
 
 mongoose.connect(
   process.env.MONGO_URI,
@@ -15,9 +16,8 @@ mongoose.connect(
     useUnifiedTopology: true,
     useCreateIndex: true,
   },
-  () => logger.info("MongoDB connection established.")
+  () => winston.info("MongoDB connection established.")
 );
-
 const avatarStorage = new GridFsStorage({
   db: mongoose.connection,
   file: (req: any, file: any) => {
@@ -64,7 +64,7 @@ const mediaStorage = new GridFsStorage({
             resolve(imgFileInfo);
 
           default:
-            logger.error(
+            winston.error(
               "File provided to this bucket isn't of the right format of mp4, jpeg, gif or png."
             );
             reject("File type doesnt match");
