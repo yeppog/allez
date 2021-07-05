@@ -3,115 +3,24 @@ import { passwordMatch, validate, validator } from "../validator";
 
 import { Errors } from "../handlers/Errors";
 import { User } from "../models/UserSchema";
-import { User as UserMethods } from "../handlers/UserHandler";
+import { UserMethods } from "../handlers/UserHandler";
+import { uploadAvatar } from "../store";
 import winston from "winston";
 
-export const userRouter = express.Router();
+export const router = express.Router();
 
-class Login {
-  static async handleRegister(req: Request, res: Response) {
-    const { name, username, email, password } = req.body;
-
-    const newUser = new User({
-      name,
-      username,
-      email,
-      password,
-    });
-    UserMethods.createUser(newUser)
-      .then((token) => res.status(200).json(token))
-      .catch((err) => {
-        winston.error(err.message);
-        res.status(401).json(err.message);
-      });
-  }
-
-  static async handleVerify(req: Request, res: Response) {
-    const token = req.header("token");
-    console.log(token);
-    UserMethods.verifyToken(token, User)
-      .then((data) => res.status(200).json(data))
-      .catch((err) => {
-        try {
-          Errors.handleJWTError(err, res);
-        } catch (err) {
-          res.status(500).json(err.message);
-        }
-      });
-  }
-
-  static async handleLogin(req: Request, res: Response) {
-    const { username, email, password } = req.body;
-    UserMethods.login(User, password, email, username)
-      .then((data) => {
-        res.status(200).json(data);
+class UserActions {
+  static async handleUpdate(req: Request, res: Response) {
+    const { token, body } = req.body;
+    const file = req.file;
+    UserMethods.verifyJWT(token)
+      .then((id) => {
+        // Upload the Avatar
+        winston.info(JSON.stringify(file));
+        res.status(200).json(id);
       })
-      .catch((err) => {
-        if (err === "Account not activated") {
-          res.status(403).json(err);
-        } else {
-          res.status(401).json(err.message);
-        }
-      });
-  }
-
-  static async handleConfirm(req: Request, res: Response) {
-    const token = req.header("token");
-    UserMethods.confirm(User, token)
-      .then((data) => res.status(200).json(data))
-      .catch((err) => {
-        try {
-          Errors.handleJWTError(err, res);
-        } catch (err) {
-          res.status(500).json(err.message);
-        }
-      });
-  }
-  static async handleReset(req: Request, res: Response) {
-    const email = req.header("email");
-    UserMethods.resetReq(User, email)
-      .then((data) => {
-        res.status(200).json(data);
-      })
-      .catch((err) => {
-        try {
-          Errors.handleJWTError(err, res);
-        } catch (err) {
-          res.status(500).json(err.message);
-        }
-      });
-  }
-
-  static async handleResetEnd(req: Request, res: Response) {
-    const token = req.header("token");
-    const { password, password_confirm } = req.body;
-    UserMethods.reset(User, token, password)
-      .then((data) => res.status(200).json(data))
-      .catch((err) => {
-        try {
-          Errors.handleJWTError(err, res);
-        } catch (err) {
-          res.status(500).json(err.message);
-        }
-      });
+      .catch((err) => res.status(500).json(err.message));
   }
 }
 
-userRouter.post(
-  "/register",
-  validator("register"),
-  validate,
-  Login.handleRegister
-);
-userRouter.get("/verify", validator("verify"), validate, Login.handleVerify);
-userRouter.post("/login", validator("login"), validate, Login.handleLogin);
-userRouter.get("/confirm", validator("confirm"), validate, Login.handleConfirm);
-userRouter.get("/reset", validator("reset"), validate, Login.handleReset);
-userRouter.post(
-  "/reset/end",
-  passwordMatch,
-  validator("token"),
-  validator("resetEnd"),
-  validate,
-  Login.handleResetEnd
-);
+router.post("/update", uploadAvatar.single("file"), UserActions.handleUpdate);
