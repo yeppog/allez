@@ -7,7 +7,7 @@ import nodemailer from "nodemailer";
 import { transport } from "../index";
 import winston from "winston";
 
-export class User {
+export class UserMethods {
   static async createUser(
     document: (IUserDoc | IGymDoc) & Document<any, any>
   ): Promise<string> {
@@ -32,7 +32,7 @@ export class User {
                   to: `${doc.email}`,
                   subject: "Welcome to Allez. Confirm your account now!",
                   text: `Click here to confirm your account.`,
-                  html: `Click <a href = "${process.env.DOMAIN}/recover/token=${token}">here</a> to confirm your account.`,
+                  html: `Click <a href = "${process.env.APPDOMAIN}/confirm/token=${token}">here</a> to confirm your account.`,
                 },
                 (error: any, info: any) => {
                   if (error) {
@@ -147,14 +147,31 @@ export class User {
     return new Promise<string>((resolve, reject) => {
       document
         .findOne({ email })
-        .then((data) => {
+        .then(async (data) => {
           if (data) {
             const resetToken = jwt.sign(
               { id: data.id },
               `password_reset-${process.env.JWT_SECRET}`
             );
-            winston.info(
-              `User ${email} password reset request successfully sent to email.`
+            await transport.sendMail(
+              {
+                from: '"Allez" <allez.orbital@gmail.com>',
+                to: `${email}`,
+                subject: "Allez: Password Reset Request",
+                text: `Click here to reset your password.`,
+                html: `Click <a href = "${process.env.APPDOMAIN}/reset/token=${resetToken}">here</a> to reset your account.`,
+              },
+              (error: any, info: any) => {
+                if (error) {
+                  winston.error(error);
+                }
+                if (info) {
+                  winston.info(
+                    `Email sent to ${email}. Contents: ${JSON.stringify(info)}`
+                  );
+                }
+                reject(error);
+              }
             );
             resolve(resetToken);
           } else {
@@ -205,6 +222,17 @@ export class User {
             .catch((err) => reject(err));
         })
         .catch((err) => reject(err));
+    });
+  }
+
+  static async verifyJWT(token: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      try {
+        const id = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
+        resolve(id.id);
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 }
