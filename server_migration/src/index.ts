@@ -1,10 +1,11 @@
+import { authRouter } from "./routes/auth";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { google } from "googleapis";
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
-import { userRouter } from "./routes/user";
+import { router } from "./routes/user";
 import winston from "winston";
 
 // Load process.env file
@@ -19,7 +20,8 @@ app.get("/", (req, res) => {
 });
 
 app.use(express.json());
-app.use("/api/users", userRouter);
+app.use("/api/users", authRouter);
+app.use("/api/users", router);
 
 // Nodemailer for google SMTP
 
