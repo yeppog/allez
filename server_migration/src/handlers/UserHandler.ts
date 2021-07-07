@@ -235,4 +235,26 @@ export class UserMethods {
       }
     });
   }
+
+  static async getUserFromToken(
+    token: string,
+    document: Model<IUserDoc | IGymDoc>
+  ): Promise<(IUserDoc | IGymDoc) & mongoose.Document> {
+    return new Promise<(IUserDoc | IGymDoc) & mongoose.Document>(
+      (resolve, reject) => {
+        try {
+          const id = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+          ) as jwt.JwtPayload;
+          document
+            .findById({ _id: id })
+            .then((user) => resolve(user))
+            .catch((err) => reject(err));
+        } catch (err) {
+          reject(err);
+        }
+      }
+    );
+  }
 }

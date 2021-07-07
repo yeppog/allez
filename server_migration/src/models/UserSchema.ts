@@ -94,6 +94,7 @@ export const User = mongoose.model<IUserDoc>("UserData", UserSchema);
 export const Gym = mongoose.model<IGymDoc>("GymData", GymSchema);
 
 export interface User {
+  id: string;
   username: string;
   email: string;
   password: string;
