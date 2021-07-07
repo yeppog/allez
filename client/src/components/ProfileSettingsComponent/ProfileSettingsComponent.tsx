@@ -14,6 +14,7 @@ import { User } from '../../interface/Schemas';
 import axios from 'axios';
 import { updateUser } from '../Redux/userSlice';
 import { useHistory } from 'react-router';
+import { editProfile } from '../../api';
 
 const ProfileSettingsComponent: React.FC = () => {
   const [avatar, setAvatar] = useState<File | null>();
@@ -87,13 +88,11 @@ const ProfileSettingsComponent: React.FC = () => {
     formData.append('token', token);
     formData.append('bio', state.bio);
     // dispatch(updateUserProfile(formData));
-    axios
-      .post('/api/users/updateProfile', formData)
+    editProfile(formData)
       .then((data) => {
-        console.log(data.data);
-        setState(data.data);
+        setState(data);
         setAvatar(null);
-        dispatch(updateUser(data.data as User));
+        dispatch(updateUser(data as User));
         history.goBack();
       })
       .catch((err) => {

@@ -1,9 +1,16 @@
 .ProfileComponent {
   margin-top: 100px;
   display: grid;
+  margin-bottom: 100px;
 }
 
-.img {
-  max-width: 200px;
-  display: block;
+.profileImg {
+  height: 150px;
+  width: 150px;
 }
+
+// .profilepic {
+//   height: 150px;
+//   width: 150px;
+//   background-color: white;
+// }

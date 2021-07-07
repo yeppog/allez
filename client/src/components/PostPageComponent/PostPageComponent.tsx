@@ -33,6 +33,8 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import { addComment, fetchPost, likePost } from '../../api';
 import { useHistory, useParams } from 'react-router';
 
+import { Alert } from '@material-ui/lab';
+import { CSSTransition } from 'react-transition-group';
 import CommentComponent from '../CommentComponent/CommentComponent';
 import DeleteModal from '../DeleteModal/DeleteModal';
 import { formatTimeToString } from '../../formatNumber';
@@ -45,6 +47,7 @@ interface State {
   liked: boolean;
   mediaType: 'image' | 'video' | null;
   comment: string;
+  errorMessage: string;
 }
 
 function getMediaType(post: Post): 'video' | 'image' {
@@ -60,6 +63,7 @@ function getMediaType(post: Post): 'video' | 'image' {
 
 const PostPageComponent: React.FC = () => {
   const slug = useParams<ID>().id;
+  const nodeRef = React.useRef(null);
   const [mappedComponent, setMappedComponent] = useState<ReactNode>();
   const [anchor, setAnchor] = useState<null | HTMLElement>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<boolean>(false);
@@ -67,6 +71,7 @@ const PostPageComponent: React.FC = () => {
     liked: false,
     mediaType: null,
     comment: '',
+    errorMessage: '',
   });
   const [post, setPost] = useState<Post>();
 
@@ -135,7 +140,10 @@ const PostPageComponent: React.FC = () => {
             comment: '',
           });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          setState({ ...state, errorMessage: err.message });
+          console.log(err);
+        });
     }
   };
 
@@ -261,6 +269,24 @@ const PostPageComponent: React.FC = () => {
                     />
                   </form>
                 </FormControl>
+                <div className="errorAlert">
+                  <CSSTransition
+                    nodeRef={nodeRef}
+                    in={state.errorMessage ? true : false}
+                    timeout={1000}
+                    unmountOnExit
+                    classNames="errorAlert"
+                  >
+                    <div ref={nodeRef}>
+                      <Alert
+                        severity="error"
+                        onClose={() => setState({ ...state, errorMessage: '' })}
+                      >
+                        {state.errorMessage}
+                      </Alert>
+                    </div>
+                  </CSSTransition>
+                </div>
               </CardContent>
             </Card>
           </Grid>
