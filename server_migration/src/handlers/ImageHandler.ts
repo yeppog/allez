@@ -62,4 +62,26 @@ export class ImageHandler {
         .catch((err) => reject(err));
     });
   }
+
+  public static async uploadImage(
+    caption: string,
+    filename: string,
+    id: string,
+    route: string
+  ): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const image = new Image({
+        caption,
+        filename,
+        chunkIDRef: id,
+      });
+
+      image
+        .save()
+        .then((data) =>
+          resolve(`${process.env.DOMAIN}${route}${data.filename}`)
+        )
+        .catch((err) => reject(err));
+    });
+  }
 }

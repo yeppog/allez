@@ -5,6 +5,7 @@ import express from "express";
 import { google } from "googleapis";
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
+import { postRouter } from "./routes/post";
 import { router } from "./routes/user";
 import winston from "winston";
 
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 app.use(express.json());
 app.use("/api/users", authRouter);
 app.use("/api/users", router);
+app.use("/api/posts", postRouter);
 
 // Nodemailer for google SMTP
 

@@ -46,6 +46,17 @@ export const validator = (method: string) => {
   }
 };
 
+export const postValidator = (method: string) => {
+  switch (method) {
+    case "token": {
+      return [header("token", "Token doesn't exist on the header.").exists()];
+    }
+    case "create": {
+      return [body("body", "Body doesn't exist on the request body.").exists()];
+    }
+  }
+};
+
 export const validate = (req: Request, res: Response, next: () => any) => {
   const errors = validationResult(req);
   if (errors.isEmpty()) {
@@ -69,3 +80,11 @@ export const passwordMatch = body("password_confirm").custom(
     return true;
   }
 );
+
+export const validateFile = (req: Request, res: Response, next: () => any) => {
+  if (req.file === null) {
+    res.status(422).json("No file provided!");
+  } else {
+    return next();
+  }
+};

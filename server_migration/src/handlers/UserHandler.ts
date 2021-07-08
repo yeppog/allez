@@ -102,6 +102,10 @@ export class UserMethods {
       document
         .findOne(query)
         .then((doc) => {
+          if (!doc) {
+            reject("Invalid user");
+            winston.info("User does not exist");
+          }
           if (!doc.activated) {
             reject("Account not activated");
           }
@@ -110,6 +114,9 @@ export class UserMethods {
             const token = jwt.sign({ id: doc._id }, process.env.JWT_SECRET);
             resolve({ token, user: doc });
           } else {
+            winston.info(
+              `Password is incorrect for user ${email} / ${username}`
+            );
             reject("Password incorrect.");
           }
         })
@@ -248,7 +255,7 @@ export class UserMethods {
             process.env.JWT_SECRET
           ) as jwt.JwtPayload;
           document
-            .findById({ _id: id })
+            .findById({ _id: id.id })
             .then((user) => resolve(user))
             .catch((err) => reject(err));
         } catch (err) {
