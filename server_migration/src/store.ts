@@ -48,26 +48,30 @@ const mediaStorage = new GridFsStorage({
         const filename = buff.toString("hex") + path.extname(file.originalname);
 
         switch (file.mimetype) {
-          case "video/mp4":
+          case "video/mp4": {
             const videoFileInfo = {
               filename: `video_${filename}`,
               bucketName: "video",
             };
             resolve(videoFileInfo);
+          }
           case "image/jpeg":
           case "image/gif":
           case "image/png":
+          case "image/jpg": {
             const imgFileInfo = {
               filename: `image_${filename}`,
               bucketName: "images",
             };
             resolve(imgFileInfo);
+          }
 
-          default:
-            winston.error(
-              "File provided to this bucket isn't of the right format of mp4, jpeg, gif or png."
-            );
+          default: {
+            // winston.error(
+            //   "File provided to this bucket isn't of the right format of mp4, jpeg, gif or png."
+            // );
             reject("File type doesnt match");
+          }
         }
       });
     });
