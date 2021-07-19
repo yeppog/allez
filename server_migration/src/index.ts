@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import nodemailer from "nodemailer";
 import { postRouter } from "./routes/post";
 import { router } from "./routes/user";
+import { videoRouter } from "./routes/video";
 import winston from "winston";
 
 // Load process.env file
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use("/api/users", authRouter);
 app.use("/api/users", router);
 app.use("/api/posts", postRouter);
+app.use("/api/videos", videoRouter);
 
 // Nodemailer for google SMTP
 
@@ -40,7 +42,11 @@ let accessToken;
 oauth2Client
   .getAccessToken()
   .then((data) => (accessToken = data.token))
-  .catch((err) => winston.error(err));
+  .catch((err) => {
+    if (err) {
+      winston.error(err.message);
+    }
+  });
 
 export const transport = nodemailer.createTransport({
   service: "gmail",

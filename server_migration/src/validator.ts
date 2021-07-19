@@ -52,7 +52,14 @@ export const postValidator = (method: string) => {
       return [header("token", "Token doesn't exist on the header.").exists()];
     }
     case "create": {
-      return [body("body", "Body doesn't exist on the request body.").exists()];
+      return [
+        body("body", "Post body doesn't exist on the request body.").exists(),
+      ];
+    }
+    case "edit": {
+      return [
+        body("body", "Post body doesn't exist on the request body.").exists(),
+      ];
     }
   }
 };

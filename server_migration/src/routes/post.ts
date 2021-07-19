@@ -10,6 +10,7 @@ import {
 import { Errors } from "../handlers/Errors";
 import { ImageHandler } from "../handlers/ImageHandler";
 import { Post } from "../models/PostSchema";
+import { PostHandler } from "../handlers/PostHandler";
 import { User } from "../models/UserSchema";
 import { UserMethods } from "../handlers/UserHandler";
 import { VideoHandler } from "../handlers/VideoHandler";
@@ -59,7 +60,7 @@ class PostActions {
             .then((video) => (post.mediaPath = video))
             .catch((err) => res.status(500).json(err.message));
         }
-        crypto.randomBytes(32, (err, buff) => {
+        crypto.randomBytes(32, async (err, buff) => {
           if (err) {
             winston.error(err.message);
             res.status(500).json(err.message);
@@ -67,14 +68,68 @@ class PostActions {
             post.slug = buff.toString("hex");
             // settte tagging here with another method
 
-            post
-              .save()
-              .then((data) => res.status(200).json(data))
-              .catch((saveErr) => res.status(500).json(saveErr.message));
+            PostHandler.handleNewTags(
+              {
+                gym: req.body.taggedGym,
+                user: req.body.taggedUser,
+                route: req.body.taggedRoute,
+              },
+              post.slug,
+              new Date(post.createdAt)
+            ).then((tagged) => {
+              console.log(tagged);
+              post.tag = tagged;
+              post
+                .save()
+                .then((savedPost) => {
+                  savedPost.tag = tagged;
+                  winston.info(
+                    `Post ${process.env.APPDOMAIN}/post/${savedPost.slug} by user ${savedPost.username} has been successfully created.`
+                  );
+                  res.status(200).json(savedPost);
+                })
+                .catch((saveErr) => res.status(500).json(saveErr.message));
+            });
           }
         });
       })
       .catch((err) => res.status(403).json(err.message));
+  }
+
+  public static async handleEditPost(req: Request, res: Response) {
+    const token = req.header("token");
+    UserMethods.getUserFromToken(token, User).then((user) => {
+      Post.findOne({ slug: req.body.slug }).then((post) => {
+        if (!post) {
+          res.status(404).json("Unable to find the post.");
+        } else {
+          post.postBody = req.body.postBody ? req.body.postBody : post.postBody;
+          // handle the tagging here
+          post.edited = true;
+          PostHandler.handleNewTags(
+            {
+              gym: req.body.taggedGym,
+              user: req.body.taggedUser,
+              route: req.body.taggedRoute,
+            },
+            post.slug,
+            new Date(post.createdAt)
+          ).then((tagged) => {
+            post.tag = tagged;
+            post
+              .save()
+              .then((savedPost) => {
+                savedPost.tag = tagged;
+                winston.info(
+                  `Post ${process.env.APPDOMAIN}/post/${savedPost.slug} by user ${savedPost.username} has been successfully edited.`
+                );
+                res.status(200).json(savedPost);
+              })
+              .catch((err) => res.status(500).json(err.message));
+          });
+        }
+      });
+    });
   }
 }
 
@@ -85,4 +140,10 @@ postRouter.post(
   postValidator("token"),
   postValidator("create"),
   PostActions.handleCreatePost
+);
+postRouter.post(
+  "/edit",
+  postValidator("token"),
+  postValidator("edit"),
+  PostActions.handleEditPost
 );

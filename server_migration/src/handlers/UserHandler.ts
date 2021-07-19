@@ -1,4 +1,4 @@
-import { IGymDoc, IUserDoc } from "../models/UserSchema";
+import { IGymDoc, IUserDoc, User } from "../models/UserSchema";
 import mongoose, { Document, Model } from "mongoose";
 
 import bcrypt from "bcrypt";
@@ -263,5 +263,21 @@ export class UserMethods {
         }
       }
     );
+  }
+
+  public static async updateUserTag(tag: string, slug: string, date: Date) {
+    return new Promise((resolve, reject) => {
+      User.findOne({ username: tag }).then((user) => {
+        if (!user) {
+          reject("Tagged user not found");
+        } else {
+          user.taggedPost[date.toISOString()] = slug;
+          user
+            .save()
+            .then((data) => resolve(data))
+            .catch((err) => reject(err));
+        }
+      });
+    });
   }
 }
