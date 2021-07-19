@@ -21,6 +21,23 @@ app.get("/", (req, res) => {
   res.send("Hello world!");
 });
 
+app.use(
+  cors({
+    allowedHeaders: [
+      "sessionId",
+      "Content-Type",
+      "token",
+      "username",
+      "target",
+      "user",
+      "slug",
+    ],
+    exposedHeaders: ["sessionId"],
+    origin: "*",
+    methods: "GET, PUT, PATCH, POST, DELETE",
+  })
+);
+
 app.use(express.json());
 app.use("/api/users", authRouter);
 app.use("/api/users", router);

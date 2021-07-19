@@ -141,11 +141,15 @@ export class UserMethods {
         ) as jwt.JwtPayload;
         const id = payload.id;
         document.findById({ _id: id }).then((user) => {
-          user.activated = true;
-          user
-            .save()
-            .then((data) => resolve(data))
-            .catch((err) => reject(err));
+          if (user) {
+            user.activated = true;
+            user
+              .save()
+              .then((data) => resolve(data))
+              .catch((err) => reject(err));
+          } else {
+            reject("User not found.");
+          }
         });
       } catch (err) {
         reject(err);

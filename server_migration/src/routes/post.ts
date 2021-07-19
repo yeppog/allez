@@ -77,14 +77,13 @@ class PostActions {
               post.slug,
               new Date(post.createdAt)
             ).then((tagged) => {
-              console.log(tagged);
               post.tag = tagged;
               post
                 .save()
                 .then((savedPost) => {
                   savedPost.tag = tagged;
                   winston.info(
-                    `Post ${process.env.APPDOMAIN}/post/${savedPost.slug} by user ${savedPost.username} has been successfully created.`
+                    `Post ${process.env.DOMAIN}/post/${savedPost.slug} by user ${savedPost.username} has been successfully created.`
                   );
                   res.status(200).json(savedPost);
                 })
@@ -121,7 +120,7 @@ class PostActions {
               .then((savedPost) => {
                 savedPost.tag = tagged;
                 winston.info(
-                  `Post ${process.env.APPDOMAIN}/post/${savedPost.slug} by user ${savedPost.username} has been successfully edited.`
+                  `Post ${process.env.DOMAIN}/post/${savedPost.slug} by user ${savedPost.username} has been successfully edited.`
                 );
                 res.status(200).json(savedPost);
               })

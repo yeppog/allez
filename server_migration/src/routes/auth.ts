@@ -28,7 +28,6 @@ class Auth {
 
   static async handleVerify(req: Request, res: Response) {
     const token = req.header("token");
-    console.log(token);
     UserMethods.verifyToken(token, User)
       .then((data) => res.status(200).json(data))
       .catch((err) => {
