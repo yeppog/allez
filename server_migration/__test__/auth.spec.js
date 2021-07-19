@@ -364,3 +364,162 @@ describe("Test reset password reset", () => {
       });
   });
 });
+
+describe("Test verify", () => {
+  it("Test verify with correct token", async () => {
+    await request
+      .post("/api/users/register")
+      .send({
+        username: "test2",
+        name: "name",
+        email: "test2@gmail.com",
+        password: "test1",
+      })
+      .then(async (data) => {
+        expect(data.status).toBe(200);
+        await request
+          .get("/api/users/confirm")
+          .set("token", data.body)
+          .then(async (data2) => {
+            expect(data2.status).toBe(200);
+            await request
+              .post("/api/users/login")
+              .send({
+                email: "test2@gmail.com",
+                password: "test1",
+              })
+              .then(async (data3) => {
+                expect(data3.status).toBe(200);
+                await request
+                  .get("/api/users/verify")
+                  .set("token", data3.body.token)
+                  .then((dataVerify) => {
+                    expect(dataVerify.status).toBe(200);
+                    expect(dataVerify.body).toHaveProperty("username");
+                  });
+              });
+          });
+      });
+  });
+  it("Test verify with invalid token", async () => {
+    await request
+      .get("/api/users/verify")
+      .set(
+        "token",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+      )
+      .then((dataVerify) => {
+        expect(dataVerify.status).toBe(400);
+      });
+  });
+
+  it("Test verify with no token", async () => {
+    await request.get("/api/users/verify").then((dataVerify) => {
+      expect(dataVerify.status).toBe(422);
+    });
+  });
+});
+
+describe("Test user update profile", () => {
+  it("Test update profile without images", async () => {
+    await request
+      .post("/api/users/register")
+      .send({
+        username: "test",
+        name: "test",
+        email: "test@gmail.com",
+        password: "test",
+      })
+      .then(async (data) => {
+        await request
+          .get("/api/users/confirm")
+          .set("token", data.body)
+          .then(async (confirm) => {
+            expect(confirm.status).toBe(200);
+            await request
+              .post("/api/users/login")
+              .send({
+                username: "test",
+                email: "test@gmail.com",
+                password: "test",
+              })
+              .then(async (data) => {
+                expect(data.status).toBe(200);
+                await request
+                  .post("/api/users/update")
+                  .set("token", data.body.token)
+                  .send({
+                    bio: "tester",
+                    name: "name",
+                  })
+                  .then((receive) => {
+                    expect(receive.status).toBe(200);
+                    expect(receive.body.name).toBe("name");
+                    expect(receive.body.bio).toBe("tester");
+                  });
+              });
+          });
+      });
+  });
+  it("Test update profile without invalid token", async () => {
+    await request
+      .post("/api/users/update")
+      .set(
+        "token",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+      )
+      .send({
+        bio: "tester",
+        name: "name",
+      })
+      .then((receive) => {
+        expect(receive.status).toBe(500);
+        expect(receive.body).toBe("invalid signature");
+      });
+  });
+});
+
+// describe("Test public profile", () => {
+//   it("Test valid profile search", async () => {
+//     await request
+//       .post("/api/users/register")
+//       .send({
+//         username: "test",
+//         email: "test",
+//         password: "test",
+//       })
+//       .then(async (data) => {
+//         await request
+//           .get("/api/users/getPublicProfile")
+//           .set("username", "test")
+//           .then((test) => {
+//             expect(test.status).toBe(200);
+//             expect(test.body).toHaveProperty("username");
+//           });
+//       });
+//   });
+//   it("Test invalid profile search (invalid username)", async () => {
+//     await request
+//       .post("/api/users/register")
+//       .send({
+//         username: "test",
+//         email: "test",
+//         password: "test",
+//       })
+//       .then(async (data) => {
+//         await request
+//           .get("/api/users/getPublicProfile")
+//           .set("username", "test1")
+//           .then((test) => {
+//             expect(test.status).toBe(403);
+//             expect(test.body.message).toBe("User not found");
+//           });
+//       });
+//   });
+//   it("Test invalid profile search (no username)", async () => {
+//     await request.get("/api/users/getPublicProfile").then((test) => {
+//       expect(test.status).toBe(404);
+//       expect(test.body.message).toBe("No username specified");
+//     });
+//   });
+// });
