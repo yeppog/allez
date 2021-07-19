@@ -107,23 +107,23 @@ export class UserMethods {
       }
       document
         .findOne(query)
-        .then((doc) => {
+        .then(async (doc) => {
           if (!doc) {
-            reject("Invalid user");
+            reject({ message: "Invalid user" });
             winston.info("User does not exist");
           }
           if (!doc.activated) {
-            reject("Account not activated");
+            reject({ message: "Account not activated" });
           }
-          const check = bcrypt.compare(doc.password, password);
-          if (check) {
+          const check = await bcrypt.compare(password, doc.password);
+          if (check === true) {
             const token = jwt.sign({ id: doc._id }, process.env.JWT_SECRET);
             resolve({ token, user: doc });
           } else {
             winston.info(
               `Password is incorrect for user ${email} / ${username}`
             );
-            reject("Password incorrect.");
+            reject({ message: "Password incorrect." });
           }
         })
         .catch((err) => reject(err));

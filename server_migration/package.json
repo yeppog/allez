@@ -8,7 +8,7 @@
     "build": "tsc",
     "prestart": "npm run build",
     "start": "node .",
-    "test": "jest"
+    "test": "jest --collectCoverage"
   },
   "keywords": [],
   "author": "",

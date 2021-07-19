@@ -149,3 +149,218 @@ describe("Testing Confirm ", () => {
     });
   });
 });
+
+describe("Testing login", () => {
+  it("Test login with valid credentials and confirmed account", async () => {
+    await request
+      .post("/api/users/register")
+      .send({
+        username: "test2",
+        name: "lol",
+        email: "test2@gmail.com",
+        password: "test1",
+      })
+      .then(async (data) => {
+        expect(data.status).toBe(200);
+        await request
+          .get("/api/users/confirm")
+          .set("token", data.body)
+          .then(async (data2) => {
+            expect(data2.status).toBe(200);
+            await request
+              .post("/api/users/login")
+              .send({
+                email: "test2@gmail.com",
+                password: "test1",
+              })
+              .then((data3) => {
+                expect(data3.status).toBe(200);
+              });
+          });
+      });
+  });
+
+  it("Test login with valid credentials but unconfirmed account", async () => {
+    await request
+      .post("/api/users/register")
+      .send({
+        username: "test",
+        email: "test@gmail.com",
+        password: "test",
+      })
+      .then(async (data) => {
+        await request
+          .post("/api/users/login")
+          .send({
+            username: "test",
+            email: "test@gmail.com",
+            password: "test",
+          })
+          .then((data) => {
+            expect(data.status).toBe(401);
+            expect(data.body).toBe("Account not activated");
+          });
+      });
+  });
+  it("Test login with only username valid credentials", async () => {
+    await request
+      .post("/api/users/login")
+      .send({
+        username: "test2",
+        password: "test1",
+      })
+      .then((data) => {
+        expect(data.status).toBe(200);
+        expect(data.body).toHaveProperty("token");
+      });
+  });
+  it("Test login with only email valid credentials", async () => {
+    await request
+      .post("/api/users/login")
+      .send({
+        email: "test2@gmail.com",
+        password: "test1",
+      })
+      .then((data) => {
+        expect(data.status).toBe(200);
+        expect(data.body).toHaveProperty("token");
+      });
+  });
+
+  it("Test login with incorrect password", async () => {
+    await request
+      .post("/api/users/login")
+      .send({
+        username: "test2",
+        email: "test2@gmail.com",
+        password: "wrong_password",
+      })
+      .then((data) => {
+        expect(data.body).toBe("Password incorrect.");
+        expect(data.status).toBe(401);
+      });
+  });
+  it("Test login with invalid email", async () => {
+    await request
+      .post("/api/users/login")
+      .send({
+        username: "nonaddeduser",
+        email: "nonaddeduser@gmail.com",
+        password: "test",
+      })
+      .then((data) => {
+        expect(data.status).toBe(401);
+        expect(data.body).toBe("Invalid user");
+      });
+  });
+  it("Test login without proper fields", async () => {
+    await request
+      .post("/api/users/login")
+      .send({
+        password: "test",
+      })
+      .then((data) => {
+        expect(data.status).toBe(401);
+        expect(data.body).toBe("Invalid user");
+      });
+  });
+});
+
+describe("Test reset password request", () => {
+  it("Create an account", async () => {
+    await request
+      .post("/api/users/register")
+      .send({
+        username: "test",
+        name: "test",
+        email: "test@gmail.com",
+        password: "test",
+      })
+      .then((data) => {
+        expect(data.status).toBe(200);
+      });
+  });
+  it("Create a password reset request", async () => {
+    await request
+      .get("/api/users/reset")
+      .set("email", "test@gmail.com")
+      .then((data) => {
+        expect(data.status).toBe(200);
+      });
+  });
+  it("Create a password reset request for invalid user", async () => {
+    await request
+      .get("/api/users/reset")
+      .set("email", "wat@gmail.com")
+      .then((data) => {
+        expect(data.status).toBe(200);
+      });
+  });
+
+  it("Create a password reset request with no email in header", async () => {
+    await request.get("/api/users/reset").then((data) => {
+      expect(data.status).toBe(422);
+      expect(data.body.errors).toBeDefined();
+    });
+  });
+});
+
+describe("Test reset password reset", () => {
+  it("Create an account", async () => {
+    await request
+      .post("/api/users/register")
+      .send({
+        username: "test",
+        name: "test",
+        email: "test@gmail.com",
+        password: "test",
+      })
+      .then((data) => {
+        expect(data.status).toBe(200);
+      });
+  });
+  it("Reset password with correct body", async () => {
+    await request
+      .get("/api/users/reset")
+      .set("email", "test@gmail.com")
+      .then(async (data) => {
+        expect(data.status).toBe(200);
+        await request
+          .post("/api/users/reset/end")
+          .set("token", data.body)
+          .send({
+            password: "12345678",
+            password_confirm: "12345678",
+          })
+          .then((data2) => {
+            expect(data2.status).toBe(200);
+            expect(data2.body).toBeDefined();
+          });
+      });
+  });
+
+  it("Reset password with invalid token", async () => {
+    await request
+      .post("/api/users/reset/end")
+      .set("token", "yeet")
+      .send({
+        password: "test",
+        password_confirm: "test",
+      })
+      .then((data) => {
+        expect(data.status).toBe(400);
+      });
+  });
+
+  it("Reset password with invalid fields", async () => {
+    await request
+      .post("/api/users/reset/end")
+      .send({
+        password: "test",
+      })
+      .then((data) => {
+        expect(data.status).toBe(422);
+        expect(data.body.errors).toBeDefined();
+      });
+  });
+});
