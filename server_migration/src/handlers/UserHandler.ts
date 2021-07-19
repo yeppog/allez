@@ -71,10 +71,15 @@ export class UserMethods {
         document
           .findById({ _id: id })
           .then((user) => {
-            if (!user.activated) {
-              reject("Account not activated");
+            if (user) {
+              if (!user.activated) {
+                reject("Account not activated");
+              } else {
+                resolve(user);
+              }
+            } else {
+              reject("User not found.");
             }
-            resolve(user);
           })
           .catch((err) => {
             winston.error(err.message);
