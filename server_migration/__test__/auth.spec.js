@@ -37,7 +37,7 @@ describe("Testing /api/users/register endpoint", () => {
     const response = await request.post("/api/users/register").send({
       name: "test",
       username: "test",
-      email: "test@gmail.com",
+      email: "allez.orbital@gmail.com",
       password: "test",
     });
     expect(response.status).toBe(200);
@@ -66,7 +66,7 @@ describe("Testing /api/users/register endpoint", () => {
       .send({
         name: "test",
         username: "test",
-        email: "test@gmail.com",
+        email: "allez.orbital@gmail.com",
         password: "test",
       })
       .then(async () => {
@@ -74,7 +74,7 @@ describe("Testing /api/users/register endpoint", () => {
         const response2 = await request.post("/api/users/register").send({
           name: "test",
           username: "test",
-          email: "test@gmail.com",
+          email: "allez.orbital@gmail.com",
           password: "test",
         });
       })
@@ -185,7 +185,7 @@ describe("Testing login", () => {
       .post("/api/users/register")
       .send({
         username: "test",
-        email: "test@gmail.com",
+        email: "allez.orbital@gmail.com",
         password: "test",
       })
       .then(async (data) => {
@@ -193,7 +193,7 @@ describe("Testing login", () => {
           .post("/api/users/login")
           .send({
             username: "test",
-            email: "test@gmail.com",
+            email: "allez.orbital@gmail.com",
             password: "test",
           })
           .then((data) => {
@@ -273,7 +273,7 @@ describe("Test reset password request", () => {
       .send({
         username: "test",
         name: "test",
-        email: "test@gmail.com",
+        email: "allez.orbital@gmail.com",
         password: "test",
       })
       .then((data) => {
@@ -283,7 +283,7 @@ describe("Test reset password request", () => {
   it("Create a password reset request", async () => {
     await request
       .get("/api/users/reset")
-      .set("email", "test@gmail.com")
+      .set("email", "allez.orbital@gmail.com")
       .then((data) => {
         expect(data.status).toBe(200);
       });
@@ -312,7 +312,7 @@ describe("Test reset password reset", () => {
       .send({
         username: "test",
         name: "test",
-        email: "test@gmail.com",
+        email: "allez.orbital@gmail.com",
         password: "test",
       })
       .then((data) => {
@@ -322,7 +322,7 @@ describe("Test reset password reset", () => {
   it("Reset password with correct body", async () => {
     await request
       .get("/api/users/reset")
-      .set("email", "test@gmail.com")
+      .set("email", "allez.orbital@gmail.com")
       .then(async (data) => {
         expect(data.status).toBe(200);
         await request

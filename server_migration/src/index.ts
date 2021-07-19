@@ -46,39 +46,39 @@ app.use("/api/videos", videoRouter);
 
 // Nodemailer for google SMTP
 
-// const oauth2Client = new google.auth.OAuth2(
-//   process.env.clientID,
-//   process.env.clientSecret,
-//   "https://developers.google.com/oauthplayground"
-// );
-// oauth2Client.setCredentials({
-//   refresh_token: process.env.refreshToken,
-// });
+const oauth2Client = new google.auth.OAuth2(
+  process.env.clientID,
+  process.env.clientSecret,
+  "https://developers.google.com/oauthplayground"
+);
+oauth2Client.setCredentials({
+  refresh_token: process.env.refreshToken,
+});
 
-// let accessToken;
-// oauth2Client
-//   .getAccessToken()
-//   .then((data) => (accessToken = data.token))
-//   .catch((err) => {
-//     if (err) {
-//       winston.error(err.message);
-//     }
-//   });
+let accessToken;
+oauth2Client
+  .getAccessToken()
+  .then((data) => (accessToken = data.token))
+  .catch((err) => {
+    if (err) {
+      winston.error(err.message);
+    }
+  });
 
-// export const transport = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     type: "OAuth2",
-//     user: "allez.orbital@gmail.com",
-//     clientId: process.env.clientID,
-//     clientSecret: process.env.clientSecret,
-//     refreshToken: process.env.refreshToken,
-//     accessToken,
-//   },
-//   tls: {
-//     rejectUnauthorized: false,
-//   },
-// });
+export const transport = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    type: "OAuth2",
+    user: "allez.orbital@gmail.com",
+    clientId: process.env.clientID,
+    clientSecret: process.env.clientSecret,
+    refreshToken: process.env.refreshToken,
+    accessToken,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
 
 const logFormat = winston.format.combine(
   winston.format.colorize(),
