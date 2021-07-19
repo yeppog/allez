@@ -7,7 +7,6 @@ import { UserMethods } from "./UserHandler";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import { transport } from "../index";
 import winston from "winston";
 
 interface TagObj {

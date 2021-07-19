@@ -13,7 +13,7 @@ import winston from "winston";
 // Load process.env file
 dotenv.config();
 
-const app = express();
+export const app = express();
 const port = 3001; // default port to listen
 
 // define a route handler for the default home page
@@ -46,37 +46,47 @@ app.use("/api/videos", videoRouter);
 
 // Nodemailer for google SMTP
 
-const oauth2Client = new google.auth.OAuth2(
-  process.env.clientID,
-  process.env.clientSecret,
-  "https://developers.google.com/oauthplayground"
+// const oauth2Client = new google.auth.OAuth2(
+//   process.env.clientID,
+//   process.env.clientSecret,
+//   "https://developers.google.com/oauthplayground"
+// );
+// oauth2Client.setCredentials({
+//   refresh_token: process.env.refreshToken,
+// });
+
+// let accessToken;
+// oauth2Client
+//   .getAccessToken()
+//   .then((data) => (accessToken = data.token))
+//   .catch((err) => {
+//     if (err) {
+//       winston.error(err.message);
+//     }
+//   });
+
+// export const transport = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     type: "OAuth2",
+//     user: "allez.orbital@gmail.com",
+//     clientId: process.env.clientID,
+//     clientSecret: process.env.clientSecret,
+//     refreshToken: process.env.refreshToken,
+//     accessToken,
+//   },
+//   tls: {
+//     rejectUnauthorized: false,
+//   },
+// });
+
+const logFormat = winston.format.combine(
+  winston.format.colorize(),
+  winston.format.timestamp({ format: "DD-MM-YYYY HH:mm:ss" }),
+  winston.format.align(),
+  winston.format.printf(
+    (info) => `${info.timestamp} ${info.level}: ${info.message}`
+  )
 );
-oauth2Client.setCredentials({
-  refresh_token: process.env.refreshToken,
-});
 
-let accessToken;
-oauth2Client
-  .getAccessToken()
-  .then((data) => (accessToken = data.token))
-  .catch((err) => {
-    if (err) {
-      winston.error(err.message);
-    }
-  });
-
-export const transport = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    type: "OAuth2",
-    user: "allez.orbital@gmail.com",
-    clientId: process.env.clientID,
-    clientSecret: process.env.clientSecret,
-    refreshToken: process.env.refreshToken,
-    accessToken,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
-export default app;
+winston.add(new winston.transports.Console({ format: logFormat }));

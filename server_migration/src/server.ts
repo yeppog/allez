@@ -1,4 +1,4 @@
-import app from "./index";
+import { app } from "./index";
 import mongoose from "mongoose";
 import winston from "winston";
 

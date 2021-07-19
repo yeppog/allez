@@ -4,8 +4,9 @@ import mongoose, { Document, Model } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import { transport } from "../index";
 import winston from "winston";
+
+// import { transport } from "../index";
 
 export class UserMethods {
   static async createUser(
@@ -26,28 +27,28 @@ export class UserMethods {
                 `User ${document.username} successfully registered.`
               );
               const token = jwt.sign({ id: doc.id }, process.env.JWT_SECRET);
-              await transport.sendMail(
-                {
-                  from: '"Allez" <allez.orbital@gmail.com>',
-                  to: `${doc.email}`,
-                  subject: "Welcome to Allez. Confirm your account now!",
-                  text: `Click here to confirm your account.`,
-                  html: `Click <a href = "${process.env.APPDOMAIN}/confirm/token=${token}">here</a> to confirm your account.`,
-                },
-                (error: any, info: any) => {
-                  if (error) {
-                    winston.error(error);
-                  }
-                  if (info) {
-                    winston.info(
-                      `Email sent to ${doc.email}. Contents: ${JSON.stringify(
-                        info
-                      )}`
-                    );
-                  }
-                  reject(error);
-                }
-              );
+              // await transport.sendMail(
+              //   {
+              //     from: '"Allez" <allez.orbital@gmail.com>',
+              //     to: `${doc.email}`,
+              //     subject: "Welcome to Allez. Confirm your account now!",
+              //     text: `Click here to confirm your account.`,
+              //     html: `Click <a href = "${process.env.APPDOMAIN}/confirm/token=${token}">here</a> to confirm your account.`,
+              //   },
+              //   (error: any, info: any) => {
+              //     if (error) {
+              //       winston.error(error);
+              //     }
+              //     if (info) {
+              //       winston.info(
+              //         `Email sent to ${doc.email}. Contents: ${JSON.stringify(
+              //           info
+              //         )}`
+              //       );
+              //     }
+              //     reject(error);
+              //   }
+              // );
               resolve(token);
             })
             .catch((error) => {
@@ -142,13 +143,16 @@ export class UserMethods {
         const id = payload.id;
         document.findById({ _id: id }).then((user) => {
           if (user) {
+            if (user.activated) {
+              reject({ message: "User already activated." });
+            }
             user.activated = true;
             user
               .save()
               .then((data) => resolve(data))
               .catch((err) => reject(err));
           } else {
-            reject("User not found.");
+            reject({ message: "User not found." });
           }
         });
       } catch (err) {
@@ -169,26 +173,26 @@ export class UserMethods {
               { id: data.id },
               `password_reset-${process.env.JWT_SECRET}`
             );
-            await transport.sendMail(
-              {
-                from: '"Allez" <allez.orbital@gmail.com>',
-                to: `${email}`,
-                subject: "Allez: Password Reset Request",
-                text: `Click here to reset your password.`,
-                html: `Click <a href = "${process.env.APPDOMAIN}/reset/token=${resetToken}">here</a> to reset your account.`,
-              },
-              (error: any, info: any) => {
-                if (error) {
-                  winston.error(error);
-                }
-                if (info) {
-                  winston.info(
-                    `Email sent to ${email}. Contents: ${JSON.stringify(info)}`
-                  );
-                }
-                reject(error);
-              }
-            );
+            // await transport.sendMail(
+            //   {
+            //     from: '"Allez" <allez.orbital@gmail.com>',
+            //     to: `${email}`,
+            //     subject: "Allez: Password Reset Request",
+            //     text: `Click here to reset your password.`,
+            //     html: `Click <a href = "${process.env.APPDOMAIN}/reset/token=${resetToken}">here</a> to reset your account.`,
+            //   },
+            //   (error: any, info: any) => {
+            //     if (error) {
+            //       winston.error(error);
+            //     }
+            //     if (info) {
+            //       winston.info(
+            //         `Email sent to ${email}. Contents: ${JSON.stringify(info)}`
+            //       );
+            //     }
+            //     reject(error);
+            //   }
+            // );
             resolve(resetToken);
           } else {
             winston.info(`User ${email} is not found. Faking 200 response.`);
