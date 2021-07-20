@@ -89,7 +89,7 @@ export const passwordMatch = body("password_confirm").custom(
 );
 
 export const validateFile = (req: Request, res: Response, next: () => any) => {
-  if (req.file === null) {
+  if (!req.file) {
     res.status(422).json("No file provided!");
   } else {
     return next();
