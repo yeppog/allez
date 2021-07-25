@@ -7,6 +7,8 @@ import mongoose from "mongoose";
 import nodemailer from "nodemailer";
 import { postRouter } from "./routes/post";
 import { router } from "./routes/user";
+import swaggerjsdoc from "swagger-jsdoc";
+import swaggeruiexpress from "swagger-ui-express";
 import { videoRouter } from "./routes/video";
 import winston from "winston";
 
@@ -15,11 +17,6 @@ dotenv.config();
 
 export const app = express();
 const port = 3001; // default port to listen
-
-// define a route handler for the default home page
-app.get("/", (req, res) => {
-  res.send("Hello world!");
-});
 
 app.use(
   cors({
@@ -90,3 +87,34 @@ const logFormat = winston.format.combine(
 );
 
 winston.add(new winston.transports.Console({ format: logFormat }));
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Allez Express API with Swagger",
+      version: "1.0.0",
+      description:
+        "This API serves the entire data system for the Allez social network",
+      license: {
+        name: "MIT",
+        url: "https://spdx.org/licenses/MIT.html",
+      },
+      contact: {
+        name: "Jonathan Lee & Ng Zi Xuan",
+      },
+    },
+    servers: [
+      {
+        url: "https://allez-orbital.herokuapp.com",
+      },
+    ],
+  },
+  apis: ["**/*.ts"],
+};
+
+app.use(
+  "/",
+  swaggeruiexpress.serve,
+  swaggeruiexpress.setup(swaggerjsdoc(options))
+);
