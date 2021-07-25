@@ -81,7 +81,6 @@ const RegisterComponent: React.FC = () => {
         setState({ ...state, postSuccess: true });
       })
       .catch((err) => {
-        console.log(err.response);
         if (err.response.data.includes('username')) {
           setState({ ...state, message: 'Username already taken!' });
         } else if (err.response.data.includes('email')) {
