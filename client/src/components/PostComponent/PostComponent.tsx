@@ -154,6 +154,7 @@ const PostComponent: React.FC<PostProps> = ({ post, user }) => {
               )}  ${post.edited ? '· Edited' : ''} `}
               style={{ position: 'relative' }}
             />
+
             <CardMedia
               controls
               className={state.mediaType === 'image' ? 'img' : 'video'}

@@ -21,6 +21,7 @@ const HomeComponent: React.FC = () => {
     .reverse()
     .flatMap((key) => posts[key])
     .reverse()
+    .filter((x) => x !== null)
     .map((post) => {
       return (
         <PostComponent key={post.slug} post={post} user={user}></PostComponent>
