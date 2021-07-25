@@ -1,6 +1,7 @@
 import './ProfileComponent.scss';
 
 import {
+  Avatar,
   Box,
   Button,
   ButtonBase,
@@ -193,14 +194,22 @@ const ProfileComponent: React.FC = (props) => {
           >
             <Grid item container direction="row" alignItems="stretch">
               <Grid item>
-                <ButtonBase>
-                  {/* <img src={state.img} className="img" /> */}
-                  <img
-                    alt="avatar"
-                    src={user.avatarPath ? user.avatarPath : Image}
-                    className="img"
-                  />
-                </ButtonBase>
+                <div className="imgContainer">
+                  <Avatar
+                    className="profilepic"
+                    style={{
+                      height: 150,
+                      width: 150,
+                      backgroundColor: 'white',
+                    }}
+                  >
+                    <img
+                      alt="avatar"
+                      src={user.avatarPath ? user.avatarPath : Image}
+                      className="profileImg"
+                    />
+                  </Avatar>
+                </div>
               </Grid>
               <Grid item>
                 <Grid
@@ -212,7 +221,10 @@ const ProfileComponent: React.FC = (props) => {
                 >
                   <Grid item container alignItems="center" spacing={4}>
                     <Grid item>
-                      <Typography variant="h5" style={{ fontWeight: 600 }}>
+                      <Typography
+                        variant="h5"
+                        style={{ fontWeight: 600, marginLeft: 15 }}
+                      >
                         {user.username}
                       </Typography>
                     </Grid>

@@ -1,5 +1,6 @@
 import './CreatePostComponent.scss';
 
+import { Alert, Autocomplete } from '@material-ui/lab';
 import {
   Button,
   Chip,
@@ -17,9 +18,10 @@ import {
 } from '@material-ui/core';
 import React, { useState } from 'react';
 
-import { Autocomplete } from '@material-ui/lab';
+import { CSSTransition } from 'react-transition-group';
 import { PostTags } from '../../interface/Schemas';
 import axios from 'axios';
+import { createPost } from '../../api';
 import { gyms } from '../../static/Gyms';
 import { join } from 'path';
 import { useHistory } from 'react-router';
@@ -29,12 +31,14 @@ const CreatePostComponent: React.FC = () => {
   const [media, setMedia] = useState<File | null>();
   const [open, setOpen] = React.useState(false);
   const [filePreview, setFilePreview] = useState<string | null>();
+  const nodeRef = React.useRef(null);
   const [state, setState] = useState<PostTags>({
     media: '',
     caption: '',
     gym: '',
     route: '',
     people: [],
+    errorMessage: '',
   });
 
   const gym = useSelector(
@@ -116,17 +120,23 @@ const CreatePostComponent: React.FC = () => {
     formData.append('body', state.caption);
     formData.append('tagUser', usertag.join());
     formData.append('tagGym', state.gym);
-    axios
-      .post('/api/posts/createPost', formData, { headers: { token: token } })
+    createPost(formData, token)
       .then((data) => {
-        setState(data.data);
+        setState({
+          media: '',
+          caption: '',
+          gym: '',
+          route: '',
+          people: [],
+          errorMessage: '',
+        });
         setMedia(null);
         history.push('/home');
       })
       .catch((err) => {
-        // TODO: Handle user errors
+        setState({ ...state, errorMessage: err.message });
         console.log(token);
-        console.log(err);
+        console.log(err.message);
       });
   };
 
@@ -296,6 +306,27 @@ const CreatePostComponent: React.FC = () => {
                   />
                 </FormControl>
               </Grid>
+              <Grid item>
+                <div className="errorAlert">
+                  <CSSTransition
+                    nodeRef={nodeRef}
+                    in={state.errorMessage ? true : false}
+                    timeout={1000}
+                    unmountOnExit
+                    classNames="errorAlert"
+                  >
+                    <div ref={nodeRef}>
+                      <Alert
+                        severity="error"
+                        onClose={() => setState({ ...state, errorMessage: '' })}
+                      >
+                        {state.errorMessage}
+                      </Alert>
+                    </div>
+                  </CSSTransition>
+                </div>
+              </Grid>
+
               <Grid item xs={12}>
                 <Button variant="text" color="primary" type="submit" fullWidth>
                   Post

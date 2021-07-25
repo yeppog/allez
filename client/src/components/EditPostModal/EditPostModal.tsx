@@ -45,6 +45,7 @@ const EditPostModal: React.FC<Props> = ({ post, editModal, setEditModal }) => {
     gym: '',
     route: '',
     people: [],
+    errorMessage: '',
   });
   const dispatch = useDispatch();
 

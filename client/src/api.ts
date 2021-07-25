@@ -1,6 +1,8 @@
-import { Comment, Post } from './interface/Schemas';
+import { Comment, Post, User } from './interface/Schemas';
 
 import axios from 'axios';
+
+const timeout_time = 2000;
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URI || '';
 
@@ -55,7 +57,7 @@ export async function addComment(req: {
 }) {
   return new Promise<Comment>((resolve, reject) => {
     axios
-      .post('/api/posts/addCommentToPost', req)
+      .post('/api/posts/addCommentToPost', req, { timeout: timeout_time })
       .then((data) => resolve(data.data))
       .catch((err) => reject(err));
   });
@@ -71,6 +73,27 @@ export async function deleteComment(body: {
     axios
       .post('/api/posts/deleteComment', body)
       .then((data) => resolve(data.data as Post))
+      .catch((err) => reject(err));
+  });
+}
+
+export async function createPost(formData: FormData, token: string) {
+  return new Promise<Post>((resolve, reject) => {
+    axios
+      .post('/api/posts/createPost', formData, {
+        headers: { token: token },
+        timeout: timeout_time,
+      })
+      .then((data) => resolve(data.data))
+      .catch((err) => reject(err));
+  });
+}
+
+export async function editProfile(body: FormData) {
+  return new Promise<User>((resolve, reject) => {
+    axios
+      .post('/api/users/updateProfile', body, { timeout: timeout_time })
+      .then((data) => resolve(data.data as User))
       .catch((err) => reject(err));
   });
 }

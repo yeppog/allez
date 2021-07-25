@@ -60,25 +60,56 @@ Backend: <https://allez-orbital.herokuapp.com/>
 
    - Users can register their account with their details and log in to the website
 
+   ![](static/Login.png)
+
+   ![](static/Register.png)
+
+
+
 2. **Homepage Feed of following posts**
 
 - Feed of posts of climbers or gyms that the user follows which will constantly be updated when someone followed posted a new post
+
+![](static/Feed.png)
+
 
 3. **Posting of Video or Photos**
 
    - Users can share videos or photos of them attempting and completing climbing routes
 
+   ![](static/CreatePost.png)
+
+
 4. **Post-editing and Deletion**
 
    - Users can edit and delete posts that the user have created.
+
+   <img src="static/EditDelete.png" alt="drawing" style="width:300px;"/>
+
+
+   **Editing**
+
+   <img src="static/Edit.png" alt="drawing" style="width:300px;"/>
+
+
+   **Deleting**
+
+   <img src="static/Delete.png" alt="drawing" style="width:300px;"/>
+
 
 5. **Profile editing**
 
    - Users can edit key information on the user's profile such as their profile picture, bio, username and password
 
+   ![](static/EditProfile.png)
+
+
 6. **Searching for Users, Gyms, Routes**
    - Users can find User and Gym pages, and browse routes based on tags
    - Users can view posts of other users and posts that are tagged to a gym
+
+   ![](static/Search.png)
+
 
 **To be completed by Milestone 3:**
 

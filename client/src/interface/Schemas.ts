@@ -21,6 +21,7 @@ export interface PostTags {
   gym: string;
   route: string;
   people: [];
+  errorMessage: string;
 }
 
 export interface Post {
