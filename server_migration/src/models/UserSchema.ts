@@ -106,7 +106,7 @@ export interface User {
   followers: string[];
   followingCount: number;
   following: string[];
-  posts: { [key: string]: string };
+  posts: { [key: string]: any[] };
   postCount: number;
   taggedPost: { [key: string]: string };
   createdAt: Date;

@@ -31,7 +31,7 @@ const HomeComponent: React.FC = () => {
   return (
     <div className="HomeComponent" data-testid="HomeComponent">
       <Typography variant="h4">Feed</Typography>
-      {mappedPosts}
+      {/* {mappedPosts} */}
     </div>
   );
 };
