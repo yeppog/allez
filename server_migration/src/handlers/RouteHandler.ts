@@ -5,7 +5,7 @@ export class RouteHandler {
     return new Promise((resolve, reject) => {
       Route.findOne({ name: tag }).then((route) => {
         if (!route) {
-          reject("Tagged route not found");
+          reject({message: "Tagged route not found"});
         } else {
           route.taggedPost[date.toISOString()] = slug;
           route
