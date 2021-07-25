@@ -43,21 +43,25 @@ class UserActions {
 
   static async handleFollow(req: Request, res: Response) {
     const token = req.header("token");
-    const username = req.body.username;
+    const username = req.header("username");
     UserMethods.getUserFromToken(token, User).then((user) => {
-      const followers = [...user.followers];
-      if (followers.includes(username)) {
-        const index = followers.indexOf(username);
-        followers.splice(index, 1);
-        user.followCount -= 1;
+      const following = [...user.following];
+      if (following.includes(username)) {
+        const index = following.indexOf(username);
+        following.splice(index, 1);
+        user.followingCount -= 1;
       } else {
-        followers.push(username);
-        user.followCount += 1;
+        following.push(username);
+        user.followingCount += 1;
       }
-      user.followers = followers;
-      user
-        .save()
-        .then((data) => res.status(200).json(data))
+      user.following = following;
+      UserMethods.updateFollowed(user.username, username)
+        .then((updated) => {
+          user
+            .save()
+            .then((data) => res.status(200).json(data))
+            .catch((err) => res.status(500).json(err.message));
+        })
         .catch((err) => res.status(500).json(err.message));
     });
   }

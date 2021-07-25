@@ -292,4 +292,25 @@ export class UserMethods {
       });
     });
   }
+
+  public static async updateFollowed(username: string, followedUser: string) {
+    return new Promise((resolve, reject) => {
+      User.findOne({ username: followedUser }).then((user) => {
+        const followers = [...user.followers];
+        if (followers.includes(username)) {
+          const index = followers.indexOf(username);
+          followers.splice(index, 1);
+          user.followCount -= 1;
+        } else {
+          followers.push(username);
+          user.followCount += 1;
+        }
+        user.followers = followers;
+        user
+          .save()
+          .then((data) => resolve(data))
+          .catch((err) => reject(err));
+      });
+    });
+  }
 }
