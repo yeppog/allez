@@ -77,7 +77,7 @@ const RegisterComponent: React.FC = () => {
     AuthAPI.register(credentials)
       .then((data) => {
         console.log(data.data);
-        setConfirm(data.data.token);
+        setConfirm(data.data);
         setState({ ...state, postSuccess: true });
       })
       .catch((err) => {
@@ -132,10 +132,11 @@ const RegisterComponent: React.FC = () => {
                 Please check your email account for a verification mail we just
                 sent to activate your account
               </p>
-              <Button onClick={() => history.push('/login')}>Login Page</Button>
               {/* //TODO: Remove this section once SMTP is working */}
               <p>
-                Well since SMTP isn't working 🤷, click{' '}
+                Check your email! If you cant find the email, check your spam.{' '}
+                <br />
+                If all else fails 🤷, click{' '}
                 <button
                   className="redirectLink"
                   type="button"
@@ -145,6 +146,7 @@ const RegisterComponent: React.FC = () => {
                 </button>{' '}
                 to confirm your account.
               </p>
+              <Button onClick={() => history.push('/login')}>Login Page</Button>
             </Grid>
           </div>
         ) : (
