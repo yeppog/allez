@@ -1,5 +1,6 @@
 import './RegisterComponent.scss';
 
+import { AuthAPI, RegisterCredentials } from '../loginapi';
 import {
   Button,
   Card,
@@ -12,7 +13,6 @@ import {
 import { Alert } from '@material-ui/lab';
 import { CSSTransition } from 'react-transition-group';
 import React from 'react';
-import { RegisterCredentials } from '../../../interface/Credentials';
 import axios from 'axios';
 import { useHistory } from 'react-router';
 import { useState } from 'react';
@@ -74,14 +74,21 @@ const RegisterComponent: React.FC = () => {
 
   const registerLogin = (credentials: RegisterCredentials): void => {
     const url = '/api/users/register';
-    axios
-      .post(url, credentials, HTTPOptions)
+    AuthAPI.register(credentials)
       .then((data) => {
+        console.log(data.data);
         setConfirm(data.data.token);
         setState({ ...state, postSuccess: true });
       })
       .catch((err) => {
-        setState({ ...state, message: err.message });
+        console.log(err.response);
+        if (err.response.data.includes('username')) {
+          setState({ ...state, message: 'Username already taken!' });
+        } else if (err.response.data.includes('email')) {
+          setState({ ...state, message: 'Email already in use!' });
+        } else {
+          setState({ ...state, message: err.response.data });
+        }
       });
   };
 
