@@ -1,5 +1,6 @@
 import './ResetRequestComponent.scss';
 
+import { AuthAPI, ResetRequestCredentials } from '../loginapi';
 import {
   Button,
   Card,
@@ -12,7 +13,6 @@ import React, { useState } from 'react';
 
 import { Alert } from '@material-ui/lab';
 import { CSSTransition } from 'react-transition-group';
-import { ResetRequestCredentials } from '../../../interface/Credentials';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 
@@ -45,14 +45,9 @@ const ResetRequestComponent: React.FC = () => {
 
   const reset = (credentials: ResetRequestCredentials): void => {
     const url = '/api/users/reset';
-    axios
-      .post(url, credentials, HTTPOptions)
+    AuthAPI.resetRequest(credentials)
       .then((data) => {
-        /**
-         * Might not need depending on the API
-         */
-        console.log(data);
-        setConfirm(data.data.token);
+        setConfirm(data.data);
         setState({ ...state, postSuccess: true });
       })
       .catch((err) => {

@@ -28,6 +28,7 @@ app.use(
       "target",
       "user",
       "slug",
+      "email",
     ],
     exposedHeaders: ["sessionId"],
     origin: "*",

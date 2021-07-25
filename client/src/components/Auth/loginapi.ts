@@ -18,8 +18,8 @@ export interface ResetRequestCredentials {
 }
 
 export interface ResetCredentials {
-  token: string;
   password: string;
+  password_confirm: string;
 }
 
 const HTTPOptions = {
@@ -30,7 +30,7 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URI || '';
 
 export class AuthAPI {
   static async login(cred: LoginCredentials) {
-    return new Promise((resolve, reject) => {
+    return new Promise<AxiosResponse>((resolve, reject) => {
       axios
         .post('/api/users/login', cred, HTTPOptions)
         .then((user) => resolve(user))
@@ -48,7 +48,7 @@ export class AuthAPI {
   }
 
   static async resetRequest(cred: ResetRequestCredentials) {
-    return new Promise((resolve, reject) => {
+    return new Promise<AxiosResponse>((resolve, reject) => {
       axios
         .get('/api/users/reset', {
           headers: { ...HTTPOptions.headers, email: cred.email },
@@ -58,14 +58,12 @@ export class AuthAPI {
     });
   }
 
-  static async reset(cred: ResetCredentials) {
-    return new Promise((resolve, reject) => {
+  static async reset(cred: ResetCredentials, token: string) {
+    return new Promise<AxiosResponse>((resolve, reject) => {
       axios
-        .post(
-          '/api/users/resetEnd',
-          { password: cred.password },
-          { headers: { ...HTTPOptions.headers, token: cred.token } }
-        )
+        .post('/api/users/reset/end', cred, {
+          headers: { ...HTTPOptions.headers, token: token },
+        })
 
         .then((data) => resolve(data))
         .catch((err) => reject(err));
@@ -73,7 +71,7 @@ export class AuthAPI {
   }
 
   static async confirm(token: string) {
-    return new Promise((resolve, reject) => {
+    return new Promise<AxiosResponse>((resolve, reject) => {
       axios
         .get('/api/users/confirm', {
           headers: { ...HTTPOptions.headers, token: token },
@@ -84,7 +82,7 @@ export class AuthAPI {
   }
 
   static async verify(token: string) {
-    return new Promise((resolve, reject) => {
+    return new Promise<AxiosResponse>((resolve, reject) => {
       axios
         .get('/api/users/verify', {
           headers: { ...HTTPOptions.headers, token },

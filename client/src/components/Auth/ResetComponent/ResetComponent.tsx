@@ -1,5 +1,6 @@
 import './ResetComponent.scss';
 
+import { AuthAPI, ResetCredentials } from '../loginapi';
 import {
   Button,
   Card,
@@ -14,7 +15,6 @@ import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { Alert } from '@material-ui/lab';
-import { ResetCredentials } from '../../../interface/Credentials';
 import axios from 'axios';
 
 interface Token {
@@ -51,9 +51,12 @@ const ResetComponent: React.FC = () => {
     // simple validator for now
     // TODO: Better validation for email and password
     if (validator(state)) {
-      const token = state.token;
       const password = state.password;
-      const credential = { token, password } as ResetCredentials;
+      const password_confirm = state.confirmPassword;
+      const credential = {
+        password,
+        password_confirm,
+      } as ResetCredentials;
       reset(credential);
     } else {
       console.log('Form is invalid or passwords do not match');
@@ -63,8 +66,7 @@ const ResetComponent: React.FC = () => {
   const reset = (credentials: ResetCredentials): void => {
     setState({ ...state, postState: 'idle' });
     const url = '/api/users/reset/end';
-    axios
-      .post(url, credentials, HTTPOptions)
+    AuthAPI.reset(credentials, state.token)
       .then((data) => {
         setState({ ...state, postState: 'success' });
       })
