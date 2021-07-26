@@ -64,14 +64,11 @@ Backend: <https://allez-orbital.herokuapp.com/>
 
    ![](static/Register.png)
 
-
-
 2. **Homepage Feed of following posts**
 
 - Feed of posts of climbers or gyms that the user follows which will constantly be updated when someone followed posted a new post
 
 ![](static/Feed.png)
-
 
 3. **Posting of Video or Photos**
 
@@ -79,23 +76,19 @@ Backend: <https://allez-orbital.herokuapp.com/>
 
    ![](static/CreatePost.png)
 
-
 4. **Post-editing and Deletion**
 
    - Users can edit and delete posts that the user have created.
 
    <img src="static/EditDelete.png" alt="drawing" style="width:300px;"/>
 
-
    **Editing**
 
    <img src="static/Edit.png" alt="drawing" style="width:300px;"/>
 
-
    **Deleting**
 
    <img src="static/Delete.png" alt="drawing" style="width:300px;"/>
-
 
 5. **Profile editing**
 
@@ -103,8 +96,8 @@ Backend: <https://allez-orbital.herokuapp.com/>
 
    ![](static/EditProfile.png)
 
-
 6. **Searching for Users, Gyms, Routes**
+
    - Users can find User and Gym pages, and browse routes based on tags
    - Users can view posts of other users and posts that are tagged to a gym
 
@@ -114,11 +107,9 @@ Backend: <https://allez-orbital.herokuapp.com/>
 
 Due to insufficient time to collect data for and train the machine learning model the following features were not completed in time for milestone 3
 
-
 7.  **Machine learning to identify route holds for easier route creation**
 
-8. **Route tagging**
-
+8.  **Route tagging**
 
 **Timeline**
 
@@ -179,6 +170,14 @@ The backend is run using `Node.js`, `Express.js` and `MongoDB`. We store schemas
 Each of these schemas have their own document shape that the object will conform to, which allows us to query the data.
 
 For Image and Video uploads, we use `GridFS` with `multer` as a storage engine, to split the files up into chunks on `MongoDB`, then stream it.
+
+**New in Milestone 3!**
+
+The backend has also moved to a typescript based server to provide better error handling and prevent unforseen type errors that can be caught at compile time.
+
+We added validators to help control the flow of the HTTP requests to automatically handle errenous request quickly and easily, all while mainting cleaner code.
+
+We also included a logger to help log the requests that have been proccessed on the server.
 
 ## Class Diagram
 
