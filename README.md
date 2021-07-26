@@ -110,42 +110,15 @@ Backend: <https://allez-orbital.herokuapp.com/>
 
    ![](static/Search.png)
 
+**Uncompleted**
 
-**To be completed by Milestone 3:**
+Due to insufficient time to collect data for and train the machine learning model the following features were not completed in time for milestone 3
 
-**Features**
 
-1. **Machine learning to identify route holds for easier route creation**
+7.  **Machine learning to identify route holds for easier route creation**
 
-- Use of machine learning for climbing holds recognisation and segmentation
-- Use of segemented image for users to select holds that are included in their route
+8. **Route tagging**
 
-2. **Route tagging**
-
-- Ability for users to browse through route and videos tagged to the routes
-
-**Optimisation**
-
-1. **Cleaning up of Backend**
-
-- Refactoring to Typescript for addition type safety
-- Error Catching to handle erroneous inputs
-- Abstracting duplicate functions
-
-2. **Optimise file size to be held on server**
-
-- Compression of media uploaded to reduce space on server
-
-**Testing**
-
-1. **Frontend Testing**
-
-- Unit testing for conditional rendering and error handling
-- Testing mock inputs and expected outputs
-
-2. **Backend Testing**
-
-- Addtion of more tests to increase code coverage
 
 **Timeline**
 
