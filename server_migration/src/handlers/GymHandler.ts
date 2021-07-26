@@ -7,7 +7,14 @@ export class GymHandler {
         if (!gym) {
           reject("Tagged gym not found");
         } else {
-          gym.taggedPost[date.toISOString()] = slug;
+          if (gym.taggedPost[date.toISOString()]) {
+            gym.taggedPost[date.toISOString()] = [
+              ...gym.taggedPost[date.toISOString()],
+              slug,
+            ];
+          } else {
+            gym.taggedPost[date.toISOString()] = [slug];
+          }
           gym
             .save()
             .then((data) => resolve(data))

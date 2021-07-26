@@ -6,6 +6,7 @@ import { google } from "googleapis";
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
 import { postRouter } from "./routes/post";
+import { routeRouter } from "./routes/route";
 import { router } from "./routes/user";
 import swaggerjsdoc from "swagger-jsdoc";
 import swaggeruiexpress from "swagger-ui-express";
@@ -41,6 +42,7 @@ app.use("/api/users", authRouter);
 app.use("/api/users", router);
 app.use("/api/posts", postRouter);
 app.use("/api/videos", videoRouter);
+app.use("/api/routes", routeRouter);
 
 // Nodemailer for google SMTP
 

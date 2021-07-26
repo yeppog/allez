@@ -80,7 +80,7 @@ export async function deleteComment(body: {
 export async function createPost(formData: FormData, token: string) {
   return new Promise<Post>((resolve, reject) => {
     axios
-      .post('/api/posts/createPost', formData, {
+      .post('/api/posts/create', formData, {
         headers: { token: token },
         timeout: timeout_time,
       })
@@ -117,6 +117,7 @@ export async function fetchUserPost(token: string, username: string) {
         headers: { token: token, username: username },
       })
       .then((data) => {
+        console.log(data);
         const arr = [];
         for (const val of Object.values(
           data.data as { [key: string]: Post[] }
@@ -135,7 +136,7 @@ export async function fetchUserPost(token: string, username: string) {
 export async function fetchUserTagged(token: string, username: string) {
   return new Promise<Post[]>((resolve, reject) => {
     axios
-      .get('/api/posts/fetchUserTagged', {
+      .get('/api/posts/fetchTaggedPosts', {
         headers: { token: token, username: username },
       })
       .then((data) => {

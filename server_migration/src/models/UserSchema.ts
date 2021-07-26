@@ -108,7 +108,7 @@ export interface User {
   following: string[];
   posts: { [key: string]: any[] };
   postCount: number;
-  taggedPost: { [key: string]: string };
+  taggedPost: { [key: string]: any[] };
   createdAt: Date;
 }
 

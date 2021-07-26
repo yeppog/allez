@@ -1,4 +1,4 @@
-import { IUserDoc, User } from "../models/UserSchema";
+import { Gym, IUserDoc, User } from "../models/UserSchema";
 import express, { Request, Response } from "express";
 import { passwordMatch, validate, validator } from "../validator";
 
@@ -71,8 +71,15 @@ class UserActions {
       .then((data) => res.status(200).json(data))
       .catch((err) => res.status(500).json(err.message));
   }
+
+  static async handleFetchAllGyms(req: Request, res: Response) {
+    Gym.find({})
+      .then((data) => res.status(200).json(data))
+      .catch((err) => res.status(500).json(err.message));
+  }
 }
 
 router.post("/update", uploadAvatar.single("file"), UserActions.handleUpdate);
 router.get("/follow", UserActions.handleFollow);
 router.get("/users", UserActions.handleFetchAllUsers);
+router.get("/gyms", UserActions.handleFetchAllGyms);

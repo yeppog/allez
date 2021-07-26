@@ -176,6 +176,50 @@ class PostActions {
       res.status(200).json(posts);
     });
   }
+
+  public static async handleFetchUserPosts(req: Request, res: Response) {
+    const token = req.header("token");
+    UserMethods.getUserFromToken(token, User).then(async (user) => {
+      const posts = user.posts;
+      for (const [key, value] of Object.entries(posts)) {
+        if (Array.isArray(value)) {
+          const promises = value.map(async (id) => {
+            return await Post.findById({ _id: id })
+              .then((post) => post)
+              .catch((err) => res.status(500).json(err.message));
+          });
+          await Promise.all(promises)
+            .then((mapped) => {
+              posts[key] = [...mapped];
+            })
+            .catch((err) => res.status(500).json(err.message));
+        }
+      }
+      res.status(200).json(posts);
+    });
+  }
+
+  public static async handleTaggedUserPosts(req: Request, res: Response) {
+    const token = req.header("token");
+    UserMethods.getUserFromToken(token, User).then(async (user) => {
+      const posts = user.taggedPost;
+      for (const [key, value] of Object.entries(posts)) {
+        if (Array.isArray(value)) {
+          const promises = value.map(async (id) => {
+            return await Post.findById({ _id: id })
+              .then((post) => post)
+              .catch((err) => res.status(500).json(err.message));
+          });
+          await Promise.all(promises)
+            .then((mapped) => {
+              posts[key] = [...mapped];
+            })
+            .catch((err) => res.status(500).json(err.message));
+        }
+      }
+      res.status(200).json(posts);
+    });
+  }
 }
 
 postRouter.post(
@@ -193,3 +237,5 @@ postRouter.post(
   PostActions.handleEditPost
 );
 postRouter.post("/fetchFollowPosts", PostActions.handleFetchFollowPosts);
+postRouter.get("/fetchUserPosts", PostActions.handleFetchUserPosts);
+postRouter.get("/fetchTaggedPosts", PostActions.handleTaggedUserPosts);

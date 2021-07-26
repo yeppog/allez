@@ -283,7 +283,14 @@ export class UserMethods {
         if (!user) {
           reject("Tagged user not found");
         } else {
-          user.taggedPost[date.toISOString()] = slug;
+          if (user.taggedPost[date.toISOString()]) {
+            user.taggedPost[date.toISOString()] = [
+              ...user.taggedPost[date.toISOString()],
+              slug,
+            ];
+          } else {
+            user.taggedPost[date.toISOString()] = [slug];
+          }
           user
             .save()
             .then((data) => resolve(data))
