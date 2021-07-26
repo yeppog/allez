@@ -1,5 +1,6 @@
 import './RegisterComponent.scss';
 
+import { AuthAPI, RegisterCredentials } from '../loginapi';
 import {
   Button,
   Card,
@@ -12,7 +13,6 @@ import {
 import { Alert } from '@material-ui/lab';
 import { CSSTransition } from 'react-transition-group';
 import React from 'react';
-import { RegisterCredentials } from '../../../interface/Credentials';
 import axios from 'axios';
 import { useHistory } from 'react-router';
 import { useState } from 'react';
@@ -74,14 +74,20 @@ const RegisterComponent: React.FC = () => {
 
   const registerLogin = (credentials: RegisterCredentials): void => {
     const url = '/api/users/register';
-    axios
-      .post(url, credentials, HTTPOptions)
+    AuthAPI.register(credentials)
       .then((data) => {
-        setConfirm(data.data.token);
+        console.log(data.data);
+        setConfirm(data.data);
         setState({ ...state, postSuccess: true });
       })
       .catch((err) => {
-        setState({ ...state, message: err.message });
+        if (err.response.data.includes('username')) {
+          setState({ ...state, message: 'Username already taken!' });
+        } else if (err.response.data.includes('email')) {
+          setState({ ...state, message: 'Email already in use!' });
+        } else {
+          setState({ ...state, message: err.response.data });
+        }
       });
   };
 
@@ -126,10 +132,11 @@ const RegisterComponent: React.FC = () => {
                 Please check your email account for a verification mail we just
                 sent to activate your account
               </p>
-              <Button onClick={() => history.push('/login')}>Login Page</Button>
               {/* //TODO: Remove this section once SMTP is working */}
               <p>
-                Well since SMTP isn't working 🤷, click{' '}
+                Check your email! If you cant find the email, check your spam.{' '}
+                <br />
+                If all else fails 🤷, click{' '}
                 <button
                   className="redirectLink"
                   type="button"
@@ -139,6 +146,7 @@ const RegisterComponent: React.FC = () => {
                 </button>{' '}
                 to confirm your account.
               </p>
+              <Button onClick={() => history.push('/login')}>Login Page</Button>
             </Grid>
           </div>
         ) : (

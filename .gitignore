@@ -26,7 +26,16 @@ server/node_modules
 
 server/.env
 
+server_migration/src/.env
+
+*/.env
+
 
 
 #testing
 server/coverage
+
+#experimental
+server_migration/dist
+server_migration/node_modules
+server_migration/coverage
