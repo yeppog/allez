@@ -34,7 +34,8 @@ const TopNavComponent: React.FC = () => {
   const [search, setSearch] = useState<string>('');
 
   const loginStatus = useSelector(
-    (state: { user: { status: any; darkMode: boolean } }) => state.user.status
+    (state: { user: { loginStatus: any; darkMode: boolean } }) =>
+      state.user.loginStatus
   );
 
   const user = useSelector(
