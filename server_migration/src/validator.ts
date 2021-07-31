@@ -61,6 +61,9 @@ export const postValidator = (method: string) => {
         body("body", "Post body doesn't exist on the request body.").exists(),
       ];
     }
+    case "fetch": {
+      return [header("slug", "Post slug doesn't exist on the header").exists()];
+    }
   }
 };
 

@@ -30,7 +30,7 @@ export async function removeFollow(headers: { user: string; target: string }) {
 export async function fetchPost(headers: { slug: string }) {
   return new Promise<Post | Error>((resolve, reject) => {
     axios
-      .get('/api/posts/getPost', { headers: headers })
+      .get('/api/posts/fetchPost', { headers: headers })
       .then((data) => resolve(data.data as Post))
       .catch((err) => reject(err));
   });
@@ -82,7 +82,7 @@ export async function createPost(formData: FormData, token: string) {
     axios
       .post('/api/posts/create', formData, {
         headers: { token: token },
-        timeout: timeout_time,
+        timeout: 10000,
       })
       .then((data) => resolve(data.data))
       .catch((err) => reject(err));

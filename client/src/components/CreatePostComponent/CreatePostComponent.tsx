@@ -118,8 +118,9 @@ const CreatePostComponent: React.FC = () => {
     }
     const usertag = state.people;
     formData.append('body', state.caption);
-    formData.append('tagUser', usertag.join());
-    formData.append('tagGym', state.gym);
+    formData.append('taggedUser', usertag.join());
+    formData.append('taggedGym', state.gym);
+    formData.append('taggedRoute', '');
     createPost(formData, token)
       .then((data) => {
         setState({

@@ -52,7 +52,7 @@ export const fetchPublicUser = createAsyncThunk(
 );
 
 export const fetchGyms = createAsyncThunk('user/fetchGyms', async () => {
-  const res = await axios.get('/api/gyms/gyms');
+  const res = await axios.get('/api/users/gyms');
   return res.data;
 });
 export const fetchUsers = createAsyncThunk('user/fetchUsers', async () => {
@@ -94,8 +94,9 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     loginUser: (state, action) => {
-      console.log(action.payload.user.username);
-      localStorage.setItem('token', action.payload);
+      console.log(action.payload.token);
+      localStorage.setItem('token', action.payload.token);
+      console.log(localStorage.getItem('token'));
       state.user = action.payload.user;
       state.status = 'succeeded';
       state.loginStatus = 'succeeded';

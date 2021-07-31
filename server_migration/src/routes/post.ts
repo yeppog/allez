@@ -133,48 +133,50 @@ class PostActions {
 
   public static async handleFetchFollowPosts(req: Request, res: Response) {
     const token = req.header("token");
-    UserMethods.getUserFromToken(token, User).then(async (user) => {
-      const dates: number[] = [];
-      const posts = user.posts;
-      const date = new Date(req.body.date);
-      for (let i = 0; i < req.body.duration; i++) {
-        const formatted = `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
-        dates.push(parseInt(formatted, 10));
-        date.setDate(date.getDate() - 1);
-        const newDate = parseInt(formatted, 10);
-        if (!(newDate in posts)) {
-          posts[newDate] = [];
+    UserMethods.getUserFromToken(token, User)
+      .then(async (user) => {
+        const dates: number[] = [];
+        const posts = user.posts;
+        const date = new Date(req.body.date);
+        for (let i = 0; i < req.body.duration; i++) {
+          const formatted = `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
+          dates.push(parseInt(formatted, 10));
+          date.setDate(date.getDate() - 1);
+          const newDate = parseInt(formatted, 10);
+          if (!(newDate in posts)) {
+            posts[newDate] = [];
+          }
         }
-      }
-      for (const i of user.following) {
-        const username = i;
-        await User.findOne({ username })
-          .then((data) => {
-            for (const d of dates) {
-              if (data) {
-                if (data.posts) {
-                  const userposts = data.posts[d];
-                  if (userposts) {
-                    let temp = [...posts[d]];
-                    temp = [...temp, ...userposts];
-                    posts[d] = [...temp];
+        for (const i of user.following) {
+          const username = i;
+          await User.findOne({ username })
+            .then((data) => {
+              for (const d of dates) {
+                if (data) {
+                  if (data.posts) {
+                    const userposts = data.posts[d];
+                    if (userposts) {
+                      let temp = [...posts[d]];
+                      temp = [...temp, ...userposts];
+                      posts[d] = [...temp];
+                    }
                   }
                 }
               }
-            }
-          })
-          .catch((err) => console.log("Cant find the user."));
-      }
-      for (const [key, val] of Object.entries(posts)) {
-        const promises = val.map(
-          async (x) => await Post.findById({ _id: x }).then((data) => data)
-        );
-        await Promise.all(promises).then(async (x) => {
-          posts[key] = x;
-        });
-      }
-      res.status(200).json(posts);
-    });
+            })
+            .catch((err) => console.log("Cant find the user."));
+        }
+        for (const [key, val] of Object.entries(posts)) {
+          const promises = val.map(
+            async (x) => await Post.findById({ _id: x }).then((data) => data)
+          );
+          await Promise.all(promises).then(async (x) => {
+            posts[key] = x;
+          });
+        }
+        res.status(200).json(posts);
+      })
+      .catch((err) => res.status(500).json(err.message));
   }
 
   public static async handleFetchUserPosts(req: Request, res: Response) {
@@ -220,6 +222,20 @@ class PostActions {
       res.status(200).json(posts);
     });
   }
+
+  static async handleFetchPost(req: Request, res: Response) {
+    const slug = req.header("slug");
+    Post.findOne({ slug })
+      .then((post) => {
+        if (post) {
+          res.status(200).json(post);
+        } else {
+          res.status(404).json("Post not found");
+          winston.info(`Post of slug ${slug} not found. `);
+        }
+      })
+      .catch((err) => res.status(500).json(err.message));
+  }
 }
 
 postRouter.post(
@@ -239,3 +255,9 @@ postRouter.post(
 postRouter.post("/fetchFollowPosts", PostActions.handleFetchFollowPosts);
 postRouter.get("/fetchUserPosts", PostActions.handleFetchUserPosts);
 postRouter.get("/fetchTaggedPosts", PostActions.handleTaggedUserPosts);
+postRouter.get(
+  "/fetchPost",
+  postValidator("fetch"),
+  validate,
+  PostActions.handleFetchPost
+);
